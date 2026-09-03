@@ -125,6 +125,11 @@ export function App() {
     }
   };
 
+  const handleDeleteWorkout = (id: string) => {
+    const updated = StorageService.deleteWorkout(id);
+    setWorkouts(updated);
+  };
+
   const handleToggleUnit = () => {
     const newUnit = settings.unit === 'kg' ? 'lbs' : 'kg';
     const updated = { ...settings, unit: newUnit as 'kg' | 'lbs' };
@@ -260,6 +265,7 @@ export function App() {
             historySessions={workouts}
             prs={prs}
             settings={settings}
+            onDeleteSession={handleDeleteWorkout}
           />
         )}
 

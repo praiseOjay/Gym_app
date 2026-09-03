@@ -15,13 +15,27 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
   onClose,
   onApplyWeight
 }) => {
+  const [barWeight, setBarWeight] = useState(unit === 'kg' ? 20 : 45);
   const [weight, setWeight] = useState(initialWeight || (unit === 'kg' ? 60 : 135));
-  const barWeight = unit === 'kg' ? 20 : 45;
   const plateCalc = calculateBarbellPlates(weight, unit, barWeight);
 
   const adjustWeight = (delta: number) => {
     setWeight((prev) => Math.max(barWeight, Math.round((prev + delta) * 10) / 10));
   };
+
+  const barPresets = unit === 'kg'
+    ? [
+        { label: 'Olympic 20kg', wt: 20 },
+        { label: "Women's 15kg", wt: 15 },
+        { label: 'EZ Curl 10kg', wt: 10 },
+        { label: 'Smith 15kg', wt: 15 }
+      ]
+    : [
+        { label: 'Olympic 45lb', wt: 45 },
+        { label: "Women's 35lb", wt: 35 },
+        { label: 'EZ Curl 25lb', wt: 25 },
+        { label: 'Smith 30lb', wt: 30 }
+      ];
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -32,7 +46,7 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
           <div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Barbell Plate Calculator</h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              Standard {barWeight}{unit} Olympic Barbell
+              Visual plate rack loading ({barWeight} {unit} bar)
             </p>
           </div>
           <button
@@ -47,6 +61,27 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
           >
             <X size={22} />
           </button>
+        </div>
+
+        {/* Bar Type Presets */}
+        <div className="quick-prompts-row" style={{ marginTop: 8, marginBottom: 10 }}>
+          {barPresets.map((b) => (
+            <button
+              key={b.label}
+              className="quick-prompt-chip"
+              style={{
+                background: barWeight === b.wt ? 'var(--accent-volt)' : undefined,
+                color: barWeight === b.wt ? '#050D0A' : undefined,
+                fontWeight: barWeight === b.wt ? 800 : undefined
+              }}
+              onClick={() => {
+                setBarWeight(b.wt);
+                if (weight < b.wt) setWeight(b.wt);
+              }}
+            >
+              {b.label}
+            </button>
+          ))}
         </div>
 
         {/* Target Weight Controls */}

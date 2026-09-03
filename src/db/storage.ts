@@ -217,6 +217,12 @@ export const StorageService = {
     this.saveWorkouts(all);
   },
 
+  deleteWorkout(id: string): WorkoutSession[] {
+    const all = this.getWorkouts().filter((w) => w.id !== id);
+    this.saveWorkouts(all);
+    return all;
+  },
+
   getRoutines(): Routine[] {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.ROUTINES);

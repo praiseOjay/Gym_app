@@ -25,13 +25,15 @@ import {
   Calculator,
   Scale,
   Plus,
-  BookOpen
+  BookOpen,
+  Trash2
 } from 'lucide-react';
 
 interface AnalyticsViewProps {
   historySessions: WorkoutSession[];
   prs: PRRecord[];
   settings: UserSettings;
+  onDeleteSession?: (id: string) => void;
 }
 
 type TabType = 'overview' | 'muscleVolume' | 'graphs' | 'calendar' | 'prs' | 'tools';
@@ -39,7 +41,8 @@ type TabType = 'overview' | 'muscleVolume' | 'graphs' | 'calendar' | 'prs' | 'to
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   historySessions,
   prs,
-  settings
+  settings,
+  onDeleteSession
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
@@ -723,14 +726,39 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                         </div>
                       )}
 
-                      <button
-                        className="btn-secondary"
-                        style={{ padding: '6px 12px', fontSize: '0.75rem', marginTop: 6, alignSelf: 'flex-start' }}
-                        onClick={() => setInspectedSession(s)}
-                      >
-                        <Clock size={13} />
-                        View Full Workout Debrief
-                      </button>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
+                        <button
+                          className="btn-secondary"
+                          style={{ padding: '6px 12px', fontSize: '0.75rem' }}
+                          onClick={() => setInspectedSession(s)}
+                        >
+                          <Clock size={13} />
+                          View Full Workout Debrief
+                        </button>
+
+                        {onDeleteSession && (
+                          <button
+                            className="btn-secondary"
+                            style={{
+                              padding: '6px 12px',
+                              fontSize: '0.75rem',
+                              color: 'var(--accent-crimson)',
+                              borderColor: 'rgba(255, 51, 102, 0.35)'
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`Delete workout log for "${s.routineName}" on ${new Date(s.date).toLocaleDateString()}?`)) {
+                                onDeleteSession(s.id);
+                                triggerHaptic('medium');
+                              }
+                            }}
+                            title="Delete this session from history"
+                          >
+                            <Trash2 size={13} />
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

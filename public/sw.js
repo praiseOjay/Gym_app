@@ -3,6 +3,7 @@ const ASSETS = [
   '/',
   '/index.html',
   '/favicon.svg',
+  '/app-icon.svg',
   '/icons.svg',
   '/manifest.webmanifest'
 ];

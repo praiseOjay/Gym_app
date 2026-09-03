@@ -467,19 +467,19 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                     <span>{ex.muscleGroup}</span>
                     <span>•</span>
                     <span>{ex.equipment}</span>
-                    {ex.equipment === 'Barbell' && (
+                    {(ex.equipment === 'Barbell' || ex.equipment === 'Smith Machine') && (
                       <button
-                        className="timer-chip"
-                        style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 8px' }}
+                        className="plate-badge-btn"
                         onClick={() =>
                           setPlateModalWeight({
-                            weight: ex.sets[0]?.weightKg || 60,
+                            weight: ex.sets.find((s) => s.weightKg > 0)?.weightKg || 60,
                             exerciseIdx: exIdx,
                             setIdx: 0
                           })
                         }
+                        title="Visual barbell plate calculator"
                       >
-                        <Calculator size={12} /> Plate Calc
+                        <Calculator size={11} /> Plates
                       </button>
                     )}
                     <button
@@ -598,11 +598,26 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                           : '—'}
                       </div>
 
-                      <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <button
+                          type="button"
+                          className="stepper-btn"
+                          onClick={() => {
+                            const cur = displayWeight(set.weightKg);
+                            const step = settings.unit === 'lbs' ? 5 : 2.5;
+                            const next = Math.max(0, Math.round((cur - step) * 10) / 10);
+                            handleSetChange(exIdx, setIdx, 'weightKg', toStorageWeight(next));
+                            triggerHaptic('light', settings.vibrationEnabled);
+                          }}
+                          title={`- ${settings.unit === 'lbs' ? 5 : 2.5}${settings.unit}`}
+                        >
+                          -
+                        </button>
                         <input
                           type="number"
                           step="0.5"
                           className="set-input-box"
+                          style={{ minWidth: 42, padding: '8px 2px', fontSize: '0.85rem' }}
                           value={displayWeight(set.weightKg) || ''}
                           placeholder={String(displayWeight(overload.targetWeight))}
                           onChange={(e) =>
@@ -614,6 +629,20 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                             )
                           }
                         />
+                        <button
+                          type="button"
+                          className="stepper-btn"
+                          onClick={() => {
+                            const cur = displayWeight(set.weightKg);
+                            const step = settings.unit === 'lbs' ? 5 : 2.5;
+                            const next = Math.round((cur + step) * 10) / 10;
+                            handleSetChange(exIdx, setIdx, 'weightKg', toStorageWeight(next));
+                            triggerHaptic('light', settings.vibrationEnabled);
+                          }}
+                          title={`+ ${settings.unit === 'lbs' ? 5 : 2.5}${settings.unit}`}
+                        >
+                          +
+                        </button>
                       </div>
 
                       <div>
