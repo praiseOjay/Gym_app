@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Exercise, MuscleGroup } from '../types/gym';
 import { X, Play, Target, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ExerciseMotionPlayer } from './ExerciseMotionPlayer';
 
 interface ExerciseDetailModalProps {
   exercise: Exercise | {
@@ -201,247 +202,95 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
           </button>
         </div>
 
-        {/* Visual Biomechanical Demo Graphic */}
+        {/* Animated Kinematic Motion Capture Player */}
+        <ExerciseMotionPlayer
+          exerciseName={exercise.name}
+          muscleGroup={exercise.muscleGroup}
+          equipment={exercise.equipment}
+          category={exercise.category}
+        />
+
+        {/* Biomechanical Kinematics & Cadence Badge Row */}
         <div
           style={{
-            background: 'linear-gradient(135deg, rgba(14, 20, 32, 0.95), rgba(7, 10, 16, 0.95))',
-            border: '1px solid rgba(0, 245, 155, 0.25)',
-            borderRadius: 'var(--radius-xl)',
-            padding: '16px',
-            position: 'relative',
-            overflow: 'hidden'
+            background: 'var(--bg-card)',
+            padding: '12px 14px',
+            borderRadius: 'var(--radius-lg)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6
           }}
         >
-          <div
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800 }}>
+                Kinematic Plane · {isBackMuscle ? 'Posterior Chain' : 'Anterior Vector'}
+              </div>
+              <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff' }}>
+                {biomechanics.movement}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 6 }}>
+              <span
+                style={{
+                  fontSize: '0.68rem',
+                  background: 'rgba(0, 229, 255, 0.1)',
+                  color: 'var(--accent-cyan)',
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontWeight: 700
+                }}
+              >
+                🎯 {repRange[0]}–{repRange[1]} Reps
+              </span>
+              <span
+                style={{
+                  fontSize: '0.68rem',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  color: '#fff',
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontWeight: 700
+                }}
+              >
+                ⚡ RPE {rpe}
+              </span>
+            </div>
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '0.72rem', color: 'var(--accent-volt)', fontWeight: 800 }}>
+              Hypertrophy Cadence:
+            </span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+              {biomechanics.tempo}
+            </span>
+          </div>
+
+          <a
+            href={searchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary"
             style={{
-              position: 'absolute',
-              top: 10,
-              right: 12,
-              fontSize: '0.65rem',
-              fontWeight: 800,
-              color: 'var(--accent-volt)',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
+              width: '100%',
               display: 'flex',
               alignItems: 'center',
-              gap: 4
+              justifyContent: 'center',
+              gap: 8,
+              padding: '7px 12px',
+              fontSize: '0.78rem',
+              color: '#fff',
+              borderColor: 'rgba(0, 245, 155, 0.35)',
+              background: 'rgba(0, 245, 155, 0.06)',
+              textDecoration: 'none',
+              marginTop: 4
             }}
           >
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                backgroundColor: 'var(--accent-volt)',
-                boxShadow: '0 0 8px var(--accent-volt)'
-              }}
-            />
-            Biomechanical Visualizer
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            {/* Animated SVG Target Silhouette */}
-            <div
-              style={{
-                width: 100,
-                height: 120,
-                background: 'rgba(0, 0, 0, 0.4)',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border-subtle)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                flexShrink: 0
-              }}
-            >
-              <svg width="84" height="110" viewBox="0 0 100 130">
-                <defs>
-                  <filter id="voltGlow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="3" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                  </filter>
-                </defs>
-
-                {/* Body Outline Silhouette */}
-                <g fill="#1A2233" stroke="rgba(255, 255, 255, 0.12)" strokeWidth="1.5">
-                  {/* Head */}
-                  <circle cx="50" cy="16" r="9" />
-                  {/* Neck */}
-                  <rect x="47" y="24" width="6" height="5" />
-                  {/* Torso */}
-                  <path d="M34 29 L66 29 L60 74 L40 74 Z" />
-                  {/* Left Arm */}
-                  <path d="M33 29 L23 48 L17 68 L22 70 L28 50 L34 35 Z" />
-                  {/* Right Arm */}
-                  <path d="M67 29 L77 48 L83 68 L78 70 L72 50 L66 35 Z" />
-                  {/* Hips & Legs */}
-                  <path d="M40 74 L37 98 L34 122 L44 122 L48 98 L50 78 L52 98 L56 122 L66 122 L63 98 L60 74 Z" />
-                </g>
-
-                {/* Highlighted Primary Muscle with Animation */}
-                {muscle === 'Chest' && (
-                  <path
-                    d="M37 34 C43 32, 57 32, 63 34 C64 45, 58 52, 50 52 C42 52, 36 45, 37 34 Z"
-                    fill="var(--accent-volt)"
-                    filter="url(#voltGlow)"
-                    style={{
-                      animation: 'pulse 1.8s infinite ease-in-out',
-                      transformOrigin: '50px 40px'
-                    }}
-                  />
-                )}
-
-                {muscle === 'Back' && (
-                  <path
-                    d="M38 32 C45 30, 55 30, 62 32 C65 48, 62 62, 50 62 C38 62, 35 48, 38 32 Z"
-                    fill="var(--accent-volt)"
-                    filter="url(#voltGlow)"
-                    style={{
-                      animation: 'pulse 1.8s infinite ease-in-out',
-                      transformOrigin: '50px 45px'
-                    }}
-                  />
-                )}
-
-                {muscle === 'Shoulders' && (
-                  <g fill="var(--accent-volt)" filter="url(#voltGlow)">
-                    <circle cx="33" cy="33" r="5" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                    <circle cx="67" cy="33" r="5" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                  </g>
-                )}
-
-                {muscle === 'Biceps' && (
-                  <g fill="var(--accent-volt)" filter="url(#voltGlow)">
-                    <ellipse cx="27" cy="46" rx="4" ry="7" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                    <ellipse cx="73" cy="46" rx="4" ry="7" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                  </g>
-                )}
-
-                {muscle === 'Triceps' && (
-                  <g fill="var(--accent-volt)" filter="url(#voltGlow)">
-                    <ellipse cx="25" cy="47" rx="3.5" ry="7" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                    <ellipse cx="75" cy="47" rx="3.5" ry="7" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                  </g>
-                )}
-
-                {muscle === 'Forearms' && (
-                  <g fill="var(--accent-volt)" filter="url(#voltGlow)">
-                    <rect x="18" y="56" width="5" height="12" rx="2" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                    <rect x="77" y="56" width="5" height="12" rx="2" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                  </g>
-                )}
-
-                {muscle === 'Quads' && (
-                  <g fill="var(--accent-volt)" filter="url(#voltGlow)">
-                    <path d="M39 77 C44 77, 47 88, 45 96 C41 96, 37 88, 39 77 Z" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                    <path d="M61 77 C56 77, 53 88, 55 96 C59 96, 63 88, 61 77 Z" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                  </g>
-                )}
-
-                {(muscle === 'Hamstrings' || muscle === 'Glutes') && (
-                  <g fill="var(--accent-volt)" filter="url(#voltGlow)">
-                    <path d="M39 75 C45 75, 48 88, 45 98 C40 98, 36 88, 39 75 Z" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                    <path d="M61 75 C55 75, 52 88, 55 98 C60 98, 64 88, 61 75 Z" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                  </g>
-                )}
-
-                {muscle === 'Calves' && (
-                  <g fill="var(--accent-volt)" filter="url(#voltGlow)">
-                    <ellipse cx="37" cy="110" rx="4" ry="7" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                    <ellipse cx="63" cy="110" rx="4" ry="7" style={{ animation: 'pulse 1.8s infinite ease-in-out' }} />
-                  </g>
-                )}
-
-                {muscle === 'Abs' && (
-                  <rect
-                    x="44"
-                    y="50"
-                    width="12"
-                    height="20"
-                    rx="2"
-                    fill="var(--accent-volt)"
-                    filter="url(#voltGlow)"
-                    style={{ animation: 'pulse 1.8s infinite ease-in-out' }}
-                  />
-                )}
-              </svg>
-            </div>
-
-            {/* Kinetic Biomechanics Details */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div>
-                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800 }}>
-                  Motion Vector · {isBackMuscle ? 'Posterior' : 'Anterior'}
-                </div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff' }}>
-                  {biomechanics.movement}
-                </div>
-              </div>
-
-              <div>
-                <div style={{ fontSize: '0.65rem', color: 'var(--accent-volt)', textTransform: 'uppercase', fontWeight: 800 }}>
-                  Hypertrophy Cadence
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
-                  {biomechanics.tempo}
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
-                <span
-                  style={{
-                    fontSize: '0.65rem',
-                    background: 'rgba(0, 229, 255, 0.1)',
-                    color: 'var(--accent-cyan)',
-                    padding: '2px 6px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontWeight: 700
-                  }}
-                >
-                  🎯 {repRange[0]}–{repRange[1]} Reps
-                </span>
-                <span
-                  style={{
-                    fontSize: '0.65rem',
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    color: '#fff',
-                    padding: '2px 6px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontWeight: 700
-                  }}
-                >
-                  ⚡ RPE {rpe}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Video Demonstration Link */}
-          <div style={{ marginTop: 12, borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: 10 }}>
-            <a
-              href={searchUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary"
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                padding: '8px 12px',
-                fontSize: '0.8rem',
-                color: '#fff',
-                borderColor: 'rgba(0, 245, 155, 0.4)',
-                background: 'rgba(0, 245, 155, 0.08)',
-                textDecoration: 'none'
-              }}
-            >
-              <Play size={14} color="var(--accent-volt)" fill="var(--accent-volt)" />
-              <span>Watch 30s Form Video Demo ↗</span>
-            </a>
-          </div>
+            <Play size={13} color="var(--accent-volt)" fill="var(--accent-volt)" />
+            <span>Watch 30s Real Video Form Demo ↗</span>
+          </a>
         </div>
 
         {/* Step-by-Step Execution Instructions */}
