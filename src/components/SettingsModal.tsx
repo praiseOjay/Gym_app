@@ -111,19 +111,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Units Preference */}
-        <div className="gym-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="gym-card" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Scale size={18} color="var(--accent-volt)" />
-              <span style={{ fontWeight: 700 }}>Weight Measurement</span>
+              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Weight Measurement</span>
             </div>
-            <div style={{ display: 'flex', gap: 4 }}>
+            <div style={{ display: 'flex', gap: 6 }}>
               <button
                 className="timer-chip"
                 style={{
                   background: localSettings.unit === 'kg' ? 'var(--accent-volt)' : undefined,
                   color: localSettings.unit === 'kg' ? '#050D0A' : undefined,
-                  fontWeight: 800
+                  fontWeight: 800,
+                  padding: '6px 14px'
                 }}
                 onClick={() => setLocalSettings({ ...localSettings, unit: 'kg' })}
               >
@@ -134,7 +135,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 style={{
                   background: localSettings.unit === 'lbs' ? 'var(--accent-volt)' : undefined,
                   color: localSettings.unit === 'lbs' ? '#050D0A' : undefined,
-                  fontWeight: 800
+                  fontWeight: 800,
+                  padding: '6px 14px'
                 }}
                 onClick={() => setLocalSettings({ ...localSettings, unit: 'lbs' })}
               >
@@ -149,20 +151,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           className="gym-card"
           style={{
             border: '1px solid rgba(0, 245, 155, 0.3)',
-            background: 'linear-gradient(180deg, rgba(0, 245, 155, 0.05) 0%, var(--bg-card) 100%)'
+            background: 'linear-gradient(180deg, rgba(0, 245, 155, 0.05) 0%, var(--bg-card) 100%)',
+            padding: '16px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, flexWrap: 'wrap', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Target size={18} color="var(--accent-volt)" />
-              <span style={{ fontWeight: 700 }}>Body Metrics & Goals</span>
+              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Body Metrics & Goals</span>
             </div>
             {weightDeltaKg !== null && (
               <span
                 style={{
                   fontSize: '0.72rem',
                   fontWeight: 800,
-                  padding: '3px 8px',
+                  padding: '4px 10px',
                   borderRadius: 'var(--radius-full)',
                   background: weightDeltaKg > 0 ? 'rgba(0, 245, 155, 0.15)' : 'rgba(0, 229, 255, 0.15)',
                   color: weightDeltaKg > 0 ? 'var(--accent-volt)' : 'var(--accent-cyan)'
@@ -175,17 +178,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px 12px' }}>
             {/* Current Weight */}
             <div>
-              <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: 4 }}>
+              <label className="settings-label">
                 Current Weight ({localSettings.unit})
               </label>
               <input
                 type="number"
                 step="0.1"
-                className="set-input-box"
-                style={{ textAlign: 'left', padding: '8px 12px' }}
+                className="settings-input"
                 value={displayCurrentWeight}
                 onChange={(e) => handleCurrentWeightChange(e.target.value)}
                 placeholder={localSettings.unit === 'kg' ? '80' : '176'}
@@ -194,14 +196,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {/* Target Weight */}
             <div>
-              <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: 4 }}>
+              <label className="settings-label">
                 Target Weight ({localSettings.unit})
               </label>
               <input
                 type="number"
                 step="0.1"
-                className="set-input-box"
-                style={{ textAlign: 'left', padding: '8px 12px' }}
+                className="settings-input"
                 value={displayTargetWeight}
                 onChange={(e) => handleTargetWeightChange(e.target.value)}
                 placeholder={localSettings.unit === 'kg' ? '85' : '187'}
@@ -210,13 +211,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {/* Height */}
             <div>
-              <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: 4 }}>
+              <label className="settings-label">
                 Height (cm)
               </label>
               <input
                 type="number"
-                className="set-input-box"
-                style={{ textAlign: 'left', padding: '8px 12px' }}
+                className="settings-input"
                 value={localSettings.heightCm || ''}
                 onChange={(e) =>
                   setLocalSettings({ ...localSettings, heightCm: parseFloat(e.target.value) || undefined })
@@ -227,13 +227,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {/* Age */}
             <div>
-              <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: 4 }}>
+              <label className="settings-label">
                 Age (years)
               </label>
               <input
                 type="number"
-                className="set-input-box"
-                style={{ textAlign: 'left', padding: '8px 12px' }}
+                className="settings-input"
                 value={localSettings.age || ''}
                 onChange={(e) =>
                   setLocalSettings({ ...localSettings, age: parseInt(e.target.value, 10) || undefined })
@@ -247,13 +246,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {(bmi || heightFtIn) && (
             <div
               style={{
-                marginTop: 12,
-                fontSize: '0.75rem',
+                marginTop: 14,
+                fontSize: '0.78rem',
                 color: 'var(--text-secondary)',
                 display: 'flex',
                 justifyContent: 'space-between',
                 borderTop: '1px solid var(--border-subtle)',
-                paddingTop: 8
+                paddingTop: 10
               }}
             >
               {bmi && (
@@ -271,19 +270,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Gemini API Key */}
-        <div className="gym-card">
+        <div className="gym-card" style={{ padding: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <Key size={18} color="var(--accent-cyan)" />
-            <span style={{ fontWeight: 700 }}>Google Gemini API Key</span>
+            <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Google Gemini API Key</span>
           </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
-            Enables instant workout debriefs, smart equipment alternatives, and interactive AI coaching.
+          <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginBottom: 10, lineHeight: 1.45 }}>
+            Powers instant workout debriefs, smart equipment alternatives, and interactive AI coaching.
           </p>
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <input
               type={showKey ? 'text' : 'password'}
-              className="set-input-box"
-              style={{ textAlign: 'left', padding: '8px 12px', flex: 1 }}
+              className="settings-input"
+              style={{ flex: 1, fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}
               value={localSettings.geminiApiKey}
               onChange={(e) =>
                 setLocalSettings({ ...localSettings, geminiApiKey: e.target.value })
@@ -291,9 +290,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               placeholder="AIzaSy..."
             />
             <button
+              type="button"
               className="timer-chip"
               onClick={() => setShowKey(!showKey)}
-              style={{ whiteSpace: 'nowrap' }}
+              style={{ minHeight: 44, padding: '0 16px', fontWeight: 800, whiteSpace: 'nowrap' }}
             >
               {showKey ? 'Hide' : 'Show'}
             </button>
@@ -301,15 +301,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Rest Timer Default */}
-        <div className="gym-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="gym-card" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Clock size={18} color="var(--accent-amber)" />
-              <span style={{ fontWeight: 700 }}>Default Rest Timer</span>
+              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Default Rest Timer</span>
             </div>
             <select
-              className="set-input-box"
-              style={{ width: 'auto', padding: '6px 10px', fontSize: '0.85rem' }}
+              className="settings-input"
+              style={{ width: 'auto', minWidth: 160, minHeight: 42, padding: '8px 12px', fontSize: '0.85rem' }}
               value={localSettings.defaultRestSeconds}
               onChange={(e) =>
                 setLocalSettings({
@@ -327,15 +327,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Sound Toggle */}
-        <div className="gym-card">
+        <div className="gym-card" style={{ padding: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Volume2 size={18} color="#fff" />
-              <span style={{ fontWeight: 700 }}>Audio Chimes & PR Fanfare</span>
+              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Audio Chimes & PR Fanfare</span>
             </div>
             <input
               type="checkbox"
-              style={{ width: 20, height: 20, accentColor: 'var(--accent-volt)', cursor: 'pointer' }}
+              style={{ width: 22, height: 22, accentColor: 'var(--accent-volt)', cursor: 'pointer' }}
               checked={localSettings.soundEnabled}
               onChange={(e) =>
                 setLocalSettings({ ...localSettings, soundEnabled: e.target.checked })
@@ -345,15 +345,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Athlete Name */}
-        <div className="gym-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+        <div className="gym-card" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <User size={18} color="#fff" />
-            <span style={{ fontWeight: 700 }}>Athlete Name</span>
+            <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Athlete Name</span>
           </div>
           <input
             type="text"
-            className="set-input-box"
-            style={{ textAlign: 'left', padding: '8px 12px' }}
+            className="settings-input"
             value={localSettings.userName}
             onChange={(e) => setLocalSettings({ ...localSettings, userName: e.target.value })}
             placeholder="Athlete"
@@ -361,8 +360,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 6 }}>
-          <button className="btn-primary" onClick={handleSave}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10, paddingBottom: 16 }}>
+          <button className="btn-primary" style={{ minHeight: 48, fontSize: '1rem', fontWeight: 800 }} onClick={handleSave}>
             {savedAlert ? (
               <>
                 <Check size={18} /> Settings Saved!

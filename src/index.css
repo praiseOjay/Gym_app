@@ -818,6 +818,44 @@ body {
   background: rgba(255, 255, 255, 0.2);
   align-self: center;
   margin-bottom: 6px;
+  flex-shrink: 0;
+}
+
+.modal-sheet > * {
+  flex-shrink: 0;
+}
+
+/* Dedicated Form Input Styles for Modals & Settings */
+.settings-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 10px 14px;
+  min-height: 44px;
+  width: 100%;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.settings-input:focus {
+  border-color: var(--accent-volt);
+  box-shadow: 0 0 10px var(--accent-volt-glow);
+  background: var(--bg-surface);
+}
+
+.settings-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 6px;
 }
 
 /* AI Coach Chat View */
