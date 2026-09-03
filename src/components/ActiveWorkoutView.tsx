@@ -21,6 +21,7 @@ import { triggerHaptic } from '../utils/haptics';
 import { PlateCalculatorModal } from './PlateCalculatorModal';
 import { SmartSwapModal } from './SmartSwapModal';
 import { RestTimerFloating } from './RestTimerFloating';
+import { ExerciseDetailModal } from './ExerciseDetailModal';
 import {
   Check,
   Plus,
@@ -31,7 +32,8 @@ import {
   X,
   ArrowUp,
   ArrowDown,
-  Trash2
+  Trash2,
+  Info
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -68,6 +70,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   const [showAddExerciseModal, setShowAddExerciseModal] = useState(false);
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState<string>('All');
   const [newPRNotice, setNewPRNotice] = useState<string | null>(null);
+  const [inspectExerciseDetails, setInspectExerciseDetails] = useState<Exercise | null>(null);
 
   // Live timer tick
   useEffect(() => {
@@ -460,7 +463,31 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                         <ArrowDown size={13} />
                       </button>
                     </div>
-                    <div className="exercise-name">{ex.name}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div className="exercise-name">{ex.name}</div>
+                      <button
+                        type="button"
+                        className="icon-ctrl-btn"
+                        style={{ width: 22, height: 22, borderRadius: '50%', color: 'var(--accent-cyan)' }}
+                        onClick={() => {
+                          const fullMeta = EXERCISE_LIBRARY.find((e) => e.id === ex.exerciseId || e.name === ex.name);
+                          setInspectExerciseDetails(fullMeta || {
+                            id: ex.exerciseId,
+                            name: ex.name,
+                            muscleGroup: ex.muscleGroup,
+                            secondaryMuscles: [],
+                            equipment: ex.equipment,
+                            category: 'Compound',
+                            targetRepRange: [8, 12],
+                            targetRpe: 8
+                          });
+                          triggerHaptic('light', settings.vibrationEnabled);
+                        }}
+                        title="View visual demo, execution cues & video"
+                      >
+                        <Info size={12} />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="exercise-meta-tags" style={{ marginTop: 4 }}>
@@ -851,6 +878,14 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Exercise Detail & Visual Demo Modal */}
+      {inspectExerciseDetails && (
+        <ExerciseDetailModal
+          exercise={inspectExerciseDetails}
+          onClose={() => setInspectExerciseDetails(null)}
+        />
       )}
     </div>
   );

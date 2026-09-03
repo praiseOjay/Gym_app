@@ -3,6 +3,7 @@ import type { Routine, Exercise, RoutineExerciseTemplate } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import { triggerHaptic } from '../utils/haptics';
 import { sounds } from '../utils/audio';
+import { ExerciseDetailModal } from './ExerciseDetailModal';
 import {
   Play,
   Clock,
@@ -735,62 +736,12 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
         </div>
       )}
 
-      {/* Exercise Detail Modal */}
+      {/* Exercise Detail Modal with Biomechanical Visual Demo */}
       {inspectExercise && (
-        <div className="modal-overlay" onClick={() => setInspectExercise(null)}>
-          <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-handle" />
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--accent-volt)', textTransform: 'uppercase' }}>
-                  {inspectExercise.muscleGroup} · {inspectExercise.equipment}
-                </span>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>
-                  {inspectExercise.name}
-                </h3>
-              </div>
-              <button
-                onClick={() => setInspectExercise(null)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
-              >
-                <X size={22} />
-              </button>
-            </div>
-
-            {inspectExercise.instructions && (
-              <div style={{ background: 'var(--bg-card)', padding: '12px 14px', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-cyan)', textTransform: 'uppercase', marginBottom: 4 }}>
-                  Execution Instructions
-                </div>
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
-                  {inspectExercise.instructions}
-                </p>
-              </div>
-            )}
-
-            {inspectExercise.tips && inspectExercise.tips.length > 0 && (
-              <div style={{ background: 'var(--bg-surface)', padding: '12px 14px', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-volt)', textTransform: 'uppercase', marginBottom: 4 }}>
-                  Hypertrophy Cues
-                </div>
-                <ul style={{ paddingLeft: 16, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                  {inspectExercise.tips.map((t, idx) => (
-                    <li key={idx} style={{ marginBottom: 4 }}>{t}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <button
-              className="btn-primary"
-              style={{ width: '100%', marginTop: 8 }}
-              onClick={() => setInspectExercise(null)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <ExerciseDetailModal
+          exercise={inspectExercise}
+          onClose={() => setInspectExercise(null)}
+        />
       )}
     </div>
   );
