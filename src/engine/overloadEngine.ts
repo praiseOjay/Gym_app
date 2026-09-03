@@ -5,7 +5,8 @@ import type {
   MuscleGroup,
   MuscleRecoveryState,
   PlateCalculation,
-  PRRecord
+  PRRecord,
+  MuscleVolumeLandmark
 } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 
@@ -46,14 +47,16 @@ export function formatWeight(weightKg: number, unit: 'kg' | 'lbs'): string {
 
 /**
  * Determines whether a set is a Personal Record (PR).
+ * Automatically excludes warmup sets from PR detection.
  */
 export function checkIfPR(
   exerciseId: string,
   weightKg: number,
   reps: number,
-  existingPRs: PRRecord[]
+  existingPRs: PRRecord[],
+  setType?: string
 ): { isPR: boolean; type?: '1RM' | 'MaxWeight' | 'MaxVolume'; prevRecord?: number } {
-  if (weightKg <= 0 || reps <= 0) return { isPR: false };
+  if (weightKg <= 0 || reps <= 0 || setType === 'warmup') return { isPR: false };
 
   const est1RM = calculate1RM(weightKg, reps);
   const existing1RMPR = existingPRs.find(
@@ -295,6 +298,7 @@ export function calculateMuscleRecovery(
     'Calves',
     'Biceps',
     'Triceps',
+    'Forearms',
     'Abs'
   ];
 
@@ -364,4 +368,155 @@ export function calculateMuscleRecovery(
   });
 
   return result;
+}
+
+export interface WarmupSetPlan {
+  weightKg: number;
+  reps: number;
+  percent: number;
+  label: string;
+}
+
+/**
+ * Generates an optimal 4-stage progressive warmup ramp based on the target working set load.
+ * 1. Empty Olympic Bar (20kg) x 10
+ * 2. Light Ramp (~50%) x 5
+ * 3. Moderate Ramp (~72%) x 3
+ * 4. Neural Potentiation (~88%) x 1
+ */
+export function generateWarmupSets(
+  targetWorkingWeightKg: number,
+  barWeightKg = 20
+): WarmupSetPlan[] {
+  if (targetWorkingWeightKg <= barWeightKg) {
+    return [
+      { weightKg: barWeightKg, reps: 10, percent: 100, label: 'Bar Warmup' }
+    ];
+  }
+
+  const roundToPlate = (w: number) => Math.max(barWeightKg, Math.round(w / 2.5) * 2.5);
+
+  const rawStages: WarmupSetPlan[] = [
+    { weightKg: barWeightKg, reps: 10, percent: Math.round((barWeightKg / targetWorkingWeightKg) * 100), label: 'Empty Bar' },
+    { weightKg: roundToPlate(targetWorkingWeightKg * 0.5), reps: 5, percent: 50, label: 'Light Ramp (50%)' },
+    { weightKg: roundToPlate(targetWorkingWeightKg * 0.72), reps: 3, percent: 72, label: 'Moderate Ramp (72%)' },
+    { weightKg: roundToPlate(targetWorkingWeightKg * 0.88), reps: 1, percent: 88, label: 'Potentiation (88%)' }
+  ];
+
+  // Deduplicate and ensure each ramp stage is strictly increasing and below target
+  const valid: WarmupSetPlan[] = [];
+  for (const stage of rawStages) {
+    if (stage.weightKg < targetWorkingWeightKg && (!valid.length || stage.weightKg > valid[valid.length - 1].weightKg)) {
+      valid.push(stage);
+    }
+  }
+
+  return valid.length > 0 ? valid : [{ weightKg: barWeightKg, reps: 8, percent: 100, label: 'Bar Warmup' }];
+}
+
+export interface RepMaxEntry {
+  reps: number;
+  epleyWeight: number;
+  brzyckiWeight: number;
+  avgWeight: number;
+  percentage: number;
+}
+
+/**
+ * Calculates a complete 1RM to 12RM table based on weight and reps performed.
+ * Combines Epley and Brzycki equations for maximum precision.
+ */
+export function calculateRepMaxTable(weightKg: number, reps: number): RepMaxEntry[] {
+  if (weightKg <= 0 || reps <= 0) return [];
+  const oneRmEpley = reps === 1 ? weightKg : weightKg * (1 + reps / 30);
+  const oneRmBrzycki = reps === 1 ? weightKg : weightKg * (36 / (37 - reps));
+  const base1RM = (oneRmEpley + oneRmBrzycki) / 2;
+
+  const repCounts = [1, 2, 3, 4, 5, 6, 8, 10, 12];
+  return repCounts.map((r) => {
+    const epley = Math.round((base1RM / (1 + r / 30)) * 10) / 10;
+    const brzycki = Math.round((base1RM * ((37 - r) / 36)) * 10) / 10;
+    const avg = Math.round(((epley + brzycki) / 2) * 10) / 10;
+    const pct = Math.round((avg / base1RM) * 100);
+    return {
+      reps: r,
+      epleyWeight: epley,
+      brzyckiWeight: brzycki,
+      avgWeight: avg,
+      percentage: pct
+    };
+  });
+}
+
+/**
+ * Calculates total weekly working sets per muscle group and maps against
+ * hypertrophy science landmarks (Maintenance MV, Minimum Effective MEV,
+ * Optimal Growth MAV, and Max Recoverable MRV).
+ */
+export function calculateMuscleWeeklySets(
+  sessions: WorkoutSession[],
+  days = 7
+): MuscleVolumeLandmark[] {
+  const muscleGroups: MuscleGroup[] = [
+    'Chest',
+    'Back',
+    'Shoulders',
+    'Quads',
+    'Hamstrings',
+    'Glutes',
+    'Calves',
+    'Biceps',
+    'Triceps',
+    'Forearms',
+    'Abs'
+  ];
+
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const recentSessions = sessions.filter((s) => new Date(s.date).getTime() >= cutoff);
+
+  return muscleGroups.map((muscle) => {
+    let directSets = 0;
+    for (const s of recentSessions) {
+      for (const ex of s.exercises) {
+        const exMeta = EXERCISE_LIBRARY.find((e) => e.id === ex.exerciseId);
+        const isPrimary = exMeta?.muscleGroup === muscle;
+        const isSecondary = exMeta?.secondaryMuscles.includes(muscle);
+
+        if (isPrimary) {
+          const completedWorkingSets = ex.sets.filter((st) => st.completed && st.type !== 'warmup').length;
+          directSets += completedWorkingSets;
+        } else if (isSecondary) {
+          const completedWorkingSets = ex.sets.filter((st) => st.completed && st.type !== 'warmup').length;
+          directSets += completedWorkingSets * 0.5;
+        }
+      }
+    }
+
+    const roundedSets = Math.round(directSets * 10) / 10;
+
+    let status: 'Maintenance' | 'Minimum Effective' | 'Optimal Growth' | 'Max Recoverable' = 'Maintenance';
+    let color = 'var(--text-muted)';
+
+    if (roundedSets < 6) {
+      status = 'Maintenance';
+      color = '#9E9E9E';
+    } else if (roundedSets < 10) {
+      status = 'Minimum Effective';
+      color = 'var(--accent-cyan)';
+    } else if (roundedSets <= 18) {
+      status = 'Optimal Growth';
+      color = 'var(--accent-volt)';
+    } else {
+      status = 'Max Recoverable';
+      color = 'var(--accent-crimson)';
+    }
+
+    return {
+      muscle,
+      sets: roundedSets,
+      status,
+      recommendedRange: [10, 18],
+      color
+    };
+  });
 }

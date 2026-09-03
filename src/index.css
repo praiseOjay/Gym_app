@@ -111,6 +111,7 @@ body {
   letter-spacing: -0.5px;
   background: linear-gradient(135deg, #FFFFFF 60%, #94A3B8);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -628,6 +629,83 @@ body {
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.set-badge-working {
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  color: var(--accent-cyan);
+}
+
+.set-badge-warmup {
+  border: 1px solid rgba(255, 165, 0, 0.6);
+  background: rgba(255, 165, 0, 0.12);
+  color: #FFA500;
+  font-weight: 900;
+}
+
+.set-badge-drop {
+  border: 1px solid rgba(179, 136, 255, 0.6);
+  background: rgba(179, 136, 255, 0.12);
+  color: #B388FF;
+  font-weight: 900;
+}
+
+.set-badge-failure {
+  border: 1px solid rgba(255, 51, 102, 0.6);
+  background: rgba(255, 51, 102, 0.12);
+  color: #FF3366;
+  font-weight: 900;
+}
+
+.exercise-notes-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.exercise-notes-input:focus {
+  border-style: solid;
+  border-color: var(--accent-cyan);
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.exercise-card-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-ctrl-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.icon-ctrl-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.icon-ctrl-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .set-previous-text {

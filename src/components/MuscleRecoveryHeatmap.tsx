@@ -164,6 +164,24 @@ export const MuscleRecoveryHeatmap: React.FC<MuscleRecoveryHeatmapProps> = ({
                 onClick={() => setSelectedMuscle(getMuscle('Biceps'))}
               />
 
+              {/* FOREARMS (Front) */}
+              <path
+                d="M66 128 C60 138, 56 156, 62 166 C68 166, 74 150, 72 130 Z"
+                fill={getStatusColor(getMuscle('Forearms').status)}
+                opacity="0.85"
+                filter="url(#glow)"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedMuscle(getMuscle('Forearms'))}
+              />
+              <path
+                d="M174 128 C180 138, 184 156, 178 166 C172 166, 166 150, 168 130 Z"
+                fill={getStatusColor(getMuscle('Forearms').status)}
+                opacity="0.85"
+                filter="url(#glow)"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedMuscle(getMuscle('Forearms'))}
+              />
+
               {/* ABS */}
               <rect
                 x="102"
@@ -240,6 +258,24 @@ export const MuscleRecoveryHeatmap: React.FC<MuscleRecoveryHeatmapProps> = ({
                 filter="url(#glow)"
                 style={{ cursor: 'pointer' }}
                 onClick={() => setSelectedMuscle(getMuscle('Triceps'))}
+              />
+
+              {/* FOREARMS (Back) */}
+              <path
+                d="M64 128 C58 138, 56 156, 62 166 C68 166, 74 150, 70 130 Z"
+                fill={getStatusColor(getMuscle('Forearms').status)}
+                opacity="0.85"
+                filter="url(#glow)"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedMuscle(getMuscle('Forearms'))}
+              />
+              <path
+                d="M176 128 C182 138, 184 156, 178 166 C172 166, 166 150, 170 130 Z"
+                fill={getStatusColor(getMuscle('Forearms').status)}
+                opacity="0.85"
+                filter="url(#glow)"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedMuscle(getMuscle('Forearms'))}
               />
 
               {/* GLUTES */}

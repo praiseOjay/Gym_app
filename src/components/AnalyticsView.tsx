@@ -1,6 +1,14 @@
-import React, { useState } from 'react';
-import type { WorkoutSession, PRRecord, UserSettings } from '../types/gym';
-import { kgToLbs } from '../engine/overloadEngine';
+import React, { useState, useMemo } from 'react';
+import type { WorkoutSession, PRRecord, UserSettings, BodyWeightEntry } from '../types/gym';
+import {
+  kgToLbs,
+  lbsToKg,
+  calculateMuscleWeeklySets,
+  calculateRepMaxTable,
+  calculate1RM
+} from '../engine/overloadEngine';
+import { StorageService } from '../db/storage';
+import { triggerHaptic } from '../utils/haptics';
 import { WorkoutCalendar } from './WorkoutCalendar';
 import { ProgressGraph } from './ProgressGraph';
 import { WorkoutSummaryModal } from './WorkoutSummaryModal';
@@ -13,7 +21,11 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
-  Layers
+  Layers,
+  Calculator,
+  Scale,
+  Plus,
+  BookOpen
 } from 'lucide-react';
 
 interface AnalyticsViewProps {
@@ -22,7 +34,7 @@ interface AnalyticsViewProps {
   settings: UserSettings;
 }
 
-type TabType = 'overview' | 'graphs' | 'calendar' | 'prs' | 'history';
+type TabType = 'overview' | 'muscleVolume' | 'graphs' | 'calendar' | 'prs' | 'tools';
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   historySessions,
@@ -33,6 +45,17 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
   const [inspectedSession, setInspectedSession] = useState<WorkoutSession | null>(null);
 
+  // 1RM Calculator State
+  const [calcWeight, setCalcWeight] = useState<number>(100);
+  const [calcReps, setCalcReps] = useState<number>(8);
+
+  // Bodyweight Weigh-In State
+  const [bodyWeightLogs, setBodyWeightLogs] = useState<BodyWeightEntry[]>(
+    StorageService.getBodyWeightLogs()
+  );
+  const [inputWeight, setInputWeight] = useState<string>('');
+  const [inputNote, setInputNote] = useState<string>('');
+
   const displayVolume = (kg: number) => {
     if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
     return `${kg} kg`;
@@ -41,6 +64,31 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   const displayWeight = (kg: number) => {
     if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
     return `${kg} kg`;
+  };
+
+  // Weekly muscle group set volume calculation (MEV / MRV)
+  const muscleVolumeStats = useMemo(() => {
+    return calculateMuscleWeeklySets(historySessions, 7);
+  }, [historySessions]);
+
+  // Real-time 1RM & Rep Max calculations
+  const repMaxTable = useMemo(() => {
+    return calculateRepMaxTable(calcWeight, calcReps);
+  }, [calcWeight, calcReps]);
+
+  const estimated1RM = useMemo(() => {
+    return calculate1RM(calcWeight, calcReps);
+  }, [calcWeight, calcReps]);
+
+  const handleLogWeighIn = () => {
+    const val = parseFloat(inputWeight);
+    if (isNaN(val) || val <= 0) return;
+    const kg = settings.unit === 'lbs' ? lbsToKg(val) : val;
+    const entry = StorageService.addBodyWeightLog(kg, new Date().toISOString(), inputNote.trim() || undefined);
+    setBodyWeightLogs([entry, ...bodyWeightLogs]);
+    setInputWeight('');
+    setInputNote('');
+    triggerHaptic('success');
   };
 
   return (
@@ -53,7 +101,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             Progress & Analytics
           </h2>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-            Mechanical volume graphs, workout calendar & PR tracking
+            Mechanical volume, MEV/MRV muscle sets, calendar & gym tools
           </p>
         </div>
       </div>
@@ -71,9 +119,11 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       >
         {[
           { id: 'overview', label: 'Overview', icon: Layers },
+          { id: 'muscleVolume', label: 'Muscle Sets (MEV/MRV)', icon: Flame },
           { id: 'graphs', label: 'Progression Graph', icon: BarChart3 },
           { id: 'calendar', label: 'Workout Calendar', icon: Calendar },
-          { id: 'prs', label: 'PR Hall of Fame', icon: Trophy }
+          { id: 'prs', label: 'PR Hall of Fame', icon: Trophy },
+          { id: 'tools', label: 'Gym Tools & 1RM', icon: Calculator }
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -104,24 +154,21 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
         })}
       </div>
 
-      {/* OVERVIEW TAB: Shows both Graph and Calendar */}
+      {/* OVERVIEW TAB: Graphs + Calendar + Quick PRs */}
       {activeTab === 'overview' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* Interactive Progression Graph */}
           <ProgressGraph
             historySessions={historySessions}
             prs={prs}
             settings={settings}
           />
 
-          {/* Interactive Workout Calendar */}
           <WorkoutCalendar
             historySessions={historySessions}
             settings={settings}
             onSelectSession={(session) => setInspectedSession(session)}
           />
 
-          {/* Quick PR Highlights Preview */}
           {prs.length > 0 && (
             <div className="gym-card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
@@ -171,26 +218,116 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
         </div>
       )}
 
+      {/* MUSCLE VOLUME MEV/MRV TAB */}
+      {activeTab === 'muscleVolume' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div
+            className="gym-card"
+            style={{
+              background: 'linear-gradient(135deg, rgba(0, 245, 155, 0.08) 0%, var(--bg-card) 100%)',
+              border: '1px solid rgba(0, 245, 155, 0.3)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <Flame size={18} color="var(--accent-volt)" />
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 800 }}>Weekly Muscle Volume (7 Days)</h3>
+            </div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+              Hypertrophy science benchmarks (Dr. Mike Israetel / RP): <strong>10–18 hard sets per week</strong> is the Maximum Adaptive Volume (MAV) sweetspot for muscle hypertrophy. Warmup sets are excluded.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {muscleVolumeStats.map((item) => {
+              const maxScale = 22;
+              const percent = Math.min(100, Math.max(4, (item.sets / maxScale) * 100));
+
+              return (
+                <div
+                  key={item.muscle}
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '12px 14px'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#fff' }}>
+                      {item.muscle}
+                    </span>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span
+                        style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          padding: '2px 8px',
+                          borderRadius: 'var(--radius-full)',
+                          background: `${item.color}22`,
+                          color: item.color,
+                          border: `1px solid ${item.color}44`
+                        }}
+                      >
+                        {item.status}
+                      </span>
+                      <strong style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: '#fff' }}>
+                        {item.sets} <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>sets</span>
+                      </strong>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar with Landmarks */}
+                  <div
+                    style={{
+                      width: '100%',
+                      height: 8,
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      borderRadius: 'var(--radius-full)',
+                      overflow: 'hidden',
+                      position: 'relative'
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${percent}%`,
+                        height: '100%',
+                        background: item.color,
+                        borderRadius: 'var(--radius-full)',
+                        transition: 'width 0.4s ease'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                    <span>0 sets</span>
+                    <span>MEV (6-10)</span>
+                    <span>Optimal MAV (10-18)</span>
+                    <span>MRV (20+)</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* GRAPHS ONLY TAB */}
       {activeTab === 'graphs' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <ProgressGraph
-            historySessions={historySessions}
-            prs={prs}
-            settings={settings}
-          />
-        </div>
+        <ProgressGraph
+          historySessions={historySessions}
+          prs={prs}
+          settings={settings}
+        />
       )}
 
       {/* CALENDAR ONLY TAB */}
       {activeTab === 'calendar' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <WorkoutCalendar
-            historySessions={historySessions}
-            settings={settings}
-            onSelectSession={(session) => setInspectedSession(session)}
-          />
-        </div>
+        <WorkoutCalendar
+          historySessions={historySessions}
+          settings={settings}
+          onSelectSession={(session) => setInspectedSession(session)}
+        />
       )}
 
       {/* PRs HALL OF FAME TAB */}
@@ -259,6 +396,236 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* GYM TOOLS & 1RM TAB */}
+      {activeTab === 'tools' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* 1RM Calculator */}
+          <div className="gym-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <Calculator size={18} color="var(--accent-volt)" />
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 800 }}>1-Rep Max Calculator</h3>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+              <div>
+                <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+                  Lift Weight ({settings.unit})
+                </label>
+                <input
+                  type="number"
+                  className="set-input-box"
+                  style={{ marginTop: 4 }}
+                  value={calcWeight || ''}
+                  onChange={(e) => setCalcWeight(parseFloat(e.target.value) || 0)}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+                  Reps Performed
+                </label>
+                <input
+                  type="number"
+                  className="set-input-box"
+                  style={{ marginTop: 4 }}
+                  value={calcReps || ''}
+                  onChange={(e) => setCalcReps(parseInt(e.target.value, 10) || 1)}
+                />
+              </div>
+            </div>
+
+            {/* Calculated 1RM Result Banner */}
+            <div
+              style={{
+                background: 'linear-gradient(135deg, rgba(0, 245, 155, 0.15) 0%, rgba(0, 229, 255, 0.1) 100%)',
+                border: '1px solid var(--accent-volt)',
+                borderRadius: 'var(--radius-md)',
+                padding: '14px',
+                textAlign: 'center',
+                marginBottom: 14
+              }}
+            >
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 800 }}>
+                Estimated 1-Rep Max
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--accent-volt)', margin: '4px 0' }}>
+                {displayWeight(estimated1RM)}
+              </div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                Derived using combined Epley & Brzycki formulas
+              </div>
+            </div>
+
+            {/* Rep Max Table */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>
+                Estimated Repetition Maximums
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                {repMaxTable.map((item) => (
+                  <div
+                    key={item.reps}
+                    style={{
+                      background: 'var(--bg-surface)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '8px',
+                      textAlign: 'center'
+                    }}
+                  >
+                    <div style={{ fontSize: '0.72rem', color: 'var(--accent-cyan)', fontWeight: 800 }}>
+                      {item.reps} RM ({item.percentage}%)
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', fontWeight: 800, color: '#fff', marginTop: 2 }}>
+                      {displayWeight(item.avgWeight)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* RPE & RIR Reference Guide */}
+          <div className="gym-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <BookOpen size={18} color="var(--accent-cyan)" />
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 800 }}>RPE & RIR Training Guide</h3>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: '0.78rem' }}>
+              {[
+                { rpe: 10, rir: 0, desc: 'Maximum effort. Zero reps left in reserve (True failure)' },
+                { rpe: 9.5, rir: '0-1', desc: 'Could not do more reps, but maybe slight weight increase' },
+                { rpe: 9, rir: 1, desc: '1 definite rep remaining in reserve' },
+                { rpe: 8.5, rir: '1-2', desc: '1 to 2 reps remaining in reserve' },
+                { rpe: 8, rir: 2, desc: '2 reps in reserve — optimal sweetspot for mechanical tension' },
+                { rpe: 7, rir: 3, desc: '3 reps in reserve — good for speed, warmup, or deload' }
+              ].map((item) => (
+                <div
+                  key={item.rpe}
+                  style={{
+                    background: 'var(--bg-surface)',
+                    padding: '8px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: item.rpe >= 9 ? 'var(--accent-crimson)' : 'var(--accent-volt)' }}>
+                      RPE {item.rpe}
+                    </span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{item.desc}</span>
+                  </div>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                    {item.rir} RIR
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Bodyweight Weigh-In Logger & History */}
+          <div className="gym-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Scale size={18} color="var(--accent-amber)" />
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 800 }}>Bodyweight Log</h3>
+              </div>
+              {settings.targetWeightKg && (
+                <span style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)' }}>
+                  Target: {displayWeight(settings.targetWeightKg)}
+                </span>
+              )}
+            </div>
+
+            {/* Quick Weigh-In Input */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+              <input
+                type="number"
+                step="0.1"
+                placeholder={`Weight (${settings.unit})`}
+                className="set-input-box"
+                style={{ flex: 1, textAlign: 'left', padding: '8px 12px' }}
+                value={inputWeight}
+                onChange={(e) => setInputWeight(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Note (optional)"
+                className="set-input-box"
+                style={{ flex: 1.5, textAlign: 'left', padding: '8px 12px' }}
+                value={inputNote}
+                onChange={(e) => setInputNote(e.target.value)}
+              />
+              <button
+                className="btn-primary"
+                style={{ padding: '8px 14px', fontSize: '0.8rem' }}
+                onClick={handleLogWeighIn}
+              >
+                <Plus size={16} /> Log
+              </button>
+            </div>
+
+            {/* Weigh-In History List */}
+            {bodyWeightLogs.length === 0 ? (
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                No weigh-ins recorded yet. Track morning weigh-ins to correlate with strength gains!
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
+                {bodyWeightLogs.map((entry, idx) => {
+                  const prev = bodyWeightLogs[idx + 1];
+                  const delta = prev ? Math.round((entry.weightKg - prev.weightKg) * 10) / 10 : null;
+
+                  return (
+                    <div
+                      key={entry.id}
+                      style={{
+                        background: 'var(--bg-surface)',
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius-sm)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}
+                    >
+                      <div>
+                        <span style={{ fontWeight: 800, color: '#fff', fontSize: '0.9rem' }}>
+                          {displayWeight(entry.weightKg)}
+                        </span>
+                        {delta !== null && (
+                          <span
+                            style={{
+                              marginLeft: 8,
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              color: delta > 0 ? 'var(--accent-volt)' : delta < 0 ? 'var(--accent-cyan)' : 'var(--text-muted)'
+                            }}
+                          >
+                            {delta > 0 ? `+${displayWeight(delta)}` : displayWeight(delta)}
+                          </span>
+                        )}
+                        {entry.note && (
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+                            {entry.note}
+                          </div>
+                        )}
+                      </div>
+
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        {new Date(entry.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -343,7 +710,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                               .filter((st) => st.completed)
                               .map(
                                 (st, sIdx) =>
-                                  `Set ${sIdx + 1}: ${displayWeight(st.weightKg)} × ${st.reps}`
+                                  `Set ${sIdx + 1} (${st.type === 'warmup' ? 'W' : st.type === 'drop' ? 'D' : st.type === 'failure' ? 'F' : 'Wk'}): ${displayWeight(st.weightKg)} × ${st.reps}`
                               )
                               .join(' | ') || 'No sets recorded'}
                           </div>

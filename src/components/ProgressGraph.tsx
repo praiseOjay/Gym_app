@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import type { WorkoutSession, UserSettings, PRRecord } from '../types/gym';
 import { kgToLbs } from '../engine/overloadEngine';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
@@ -60,28 +60,28 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
   // If no exercise selected yet and no logged exercises, fallback to popular library exercise
   const currentExerciseId = selectedExerciseId || (loggedExercises[0]?.id ?? 'sled-hack-squat');
 
-  const displayWeight = (kg: number) => {
+  const displayWeight = useCallback((kg: number) => {
     if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
     return `${kg} kg`;
-  };
+  }, [settings.unit]);
 
-  const displayVolume = (kg: number) => {
+  const displayVolume = useCallback((kg: number) => {
     if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
     return `${kg} kg`;
-  };
+  }, [settings.unit]);
 
-  // Filter sessions by timeframe
+  // Filter sessions by timeframe safely
+  const [mountTime] = useState(() => Date.now());
   const filteredSessions = useMemo(() => {
     const sorted = [...historySessions].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
     if (timeframe === 'all') return sorted;
-    const now = Date.now();
     const daysLimit = timeframe === '30d' ? 30 : 90;
-    const cutoff = now - daysLimit * 24 * 60 * 60 * 1000;
+    const cutoff = mountTime - daysLimit * 24 * 60 * 60 * 1000;
     return sorted.filter((s) => new Date(s.date).getTime() >= cutoff);
-  }, [historySessions, timeframe]);
+  }, [historySessions, timeframe, mountTime]);
 
   // Build raw series points based on selected mode
   const rawPoints = useMemo(() => {
@@ -168,7 +168,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
       isPR: false,
       subLabel: `Volume: ${displayVolume(data.volume)}`
     }));
-  }, [mode, filteredSessions, settings.unit, currentExerciseId, prs]);
+  }, [mode, filteredSessions, displayWeight, displayVolume, settings.unit, currentExerciseId, prs]);
 
   // Chart Dimensions & Coordinate Mapping
   const chartWidth = 340;

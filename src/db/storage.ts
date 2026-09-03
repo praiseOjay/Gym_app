@@ -1,4 +1,4 @@
-import type { WorkoutSession, Routine, PRRecord, UserSettings } from '../types/gym';
+import type { WorkoutSession, Routine, PRRecord, UserSettings, BodyWeightEntry } from '../types/gym';
 import { PRESET_ROUTINES } from '../data/presetRoutines';
 
 const STORAGE_KEYS = {
@@ -6,7 +6,8 @@ const STORAGE_KEYS = {
   ROUTINES: 'overload_routines_v2',
   PRS: 'overload_prs_v2',
   SETTINGS: 'overload_settings_v2',
-  ACTIVE_WORKOUT: 'overload_active_session_v2'
+  ACTIVE_WORKOUT: 'overload_active_session_v2',
+  BODYWEIGHT: 'overload_bodyweight_v2'
 };
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -315,5 +316,124 @@ export const StorageService = {
     } catch (e) {
       console.error('Failed saving active workout:', e);
     }
+  },
+
+  getBodyWeightLogs(): BodyWeightEntry[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.BODYWEIGHT);
+      if (!data) return [];
+      return JSON.parse(data);
+    } catch {
+      return [];
+    }
+  },
+
+  saveBodyWeightLogs(logs: BodyWeightEntry[]): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.BODYWEIGHT, JSON.stringify(logs));
+    } catch (e) {
+      console.error('Failed saving bodyweight logs:', e);
+    }
+  },
+
+  addBodyWeightLog(weightKg: number, date?: string, note?: string): BodyWeightEntry {
+    const logs = this.getBodyWeightLogs();
+    const entry: BodyWeightEntry = {
+      id: `bw-${Date.now()}`,
+      date: date || new Date().toISOString(),
+      weightKg,
+      note
+    };
+    logs.unshift(entry);
+    this.saveBodyWeightLogs(logs);
+
+    // Also sync latest bodyweight to user settings
+    const settings = this.getSettings();
+    settings.bodyWeightKg = weightKg;
+    this.saveSettings(settings);
+
+    return entry;
+  },
+
+  exportFullBackupJSON(): string {
+    const data = {
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      workouts: this.getWorkouts(),
+      routines: this.getRoutines(),
+      prs: this.getPRs(),
+      settings: this.getSettings(),
+      bodyWeightLogs: this.getBodyWeightLogs()
+    };
+    return JSON.stringify(data, null, 2);
+  },
+
+  importFullBackupJSON(jsonStr: string): { success: boolean; message: string } {
+    try {
+      const parsed = JSON.parse(jsonStr);
+      if (!parsed || typeof parsed !== 'object') {
+        return { success: false, message: 'Invalid JSON format' };
+      }
+
+      if (Array.isArray(parsed.workouts)) {
+        this.saveWorkouts(parsed.workouts);
+      }
+      if (Array.isArray(parsed.routines)) {
+        this.saveRoutines(parsed.routines);
+      }
+      if (Array.isArray(parsed.prs)) {
+        this.savePRs(parsed.prs);
+      }
+      if (parsed.settings && typeof parsed.settings === 'object') {
+        this.saveSettings({ ...DEFAULT_SETTINGS, ...parsed.settings });
+      }
+      if (Array.isArray(parsed.bodyWeightLogs)) {
+        this.saveBodyWeightLogs(parsed.bodyWeightLogs);
+      }
+
+      return { success: true, message: 'Data restored successfully!' };
+    } catch (err: any) {
+      return { success: false, message: `Import failed: ${err.message}` };
+    }
+  },
+
+  exportWorkoutsCSV(): string {
+    const workouts = this.getWorkouts();
+    const rows: string[] = [
+      'Date,Routine,Exercise,Muscle Group,Equipment,Set Number,Set Type,Weight (kg),Reps,Estimated 1RM (kg),Completed,Is PR,Notes'
+    ];
+
+    for (const s of workouts) {
+      const dateStr = s.date.split('T')[0];
+      const routineEscaped = `"${s.routineName.replace(/"/g, '""')}"`;
+
+      for (const ex of s.exercises) {
+        const exName = `"${ex.name.replace(/"/g, '""')}"`;
+        const exNotes = `"${(ex.notes || '').replace(/"/g, '""')}"`;
+
+        for (const st of ex.sets) {
+          const est1RM = st.weightKg > 0 ? Math.round((st.weightKg * (1 + st.reps / 30)) * 10) / 10 : 0;
+          rows.push(
+            [
+              dateStr,
+              routineEscaped,
+              exName,
+              ex.muscleGroup,
+              ex.equipment,
+              st.setNumber,
+              st.type,
+              st.weightKg,
+              st.reps,
+              est1RM,
+              st.completed ? 'YES' : 'NO',
+              st.isPR ? 'YES' : 'NO',
+              exNotes
+            ].join(',')
+          );
+        }
+      }
+    }
+
+    return rows.join('\n');
   }
 };

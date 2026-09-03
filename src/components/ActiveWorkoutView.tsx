@@ -5,16 +5,19 @@ import type {
   WorkoutSet,
   UserSettings,
   Exercise,
-  PRRecord
+  PRRecord,
+  SetType
 } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import {
+  generateWarmupSets,
   calculateProgressiveOverload,
   checkIfPR,
   kgToLbs,
   lbsToKg
 } from '../engine/overloadEngine';
 import { sounds } from '../utils/audio';
+import { triggerHaptic } from '../utils/haptics';
 import { PlateCalculatorModal } from './PlateCalculatorModal';
 import { SmartSwapModal } from './SmartSwapModal';
 import { RestTimerFloating } from './RestTimerFloating';
@@ -25,7 +28,10 @@ import {
   Calculator,
   Flame,
   CheckCircle2,
-  X
+  X,
+  ArrowUp,
+  ArrowDown,
+  Trash2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -120,7 +126,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
       return (
         sum +
         ex.sets.reduce((sSum, s) => {
-          return s.completed ? sSum + s.weightKg * s.reps : sSum;
+          return s.completed && s.type !== 'warmup' ? sSum + s.weightKg * s.reps : sSum;
         }, 0)
       );
     }, 0);
@@ -136,31 +142,39 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     let prTitle = '';
 
     if (isNowCompleted && currentSet.weightKg > 0 && currentSet.reps > 0) {
-      // Check PR
-      const prCheck = checkIfPR(
-        updatedExercises[exIdx].exerciseId,
-        currentSet.weightKg,
-        currentSet.reps,
-        existingPRs
-      );
+      if (currentSet.type !== 'warmup') {
+        // Check PR (exclude warmup sets)
+        const prCheck = checkIfPR(
+          updatedExercises[exIdx].exerciseId,
+          currentSet.weightKg,
+          currentSet.reps,
+          existingPRs,
+          currentSet.type
+        );
 
-      if (prCheck.isPR) {
-        isPRFound = true;
-        prTitle = `🔥 NEW PR: ${updatedExercises[exIdx].name} (${displayWeight(currentSet.weightKg)} ${settings.unit} × ${currentSet.reps} reps)`;
-        setNewPRNotice(prTitle);
-        if (settings.soundEnabled) sounds.playPRCelebration();
-        confetti({
-          particleCount: 80,
-          spread: 70,
-          origin: { y: 0.7 }
-        });
-        setTimeout(() => setNewPRNotice(null), 4000);
+        if (prCheck.isPR) {
+          isPRFound = true;
+          prTitle = `🔥 NEW PR: ${updatedExercises[exIdx].name} (${displayWeight(currentSet.weightKg)} ${settings.unit} × ${currentSet.reps} reps)`;
+          setNewPRNotice(prTitle);
+          if (settings.soundEnabled) sounds.playPRCelebration();
+          triggerHaptic('pr', settings.vibrationEnabled);
+          confetti({
+            particleCount: 80,
+            spread: 70,
+            origin: { y: 0.7 }
+          });
+          setTimeout(() => setNewPRNotice(null), 4000);
+        } else {
+          if (settings.soundEnabled) sounds.playSetComplete();
+          triggerHaptic('success', settings.vibrationEnabled);
+        }
       } else {
         if (settings.soundEnabled) sounds.playSetComplete();
+        triggerHaptic('light', settings.vibrationEnabled);
       }
 
       // Trigger Rest Timer
-      const restSec = updatedExercises[exIdx].restSeconds || settings.defaultRestSeconds || 90;
+      const restSec = currentSet.type === 'warmup' ? 45 : (updatedExercises[exIdx].restSeconds || settings.defaultRestSeconds || 90);
       setActiveRestSeconds(restSec);
     }
 
@@ -178,11 +192,86 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     });
   };
 
+  // Cycle set type: working -> warmup -> drop -> failure
+  const cycleSetType = (exIdx: number, setIdx: number) => {
+    const updated = [...session.exercises];
+    const currentType = updated[exIdx].sets[setIdx].type || 'working';
+    const order: SetType[] = ['working', 'warmup', 'drop', 'failure'];
+    const nextType = order[(order.indexOf(currentType) + 1) % order.length];
+    updated[exIdx].sets[setIdx] = { ...updated[exIdx].sets[setIdx], type: nextType };
+    const totalVol = calculateTotalVolume(updated);
+    onUpdateSession({ ...session, exercises: updated, totalVolumeKg: totalVol });
+    triggerHaptic('light', settings.vibrationEnabled);
+  };
+
+  // Auto-generate 4-stage warmup ramp based on working load
+  const handleGenerateWarmups = (exIdx: number) => {
+    const ex = session.exercises[exIdx];
+    const firstWorkingSet = ex.sets.find((s) => s.type !== 'warmup') || ex.sets[0];
+    const workingWeight = firstWorkingSet ? firstWorkingSet.weightKg : 60;
+    const barWeight = ex.equipment === 'Barbell' || ex.equipment === 'Smith Machine' ? 20 : 10;
+    const ramp = generateWarmupSets(workingWeight, barWeight);
+
+    const warmupSets: WorkoutSet[] = ramp.map((w, idx) => ({
+      id: `warmup-${Date.now()}-${idx}`,
+      setNumber: idx + 1,
+      type: 'warmup',
+      weightKg: w.weightKg,
+      reps: w.reps,
+      completed: false,
+      targetWeightKg: w.weightKg,
+      targetReps: w.reps
+    }));
+
+    // Retain existing working sets
+    const existingWorkingSets = ex.sets.filter((s) => s.type !== 'warmup');
+    const combinedSets = [...warmupSets, ...existingWorkingSets];
+
+    // Renumber working sets
+    let workNum = 1;
+    combinedSets.forEach((s) => {
+      if (s.type !== 'warmup') {
+        s.setNumber = workNum++;
+      }
+    });
+
+    const updated = [...session.exercises];
+    updated[exIdx] = { ...ex, sets: combinedSets };
+    onUpdateSession({ ...session, exercises: updated });
+    triggerHaptic('medium', settings.vibrationEnabled);
+  };
+
+  // Reorder exercises up/down
+  const handleMoveExercise = (exIdx: number, direction: 'up' | 'down') => {
+    const newIdx = direction === 'up' ? exIdx - 1 : exIdx + 1;
+    if (newIdx < 0 || newIdx >= session.exercises.length) return;
+    const updated = [...session.exercises];
+    const [moved] = updated.splice(exIdx, 1);
+    updated.splice(newIdx, 0, moved);
+    onUpdateSession({ ...session, exercises: updated });
+    triggerHaptic('light', settings.vibrationEnabled);
+  };
+
+  // Remove exercise from active workout
+  const handleRemoveExercise = (exIdx: number) => {
+    if (session.exercises.length <= 1) {
+      alert('A workout must contain at least one exercise.');
+      return;
+    }
+    if (window.confirm(`Remove "${session.exercises[exIdx].name}" from this workout?`)) {
+      const updated = [...session.exercises];
+      updated.splice(exIdx, 1);
+      const totalVol = calculateTotalVolume(updated);
+      onUpdateSession({ ...session, exercises: updated, totalVolumeKg: totalVol });
+      triggerHaptic('medium', settings.vibrationEnabled);
+    }
+  };
+
   const handleAddSet = (exIdx: number) => {
     const updated = [...session.exercises];
     const sets = updated[exIdx].sets;
     const lastSet = sets[sets.length - 1];
-    const newSetNumber = sets.length + 1;
+    const newSetNumber = sets.filter((s) => s.type !== 'warmup').length + 1;
 
     const newSet: WorkoutSet = {
       id: `set-${Date.now()}-${newSetNumber}`,
@@ -200,8 +289,13 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   const handleRemoveSet = (exIdx: number, setIdx: number) => {
     const updated = [...session.exercises];
     updated[exIdx].sets.splice(setIdx, 1);
-    // Renumber
-    updated[exIdx].sets.forEach((s, idx) => (s.setNumber = idx + 1));
+    // Renumber working sets
+    let workNum = 1;
+    updated[exIdx].sets.forEach((s) => {
+      if (s.type !== 'warmup') {
+        s.setNumber = workNum++;
+      }
+    });
     const totalVol = calculateTotalVolume(updated);
     onUpdateSession({ ...session, exercises: updated, totalVolumeKg: totalVol });
   };
@@ -211,7 +305,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     const overload = calculateProgressiveOverload(ex.id, ex.targetRepRange, historySessions);
 
     const newWorkoutEx: WorkoutExercise = {
-      id: `we-${Date.now()}`,
+      id: `we-${ex.id}-${session.exercises.length + 1}`,
       exerciseId: ex.id,
       name: ex.name,
       muscleGroup: ex.muscleGroup,
@@ -219,7 +313,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
       restSeconds: 90,
       sets: [
         {
-          id: `set-${Date.now()}-1`,
+          id: `set-${ex.id}-1`,
           setNumber: 1,
           type: 'working',
           weightKg: overload.targetWeight || 20,
@@ -346,9 +440,30 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
           return (
             <div key={ex.id || exIdx} className="workout-exercise-card">
               <div className="exercise-card-header">
-                <div className="exercise-title-group">
-                  <div className="exercise-name">{ex.name}</div>
-                  <div className="exercise-meta-tags">
+                <div className="exercise-title-group" style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="exercise-card-controls">
+                      <button
+                        className="icon-ctrl-btn"
+                        disabled={exIdx === 0}
+                        onClick={() => handleMoveExercise(exIdx, 'up')}
+                        title="Move Exercise Up"
+                      >
+                        <ArrowUp size={13} />
+                      </button>
+                      <button
+                        className="icon-ctrl-btn"
+                        disabled={exIdx === session.exercises.length - 1}
+                        onClick={() => handleMoveExercise(exIdx, 'down')}
+                        title="Move Exercise Down"
+                      >
+                        <ArrowDown size={13} />
+                      </button>
+                    </div>
+                    <div className="exercise-name">{ex.name}</div>
+                  </div>
+
+                  <div className="exercise-meta-tags" style={{ marginTop: 4 }}>
                     <span>{ex.muscleGroup}</span>
                     <span>•</span>
                     <span>{ex.equipment}</span>
@@ -367,31 +482,49 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                         <Calculator size={12} /> Plate Calc
                       </button>
                     )}
+                    <button
+                      className="timer-chip"
+                      style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 8px', color: '#FFA500' }}
+                      onClick={() => handleGenerateWarmups(exIdx)}
+                      title="Auto-generate 4-stage progressive warmup ramp"
+                    >
+                      <Flame size={12} color="#FFA500" /> Warmup Ramp
+                    </button>
                   </div>
                 </div>
 
-                <button
-                  className="smart-swap-btn"
-                  onClick={() =>
-                    setSwapExercise({
-                      exerciseIdx: exIdx,
-                      exercise: exMeta || {
-                        id: ex.exerciseId,
-                        name: ex.name,
-                        muscleGroup: ex.muscleGroup,
-                        secondaryMuscles: [],
-                        equipment: ex.equipment,
-                        category: 'Compound',
-                        targetRepRange: [8, 12],
-                        targetRpe: 8
-                      }
-                    })
-                  }
-                  title="Swap if equipment is occupied"
-                >
-                  <Sparkles size={13} />
-                  Swap
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button
+                    className="smart-swap-btn"
+                    onClick={() =>
+                      setSwapExercise({
+                        exerciseIdx: exIdx,
+                        exercise: exMeta || {
+                          id: ex.exerciseId,
+                          name: ex.name,
+                          muscleGroup: ex.muscleGroup,
+                          secondaryMuscles: [],
+                          equipment: ex.equipment,
+                          category: 'Compound',
+                          targetRepRange: [8, 12],
+                          targetRpe: 8
+                        }
+                      })
+                    }
+                    title="Swap if equipment is occupied"
+                  >
+                    <Sparkles size={13} />
+                    Swap
+                  </button>
+                  <button
+                    className="icon-ctrl-btn"
+                    style={{ color: 'var(--accent-crimson)' }}
+                    onClick={() => handleRemoveExercise(exIdx)}
+                    title="Remove exercise from workout"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
 
               {/* Progressive Overload Suggestion Pill */}
@@ -419,6 +552,21 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                 </p>
               </div>
 
+              {/* In-workout Exercise Equipment & Cue Notes */}
+              <div style={{ marginTop: 2 }}>
+                <input
+                  type="text"
+                  placeholder="📝 Notes (e.g. seat height 4, pin 5, 2s pause)..."
+                  value={ex.notes || ''}
+                  onChange={(e) => {
+                    const updated = [...session.exercises];
+                    updated[exIdx] = { ...updated[exIdx], notes: e.target.value };
+                    onUpdateSession({ ...session, exercises: updated });
+                  }}
+                  className="exercise-notes-input"
+                />
+              </div>
+
               {/* Set Table */}
               <div className="set-table">
                 <div className="set-table-header">
@@ -435,7 +583,14 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                       key={set.id || setIdx}
                       className={`set-row ${set.completed ? 'completed' : ''}`}
                     >
-                      <div className="set-num-badge">{set.setNumber}</div>
+                      <div
+                        className={`set-num-badge set-badge-${set.type || 'working'}`}
+                        onClick={() => cycleSetType(exIdx, setIdx)}
+                        title="Tap to toggle set type (Working, Warmup, Drop, Failure)"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {set.type === 'warmup' ? 'W' : set.type === 'drop' ? 'D' : set.type === 'failure' ? 'F' : set.setNumber}
+                      </div>
 
                       <div className="set-previous-text">
                         {overload.currentWeight > 0
@@ -489,6 +644,18 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Set Type Legend */}
+              <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
+                <span>Badge:</span>
+                <span style={{ color: 'var(--accent-cyan)' }}>1..N Work</span>
+                <span>•</span>
+                <span style={{ color: '#FFA500' }}>W Warmup</span>
+                <span>•</span>
+                <span style={{ color: '#B388FF' }}>D Drop</span>
+                <span>•</span>
+                <span style={{ color: '#FF3366' }}>F Failure</span>
               </div>
 
               {/* Exercise Card Actions */}
@@ -606,7 +773,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
             {/* Muscle Filter Tabs */}
             <div className="quick-prompts-row">
-              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Biceps', 'Triceps', 'Abs'].map(
+              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Biceps', 'Triceps', 'Forearms', 'Calves', 'Abs'].map(
                 (m) => (
                   <button
                     key={m}

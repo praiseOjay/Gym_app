@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type {
   WorkoutSession,
   Routine,
@@ -23,25 +23,13 @@ import { Dumbbell, Play } from 'lucide-react';
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
-  const [workouts, setWorkouts] = useState<WorkoutSession[]>([]);
-  const [routines, setRoutines] = useState<Routine[]>([]);
-  const [prs, setPrs] = useState<PRRecord[]>([]);
-  const [settings, setSettings] = useState<UserSettings>(StorageService.getSettings());
-  const [activeSession, setActiveSession] = useState<WorkoutSession | null>(null);
+  const [workouts, setWorkouts] = useState<WorkoutSession[]>(() => StorageService.getWorkouts());
+  const [routines, setRoutines] = useState<Routine[]>(() => StorageService.getRoutines());
+  const [prs, setPrs] = useState<PRRecord[]>(() => StorageService.getPRs());
+  const [settings, setSettings] = useState<UserSettings>(() => StorageService.getSettings());
+  const [activeSession, setActiveSession] = useState<WorkoutSession | null>(() => StorageService.getActiveWorkout());
   const [justCompletedSession, setJustCompletedSession] = useState<WorkoutSession | null>(null);
   const [showSettings, setShowSettings] = useState(false);
-
-  // Load from local storage
-  useEffect(() => {
-    setWorkouts(StorageService.getWorkouts());
-    setRoutines(StorageService.getRoutines());
-    setPrs(StorageService.getPRs());
-    setSettings(StorageService.getSettings());
-    const storedActive = StorageService.getActiveWorkout();
-    if (storedActive) {
-      setActiveSession(storedActive);
-    }
-  }, []);
 
   // Save active workout whenever it updates
   const handleUpdateActiveSession = (updated: WorkoutSession) => {
@@ -260,6 +248,10 @@ export function App() {
           <RoutinesView
             routines={routines}
             onStartRoutine={handleStartRoutine}
+            onUpdateRoutines={(updated) => {
+              setRoutines(updated);
+              StorageService.saveRoutines(updated);
+            }}
           />
         )}
 

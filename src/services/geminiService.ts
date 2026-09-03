@@ -1,4 +1,4 @@
-import type { WorkoutSession, UserSettings, Exercise, Routine } from '../types/gym';
+import type { WorkoutSession, UserSettings, Exercise, Routine, MuscleRecoveryState } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 
 const DEFAULT_API_KEY =
@@ -243,6 +243,73 @@ Return only JSON.`;
       equipment: alt.equipment,
       biomechanicsExplanation: `Provides equivalent tension on the ${currentExercise.muscleGroup.toLowerCase()} with high motor unit recruitment.`,
       recommendedWeightAdj: alt.equipment === 'Dumbbell' ? 'Use ~35-40% of barbell weight per hand' : 'Match resistance to RPE 8'
+    };
+  }
+}
+
+/**
+ * AI Pre-Workout Tactical Primer based on target routine and current muscle recovery state.
+ */
+export async function getPreWorkoutPrimer(
+  routine: Routine,
+  recoveryStates: MuscleRecoveryState[],
+  apiKey?: string
+): Promise<{
+  headline: string;
+  focusPoints: string[];
+  recoveryNote: string;
+}> {
+  const exerciseNames = routine.exercises.map((e) => {
+    const meta = EXERCISE_LIBRARY.find((lib) => lib.id === e.exerciseId);
+    return `${meta?.name || e.exerciseId} (${meta?.muscleGroup || 'Muscle'})`;
+  }).join(', ');
+
+  const freshMuscles = recoveryStates.filter((r) => r.status === 'Fresh').map((r) => r.muscle);
+  const fatiguedMuscles = recoveryStates.filter((r) => r.status === 'Fatigued').map((r) => r.muscle);
+
+  const prompt = `You are an elite bodybuilding coach providing a quick tactical pre-workout primer for a lifter who is about to start training.
+Workout Name: "${routine.name}" (${routine.dayTag || routine.weekday})
+Exercises planned: ${exerciseNames}
+Fresh muscle groups: ${freshMuscles.join(', ') || 'Normal'}
+Fatigued muscle groups: ${fatiguedMuscles.join(', ') || 'None'}
+
+Provide concise, laser-focused, biomechanically sound cues in JSON format with exactly these keys:
+{
+  "headline": "Short punchy motivational slogan (max 8 words)",
+  "focusPoints": [
+    "Primary progressive overload or tempo cue for compound openers",
+    "Mind-muscle connection or eccentric control cue"
+  ],
+  "recoveryNote": "1 sentence summarizing physiological readiness for today's session"
+}
+Return ONLY valid JSON. No extra text.`;
+
+  try {
+    const rawResult = await callGemini(prompt, {
+      apiKey,
+      responseMimeType: 'application/json',
+      maxOutputTokens: 1000
+    });
+    const parsed = extractJson<any>(rawResult);
+    return {
+      headline: parsed.headline || 'Maximum Tension & Progressive Overload',
+      focusPoints: parsed.focusPoints || [
+        'Push top sets to RPE 8.5 with strict 2-3 second eccentrics.',
+        'Ensure full range of motion stretch on each repetition.'
+      ],
+      recoveryNote: parsed.recoveryNote || 'Target muscle groups are primed for mechanical tension.'
+    };
+  } catch (err) {
+    console.warn('Gemini fallback for pre-workout primer:', err);
+    return {
+      headline: `Primed for ${routine.dayTag || routine.name}`,
+      focusPoints: [
+        'Aim to beat last week’s working sets by +1 rep or +2.5kg on opening compound lifts.',
+        'Control the negative (eccentric) phase for 2-3 seconds to maximize mechanical tension.'
+      ],
+      recoveryNote: freshMuscles.length > 0
+        ? `${freshMuscles.slice(0, 3).join(', ')} are in optimal fresh state for heavy load.`
+        : 'Target muscle groups are well-rested. Stay hydrated and lock in your mind-muscle connection.'
     };
   }
 }

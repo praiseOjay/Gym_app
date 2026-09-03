@@ -1,7 +1,9 @@
 import type { Exercise } from '../types/gym';
 
 export const EXERCISE_LIBRARY: Exercise[] = [
+  // ==========================================
   // CHEST
+  // ==========================================
   {
     id: 'barbell-incline-bench-press',
     name: 'Incline Barbell Bench Press',
@@ -75,6 +77,30 @@ export const EXERCISE_LIBRARY: Exercise[] = [
     tips: ['Excellent for hypertrophy without balance fatigue', 'Take last set close to true failure']
   },
   {
+    id: 'smith-machine-incline-press',
+    name: 'Smith Machine Incline Bench Press',
+    muscleGroup: 'Chest',
+    secondaryMuscles: ['Shoulders', 'Triceps'],
+    equipment: 'Smith Machine',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Position incline bench inside Smith track. Lower bar slowly to clavicle, press with maximum pec tension.',
+    tips: ['Guided track allows 100% focus on clavicular pec fibers without stability losses']
+  },
+  {
+    id: 'cable-low-to-high-fly',
+    name: 'Cable Low-to-High Fly',
+    muscleGroup: 'Chest',
+    secondaryMuscles: ['Shoulders'],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 9,
+    instructions: 'Set pulleys to lowest position. Scoop hands upward and inward toward face level, heavily contracting upper clavicular chest.',
+    tips: ['Keep palms facing up and inward', 'Hold peak contraction for 1 second']
+  },
+  {
     id: 'dips-chest-focus',
     name: 'Parallel Bar Dips (Chest Focus)',
     muscleGroup: 'Chest',
@@ -86,8 +112,34 @@ export const EXERCISE_LIBRARY: Exercise[] = [
     instructions: 'Lean torso forward roughly 30 degrees, flare elbows slightly outward. Lower until shoulders are below elbows, press back up.',
     tips: ['Keep chin tucked', 'Avoid dipping too low if shoulder discomfort occurs']
   },
+  {
+    id: 'lever-seated-fly',
+    name: 'Lever Seated Pec Fly (Pec Deck)',
+    muscleGroup: 'Chest',
+    secondaryMuscles: ['Shoulders'],
+    equipment: 'Machine',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 9,
+    instructions: 'Sit with back flat against pad. Bring arm pads together in front of sternum, squeeze inner pecs.',
+    tips: ['Control the deep stretch return for 2 seconds']
+  },
+  {
+    id: 'dumbbell-hex-press',
+    name: 'Dumbbell Hex Press',
+    muscleGroup: 'Chest',
+    secondaryMuscles: ['Triceps'],
+    equipment: 'Dumbbell',
+    category: 'Compound',
+    targetRepRange: [10, 14],
+    targetRpe: 8.5,
+    instructions: 'Press dumbbells together firmly over chest. Lower dumbbells down together and press back up while maintaining inward pressure.',
+    tips: ['Constant squeeze against the dumbbells lights up inner sternal fibers']
+  },
 
+  // ==========================================
   // BACK
+  // ==========================================
   {
     id: 'barbell-bent-over-row',
     name: 'Barbell Bent-Over Row',
@@ -98,513 +150,43 @@ export const EXERCISE_LIBRARY: Exercise[] = [
     targetRepRange: [6, 10],
     targetRpe: 8,
     instructions: 'Hinge at hips to 45 degrees with flat back. Pull bar into lower ribcage/umbilicus, driving elbows back and squeezing lats.',
-    tips: ['Do not use momentum or upright jerk', 'Keep neck neutral looking down/ahead']
+    tips: ['Do not jerk with lower back', 'Keep neck neutral in line with spine']
   },
   {
-    id: 't-bar-chest-supported-row',
-    name: 'Chest-Supported T-Bar Row',
-    muscleGroup: 'Back',
-    secondaryMuscles: ['Biceps', 'Rear Delts'],
-    equipment: 'Machine',
-    category: 'Compound',
-    targetRepRange: [8, 12],
-    targetRpe: 8.5,
-    instructions: 'Lie on pad, grip handles. Retract scapulae and pull elbows back high and tight, hold contraction for 1 second.',
-    tips: ['Eliminates spinal fatigue, isolating upper back & lats', 'Full stretch at bottom']
-  },
-  {
-    id: 'lat-pulldown-neutral',
-    name: 'Lat Pulldown (Neutral / Wide Grip)',
+    id: 'lat-pulldown-wide',
+    name: 'Wide-Grip Lat Pulldown',
     muscleGroup: 'Back',
     secondaryMuscles: ['Biceps', 'Forearms'],
     equipment: 'Cable',
     category: 'Compound',
     targetRepRange: [8, 12],
     targetRpe: 8.5,
-    instructions: 'Sit tight under knee pads. Pull bar down toward upper chest by driving elbows down and back, slight lean back.',
-    tips: ['Do not swing body back excessively', 'Pause briefly at chest']
+    instructions: 'Grip bar wider than shoulders. Lean back slightly, drive elbows straight down into hips pulling bar to upper chest.',
+    tips: ['Lead with elbows, avoid leaning back excessively', 'Pause for a microsecond at bottom contraction']
+  },
+  {
+    id: 'neutral-grip-lat-pulldown',
+    name: 'Neutral-Grip Lat Pulldown (Close Grip)',
+    muscleGroup: 'Back',
+    secondaryMuscles: ['Biceps', 'Forearms'],
+    equipment: 'Cable',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Attach V-bar or neutral handle. Pull down to mid chest with elbows tucked close to torso.',
+    tips: ['Maximum shoulder extension and lat stretch at top']
   },
   {
     id: 'seated-cable-row',
     name: 'Seated Cable Row',
     muscleGroup: 'Back',
-    secondaryMuscles: ['Biceps', 'Rear Delts'],
-    equipment: 'Cable',
-    category: 'Compound',
-    targetRepRange: [8, 12],
-    targetRpe: 8.5,
-    instructions: 'Sit upright with knees slightly bent. Pull handle into belly button, pulling shoulders back and puffing chest out.',
-    tips: ['Resist the eccentric return for 2 seconds', 'Keep spine stable']
-  },
-  {
-    id: 'pull-ups',
-    name: 'Pull-Ups / Weighted Pull-Ups',
-    muscleGroup: 'Back',
     secondaryMuscles: ['Biceps', 'Forearms'],
-    equipment: 'Bodyweight',
-    category: 'Compound',
-    targetRepRange: [6, 10],
-    targetRpe: 8,
-    instructions: 'Overhand grip outside shoulders. From dead hang, initiate with lat contraction, pull chin smoothly over bar.',
-    tips: ['Avoid kipping', 'Controlled descent all the way down to full hang']
-  },
-  {
-    id: 'single-arm-dumbbell-row',
-    name: 'Single-Arm Dumbbell Row',
-    muscleGroup: 'Back',
-    secondaryMuscles: ['Biceps', 'Forearms'],
-    equipment: 'Dumbbell',
-    category: 'Compound',
-    targetRepRange: [8, 12],
-    targetRpe: 8.5,
-    instructions: 'Support knee and hand on bench. Pull dumbbell toward hip in an arc, focusing on lat stretch and contraction.',
-    tips: ['Do not twist torso excessively', 'Pull with elbow, not hand']
-  },
-
-  // SHOULDERS
-  {
-    id: 'seated-db-shoulder-press',
-    name: 'Seated Dumbbell Shoulder Press',
-    muscleGroup: 'Shoulders',
-    secondaryMuscles: ['Triceps', 'Upper Chest'],
-    equipment: 'Dumbbell',
-    category: 'Compound',
-    targetRepRange: [8, 12],
-    targetRpe: 8,
-    instructions: 'Upright bench (approx 75-80 degrees). Press dumbbells vertically overhead without clanking, lower to ear level.',
-    tips: ['Keep core braced and back pressed against pad', 'Elbows slightly tucked in front plane of body']
-  },
-  {
-    id: 'overhead-barbell-press',
-    name: 'Standing Overhead Barbell Press (OHP)',
-    muscleGroup: 'Shoulders',
-    secondaryMuscles: ['Triceps', 'Core'],
-    equipment: 'Barbell',
-    category: 'Compound',
-    targetRepRange: [6, 10],
-    targetRpe: 8,
-    instructions: 'Bar resting on clavicle. Squeeze glutes and abs. Press bar straight up, tilting head back slightly to clear chin then push head forward.',
-    tips: ['Strict form, no leg drive', 'Lock out securely overhead']
-  },
-  {
-    id: 'dumbbell-lateral-raise',
-    name: 'Dumbbell Lateral Raise',
-    muscleGroup: 'Shoulders',
-    secondaryMuscles: ['Traps'],
-    equipment: 'Dumbbell',
-    category: 'Isolation',
-    targetRepRange: [12, 16],
-    targetRpe: 9,
-    instructions: 'Stand with slight forward lean. Raise dumbbells out to sides in scapular plane until parallel to floor, lead with elbows.',
-    tips: ['Pour water motion not needed; keep palms slightly down/forward', 'Never swing with hips']
-  },
-  {
-    id: 'cable-lateral-raise',
-    name: 'Cable Lateral Raise (Behind/Front)',
-    muscleGroup: 'Shoulders',
-    secondaryMuscles: ['Traps'],
     equipment: 'Cable',
-    category: 'Isolation',
-    targetRepRange: [12, 16],
-    targetRpe: 9,
-    instructions: 'Set pulley to ankle/knee height. Grip opposite cable, raise arm out to side smoothly under continuous tension.',
-    tips: ['Constant tension even at the bottom', 'Great for medial delt hypertrophy']
-  },
-  {
-    id: 'face-pulls',
-    name: 'Cable Face Pull with Rope',
-    muscleGroup: 'Shoulders',
-    secondaryMuscles: ['Back', 'Traps'],
-    equipment: 'Cable',
-    category: 'Isolation',
-    targetRepRange: [12, 18],
-    targetRpe: 8.5,
-    instructions: 'Set pulley at eye height. Pull rope handles toward eyes/ears while rotating hands back and externally rotating shoulders.',
-    tips: ['Crucial for shoulder health & posture', 'Squeeze rear delts and rotator cuff at end']
-  },
-  {
-    id: 'rear-delt-reverse-fly',
-    name: 'Reverse Pec Deck / Rear Delt Fly',
-    muscleGroup: 'Shoulders',
-    secondaryMuscles: ['Back'],
-    equipment: 'Machine',
-    category: 'Isolation',
-    targetRepRange: [12, 16],
-    targetRpe: 9,
-    instructions: 'Sit facing machine chest on pad. Pull arms horizontally back in wide arc, squeezing posterior deltoids.',
-    tips: ['Keep elbows slightly soft', 'Do not retract shoulder blades fully to keep rear delts isolated']
-  },
-
-  // LEGS - QUADS & CALVES
-  {
-    id: 'barbell-back-squat',
-    name: 'Barbell Back Squat',
-    muscleGroup: 'Quads',
-    secondaryMuscles: ['Glutes', 'Hamstrings', 'Abs'],
-    equipment: 'Barbell',
-    category: 'Compound',
-    targetRepRange: [6, 10],
-    targetRpe: 8,
-    instructions: 'Bar resting on upper traps/rear delts. Break at hips and knees simultaneously, descend until hip crease is below knee, drive up through midfoot.',
-    tips: ['Maintain proud chest and neutral spine', 'Knees track over toes', 'Breathe and brace abdominal wall']
-  },
-  {
-    id: 'hack-squat-machine',
-    name: 'Hack Squat Machine',
-    muscleGroup: 'Quads',
-    secondaryMuscles: ['Glutes'],
-    equipment: 'Machine',
     category: 'Compound',
     targetRepRange: [8, 12],
     targetRpe: 8.5,
-    instructions: 'Position shoulders under pads, feet shoulder-width on platform. Lower smoothly to deep knee flexion, press up driving through heels/midfoot.',
-    tips: ['Extremely quad-focused with high knee flexion', 'Do not lock out abruptly at top']
-  },
-  {
-    id: 'leg-press',
-    name: '45-Degree Leg Press',
-    muscleGroup: 'Quads',
-    secondaryMuscles: ['Glutes', 'Hamstrings'],
-    equipment: 'Machine',
-    category: 'Compound',
-    targetRepRange: [10, 15],
-    targetRpe: 8.5,
-    instructions: 'Feet mid-platform shoulder width. Lower sled until 90-degree knee angle, press sled away without locking knees out.',
-    tips: ['Keep lower back glued to pad', 'Never allow pelvis to lift/round at bottom']
-  },
-  {
-    id: 'leg-extensions',
-    name: 'Leg Extensions (Seated)',
-    muscleGroup: 'Quads',
-    secondaryMuscles: [],
-    equipment: 'Machine',
-    category: 'Isolation',
-    targetRepRange: [12, 16],
-    targetRpe: 9,
-    instructions: 'Align knee joint with machine pivot axis. Extend legs up until quads contract fully, lower with 2-second eccentric.',
-    tips: ['Hold top peak contraction for 1 second', 'Pumps maximum blood into the rectus femoris']
-  },
-  {
-    id: 'bulgarian-split-squat',
-    name: 'Bulgarian Split Squat',
-    muscleGroup: 'Quads',
-    secondaryMuscles: ['Glutes', 'Hamstrings'],
-    equipment: 'Dumbbell',
-    category: 'Compound',
-    targetRepRange: [8, 12],
-    targetRpe: 8.5,
-    instructions: 'Rear foot elevated on bench behind you. Hold dumbbells. Lower front knee until front thigh is parallel to ground, drive through front foot.',
-    tips: ['Slight forward lean increases glute focus; upright increases quad focus', 'Fixes leg strength imbalances']
-  },
-  {
-    id: 'standing-calf-raise',
-    name: 'Standing Calf Raise',
-    muscleGroup: 'Calves',
-    secondaryMuscles: [],
-    equipment: 'Machine',
-    category: 'Isolation',
-    targetRepRange: [12, 18],
-    targetRpe: 9,
-    instructions: 'Balls of feet on edge of platform. Lower heels for deep 2-second calf stretch, press up onto big toes and hold peak for 1 second.',
-    tips: ['Eliminate bouncing entirely; calves adapt to paused eccentrics', 'Full ROM is essential']
-  },
-  {
-    id: 'seated-calf-raise',
-    name: 'Seated Calf Raise',
-    muscleGroup: 'Calves',
-    secondaryMuscles: [],
-    equipment: 'Machine',
-    category: 'Isolation',
-    targetRepRange: [12, 20],
-    targetRpe: 9,
-    instructions: 'Pads placed across lower thighs. Lower heels deep, raise high onto balls of feet focusing on the soleus muscle.',
-    tips: ['Strict 2 second pause at bottom stretch']
-  },
-
-  // LEGS - POSTERIOR CHAIN & HAMSTRINGS & GLUTES
-  {
-    id: 'romanian-deadlift-barbell',
-    name: 'Barbell Romanian Deadlift (RDL)',
-    muscleGroup: 'Hamstrings',
-    secondaryMuscles: ['Glutes', 'Back', 'Forearms'],
-    equipment: 'Barbell',
-    category: 'Compound',
-    targetRepRange: [8, 12],
-    targetRpe: 8,
-    instructions: 'Hold bar with shoulder-width grip. Soft knee bend. Push hips back as if touching wall behind you, lowering bar along shins until hamstrings stretch.',
-    tips: ['Movement is pure hip hinge, not squat', 'Keep lats engaged so bar stays close to legs']
-  },
-  {
-    id: 'dumbbell-romanian-deadlift',
-    name: 'Dumbbell Romanian Deadlift',
-    muscleGroup: 'Hamstrings',
-    secondaryMuscles: ['Glutes', 'Back'],
-    equipment: 'Dumbbell',
-    category: 'Compound',
-    targetRepRange: [8, 12],
-    targetRpe: 8,
-    instructions: 'Similar to barbell RDL with dumbbells kept close to sides of legs. Hinge hips back, squeeze glutes at top.',
-    tips: ['Allows natural wrist rotation for comfort', 'Focus on hamstring stretch']
-  },
-  {
-    id: 'lying-leg-curls',
-    name: 'Lying Hamstring Leg Curls',
-    muscleGroup: 'Hamstrings',
-    secondaryMuscles: ['Calves'],
-    equipment: 'Machine',
-    category: 'Isolation',
-    targetRepRange: [10, 14],
-    targetRpe: 9,
-    instructions: 'Lie prone, pad resting above Achilles tendon. Curl legs up toward glutes, pause, lower slowly for 3 seconds.',
-    tips: ['Keep hips down on the bench', 'Dorsiflex ankles slightly']
-  },
-  {
-    id: 'seated-leg-curls',
-    name: 'Seated Hamstring Leg Curls',
-    muscleGroup: 'Hamstrings',
-    secondaryMuscles: [],
-    equipment: 'Machine',
-    category: 'Isolation',
-    targetRepRange: [10, 15],
-    targetRpe: 9,
-    instructions: 'Secure thigh pad tightly. Curl heels under seat smoothly, squeeze hamstrings in contracted position, return with control.',
-    tips: ['Places hamstrings in lengthened hip-flexed state, optimal for hypertrophy']
-  },
-  {
-    id: 'barbell-hip-thrust',
-    name: 'Barbell Hip Thrust',
-    muscleGroup: 'Glutes',
-    secondaryMuscles: ['Hamstrings', 'Quads'],
-    equipment: 'Barbell',
-    category: 'Compound',
-    targetRepRange: [8, 12],
-    targetRpe: 8.5,
-    instructions: 'Upper back against bench, barbell padded across hips. Drive through heels to full hip extension, squeeze glutes hard at top for 2 seconds.',
-    tips: ['Ribs down, chin tucked', 'Do not hyperextend lumbar spine at top']
-  },
-
-  // ARMS - BICEPS
-  {
-    id: 'incline-dumbbell-curl',
-    name: 'Incline Dumbbell Bicep Curl',
-    muscleGroup: 'Biceps',
-    secondaryMuscles: ['Forearms'],
-    equipment: 'Dumbbell',
-    category: 'Isolation',
-    targetRepRange: [10, 14],
-    targetRpe: 8.5,
-    instructions: 'Sit on 45-60 degree bench. Arms hang straight down behind torso. Curl dumbbells while supinating wrists, squeeze at top.',
-    tips: ['Puts long head of bicep into deep stretch', 'Keep elbows fixed behind torso']
-  },
-  {
-    id: 'barbell-preacher-curl',
-    name: 'EZ-Bar Preacher Curl',
-    muscleGroup: 'Biceps',
-    secondaryMuscles: ['Forearms'],
-    equipment: 'Barbell',
-    category: 'Isolation',
-    targetRepRange: [8, 12],
-    targetRpe: 8.5,
-    instructions: 'Arms resting flat against preacher bench pad. Curl bar up until forearms near vertical, lower slowly to full stretch.',
-    tips: ['Eliminates shoulder momentum', 'Do not slam or hyperextend elbows at bottom']
-  },
-  {
-    id: 'hammer-curl-dumbbell',
-    name: 'Incline / Standing Hammer Curl',
-    muscleGroup: 'Biceps',
-    secondaryMuscles: ['Forearms'],
-    equipment: 'Dumbbell',
-    category: 'Isolation',
-    targetRepRange: [10, 14],
-    targetRpe: 8.5,
-    instructions: 'Neutral grip (palms facing each other). Curl dumbbells upward without twisting wrists, squeeze brachialis and forearms.',
-    tips: ['Builds arm thickness and forearm strength', 'Avoid swinging torso']
-  },
-  {
-    id: 'cable-bicep-curl',
-    name: 'Cable Bicep Curl (Straight Bar / Rope)',
-    muscleGroup: 'Biceps',
-    secondaryMuscles: ['Forearms'],
-    equipment: 'Cable',
-    category: 'Isolation',
-    targetRepRange: [10, 15],
-    targetRpe: 9,
-    instructions: 'Low pulley. Stand upright, curl bar towards shoulders keeping elbows pinned at sides. High continuous tension.',
-    tips: ['Great finisher for maximal pump']
-  },
-
-  // ARMS - TRICEPS
-  {
-    id: 'triceps-rope-pushdown',
-    name: 'Triceps Cable Rope Pushdown',
-    muscleGroup: 'Triceps',
-    secondaryMuscles: [],
-    equipment: 'Cable',
-    category: 'Isolation',
-    targetRepRange: [10, 15],
-    targetRpe: 9,
-    instructions: 'High pulley with rope. Pin elbows to ribs. Push rope down, flaring ends outward at bottom lockout for peak contraction.',
-    tips: ['Keep upper arms stationary', 'Control return until 90 degree elbow bend']
-  },
-  {
-    id: 'overhead-cable-triceps-ext',
-    name: 'Overhead Cable Triceps Extension',
-    muscleGroup: 'Triceps',
-    secondaryMuscles: [],
-    equipment: 'Cable',
-    category: 'Isolation',
-    targetRepRange: [10, 14],
-    targetRpe: 8.5,
-    instructions: 'Cable set to hip height or high with rope. Lean forward, extend arms forward/overhead until straight, stretching long head at bottom.',
-    tips: ['Targets the long head of the triceps which gives arm size', 'Keep elbows pointed forward']
-  },
-  {
-    id: 'skull-crushers-ez-bar',
-    name: 'EZ-Bar Lying Triceps Extension (Skull Crushers)',
-    muscleGroup: 'Triceps',
-    secondaryMuscles: [],
-    equipment: 'Barbell',
-    category: 'Isolation',
-    targetRepRange: [8, 12],
-    targetRpe: 8.5,
-    instructions: 'Lie on flat bench. Press EZ bar up with slight backward angle. Lower bar toward forehead/top of head by bending elbows only, press back up.',
-    tips: ['Angle upper arms back roughly 10 degrees to keep continuous tension']
-  },
-
-  // ABS & CORE
-  {
-    id: 'hanging-leg-raises',
-    name: 'Hanging Leg / Knee Raises',
-    muscleGroup: 'Abs',
-    secondaryMuscles: ['Forearms'],
-    equipment: 'Bodyweight',
-    category: 'Isolation',
-    targetRepRange: [10, 16],
-    targetRpe: 8.5,
-    instructions: 'Hang from pull-up bar. Curl knees or straight legs up toward chest by curling pelvis upward, lower with control.',
-    tips: ['Must curl the pelvis upward, not just swing hip flexors']
-  },
-  {
-    id: 'cable-kneeling-crunch',
-    name: 'Cable Kneeling Crunch',
-    muscleGroup: 'Abs',
-    secondaryMuscles: [],
-    equipment: 'Cable',
-    category: 'Isolation',
-    targetRepRange: [12, 16],
-    targetRpe: 9,
-    instructions: 'Kneel in front of high cable rope held at temples. Flex spine, crunching elbows down towards thighs.',
-    tips: ['Hips stay locked; movement occurs purely through spinal flexion']
-  },
-
-  // USER'S TEMPLATE EXERCISES
-  {
-    id: 'lever-seated-crunch',
-    name: 'Lever Seated Crunch (chest pad)',
-    muscleGroup: 'Abs',
-    secondaryMuscles: [],
-    equipment: 'Machine',
-    category: 'Isolation',
-    targetRepRange: [10, 15],
-    targetRpe: 8.5,
-    instructions: 'Sit securely with chest pad against sternum. Curl torso downward through abdominal contraction.',
-    tips: ['Contract abs, exhale forcefully on crunch']
-  },
-  {
-    id: 'smith-calf-raise',
-    name: 'Smith Calf Raise (version 2)',
-    muscleGroup: 'Calves',
-    secondaryMuscles: [],
-    equipment: 'Smith Machine',
-    category: 'Isolation',
-    targetRepRange: [12, 16],
-    targetRpe: 9,
-    instructions: 'Elevate balls of feet on block under Smith bar. Lower heels deep for 2s stretch, explode onto toes.',
-    tips: ['Eliminate bounce; pause 2 seconds at deep stretch']
-  },
-  {
-    id: 'sled-hack-squat',
-    name: 'Sled Hack Squat',
-    muscleGroup: 'Quads',
-    secondaryMuscles: ['Glutes'],
-    equipment: 'Machine',
-    category: 'Compound',
-    targetRepRange: [8, 12],
-    targetRpe: 8.5,
-    instructions: 'Shoulders locked into pads. Descend deep into knee flexion, press sled away smoothly.',
-    tips: ['Maintain full foot contact, drive through midfoot']
-  },
-  {
-    id: 'weighted-hanging-leg-raise',
-    name: 'Weighted Hanging leg-hip raise',
-    muscleGroup: 'Abs',
-    secondaryMuscles: ['Forearms'],
-    equipment: 'Bodyweight',
-    category: 'Isolation',
-    targetRepRange: [12, 16],
-    targetRpe: 8.5,
-    instructions: 'Hang from bar with dumbbell between feet. Raise knees/legs while curling pelvis up toward chest.',
-    tips: ['Focus on posterior pelvic tilt to activate rectus abdominis']
-  },
-  {
-    id: 'sled-45-leg-press',
-    name: 'Sled 45° Leg Press',
-    muscleGroup: 'Quads',
-    secondaryMuscles: ['Glutes', 'Hamstrings'],
-    equipment: 'Machine',
-    category: 'Compound',
-    targetRepRange: [10, 15],
-    targetRpe: 8.5,
-    instructions: 'Sit tight with lower back pinned against pad. Lower sled to 90 degrees, press without lockout.',
-    tips: ['Never allow pelvis or lower back to round off pad']
-  },
-  {
-    id: 'lever-lying-leg-curl',
-    name: 'Lever Lying Leg Curl',
-    muscleGroup: 'Hamstrings',
-    secondaryMuscles: ['Calves'],
-    equipment: 'Machine',
-    category: 'Isolation',
-    targetRepRange: [10, 14],
-    targetRpe: 9,
-    instructions: 'Lie face down, pad resting behind ankles. Curl heels to glutes, pause, lower smoothly.',
-    tips: ['Keep hips pinned flat to bench throughout movement']
-  },
-  {
-    id: 'db-one-arm-hammer-preacher-curl',
-    name: 'Dumbbell One Arm Hammer Preacher Curl',
-    muscleGroup: 'Biceps',
-    secondaryMuscles: ['Forearms'],
-    equipment: 'Dumbbell',
-    category: 'Isolation',
-    targetRepRange: [8, 12],
-    targetRpe: 8.5,
-    instructions: 'One arm resting over preacher bench pad with neutral hammer grip. Curl dumbbell upward under control.',
-    tips: ['Strict isolation of brachialis and biceps long head']
-  },
-  {
-    id: 'lever-seated-fly',
-    name: 'Lever Seated Fly',
-    muscleGroup: 'Chest',
-    secondaryMuscles: ['Shoulders'],
-    equipment: 'Machine',
-    category: 'Isolation',
-    targetRepRange: [10, 14],
-    targetRpe: 9,
-    instructions: 'Sit with back flat on pad. Bring arm pads/handles together in front of chest, squeeze inner pecs.',
-    tips: ['Control the deep stretch return for 2 seconds']
-  },
-  {
-    id: 'cable-triceps-pushdown-vbar',
-    name: 'Cable Triceps Pushdown (V-bar)',
-    muscleGroup: 'Triceps',
-    secondaryMuscles: [],
-    equipment: 'Cable',
-    category: 'Isolation',
-    targetRepRange: [8, 12],
-    targetRpe: 9,
-    instructions: 'High pulley with V-bar. Pin elbows tight to sides, push bar downward to complete lockout.',
-    tips: ['Keep upper arms stationary; do not let elbows flare forward']
+    instructions: 'Sit with knees slightly bent. Pull handle toward abdomen while driving shoulders down and retracting scapulae.',
+    tips: ['Maintain upright chest; avoid excessive torso rocking']
   },
   {
     id: 'cable-low-seated-row',
@@ -619,16 +201,64 @@ export const EXERCISE_LIBRARY: Exercise[] = [
     tips: ['Squeeze scapulae together at full contraction']
   },
   {
-    id: 'dumbbell-reverse-wrist-curl',
-    name: 'Dumbbell Reverse Wrist Curl',
-    muscleGroup: 'Forearms',
-    secondaryMuscles: [],
-    equipment: 'Dumbbell',
-    category: 'Isolation',
-    targetRepRange: [12, 18],
+    id: 'chest-supported-t-bar-row',
+    name: 'Chest-Supported T-Bar Row',
+    muscleGroup: 'Back',
+    secondaryMuscles: ['Biceps', 'Forearms'],
+    equipment: 'Machine',
+    category: 'Compound',
+    targetRepRange: [8, 12],
     targetRpe: 8.5,
-    instructions: 'Forearms resting on bench, palms facing down. Curl wrists upward holding dumbbells.',
-    tips: ['High repetition burn for forearm extensor development']
+    instructions: 'Rest chest firmly against angled pad. Pull handles back until elbows pass torso, retracting shoulder blades.',
+    tips: ['Completely removes lower back fatigue so you can push upper back to failure']
+  },
+  {
+    id: 'single-arm-dumbbell-row',
+    name: 'Single-Arm Dumbbell Row',
+    muscleGroup: 'Back',
+    secondaryMuscles: ['Biceps', 'Forearms'],
+    equipment: 'Dumbbell',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Support knee and hand on flat bench. Pull dumbbell up towards hip pocket, feeling lat contraction.',
+    tips: ['Pull in an arcing path toward hip rather than straight up']
+  },
+  {
+    id: 'meadows-row',
+    name: 'Meadows Row (Landmine / Barbell)',
+    muscleGroup: 'Back',
+    secondaryMuscles: ['Biceps', 'Forearms'],
+    equipment: 'Barbell',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Stand perpendicular to landmine bar. Grip the sleeve with overhand grip and pull elbow up high toward ceiling.',
+    tips: ['John Meadows signature movement for incredible upper lat and teres development']
+  },
+  {
+    id: 'straight-arm-cable-pulldown',
+    name: 'Straight-Arm Cable Lat Pullover',
+    muscleGroup: 'Back',
+    secondaryMuscles: ['Triceps'],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 9,
+    instructions: 'Hinge hips slightly. With nearly straight arms, sweep the bar or rope down toward thighs in wide arc.',
+    tips: ['Pure lat isolation with zero bicep involvement']
+  },
+  {
+    id: 'chest-supported-dumbbell-row',
+    name: 'Chest-Supported Dumbbell Row',
+    muscleGroup: 'Back',
+    secondaryMuscles: ['Biceps', 'Rear Delts'],
+    equipment: 'Dumbbell',
+    category: 'Compound',
+    targetRepRange: [10, 14],
+    targetRpe: 8.5,
+    instructions: 'Lie face down on 30-degree incline bench. Row dumbbells upward driving elbows towards ceiling, squeezing mid-back.',
+    tips: ['Completely eliminates momentum', 'Hold peak contraction for 1 second']
   },
   {
     id: 'cable-bar-lateral-pulldown',
@@ -642,21 +272,85 @@ export const EXERCISE_LIBRARY: Exercise[] = [
     instructions: 'Grip bar wide or neutral. Pull bar down towards upper chest, driving elbows down and back.',
     tips: ['Think about pulling with your elbows, not your hands']
   },
+
+  // ==========================================
+  // SHOULDERS & REAR DELTS
+  // ==========================================
   {
-    id: 'lever-preacher-curl',
-    name: 'Lever Preacher Curl',
-    muscleGroup: 'Biceps',
-    secondaryMuscles: ['Forearms'],
-    equipment: 'Machine',
-    category: 'Isolation',
+    id: 'standing-overhead-press',
+    name: 'Standing Overhead Barbell Press (OHP)',
+    muscleGroup: 'Shoulders',
+    secondaryMuscles: ['Triceps', 'Upper Chest'],
+    equipment: 'Barbell',
+    category: 'Compound',
     targetRepRange: [6, 10],
+    targetRpe: 8,
+    instructions: 'Stand tall with core braced and glutes locked. Press barbell vertically from collarbone to overhead lockout.',
+    tips: ['Move head back slightly to clear path for bar', 'Lockout directly over midfoot']
+  },
+  {
+    id: 'smith-machine-overhead-press',
+    name: 'Smith Machine Seated Shoulder Press',
+    muscleGroup: 'Shoulders',
+    secondaryMuscles: ['Triceps'],
+    equipment: 'Smith Machine',
+    category: 'Compound',
+    targetRepRange: [8, 12],
     targetRpe: 8.5,
-    instructions: 'Sit with upper arms flushed on angled pad. Curl lever handle up smoothly, squeeze at peak.',
-    tips: ['Great continuous mechanical resistance profile']
+    instructions: 'Sit on upright bench under Smith bar. Press overhead with controlled eccentric down to chin height.',
+    tips: ['High stability allows pushing anterior delts to true mechanical failure']
+  },
+  {
+    id: 'dumbbell-lateral-raise',
+    name: 'Dumbbell Lateral Raise',
+    muscleGroup: 'Shoulders',
+    secondaryMuscles: [],
+    equipment: 'Dumbbell',
+    category: 'Isolation',
+    targetRepRange: [12, 16],
+    targetRpe: 9,
+    instructions: 'Stand with slight torso lean. Raise dumbbells out to sides until parallel to floor, leading with elbows.',
+    tips: ['Pour water slightly at top (internal rotation)', 'Do not swing or shrug with traps']
+  },
+  {
+    id: 'cable-lateral-raise',
+    name: 'Cable Lateral Raise',
+    muscleGroup: 'Shoulders',
+    secondaryMuscles: [],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [12, 16],
+    targetRpe: 9,
+    instructions: 'Set pulley to ankle or hip height. Raise arm out to side across body until parallel to ground.',
+    tips: ['Provides constant tension even at the bottom stretch', 'Keep wrist straight']
+  },
+  {
+    id: 'behind-back-cable-lateral-raise',
+    name: 'Behind-the-Back Cable Lateral Raise',
+    muscleGroup: 'Shoulders',
+    secondaryMuscles: [],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [12, 18],
+    targetRpe: 9,
+    instructions: 'Set cable low, stand in front of cable with cable running behind back. Raise arm out to shoulder level.',
+    tips: ['Phenomenal deep stretch on the side delt']
+  },
+  {
+    id: 'face-pull',
+    name: 'Cable Face Pull with External Rotation',
+    muscleGroup: 'Shoulders',
+    secondaryMuscles: ['Rear Delts', 'Traps'],
+    equipment: 'Cable',
+    category: 'Compound',
+    targetRepRange: [12, 18],
+    targetRpe: 8.5,
+    instructions: 'High pulley with rope. Pull towards eye level, separating rope ends and rotating hands backward.',
+    tips: ['Essential for rotator cuff health and rear delt fullness', 'Squeeze upper back']
   },
   {
     id: 'lever-seated-reverse-fly',
-    name: 'Lever Seated Reverse Fly',
+    name: 'Lever Seated Reverse Fly (Rear Delt Machine)',
     muscleGroup: 'Rear Delts',
     secondaryMuscles: ['Back'],
     equipment: 'Machine',
@@ -665,5 +359,573 @@ export const EXERCISE_LIBRARY: Exercise[] = [
     targetRpe: 9,
     instructions: 'Sit chest against pad. Grip vertical handles and fly arms horizontally outwards in a wide arc.',
     tips: ['Isolates posterior deltoid with zero momentum']
+  },
+  {
+    id: 'lu-raises',
+    name: 'Lu Lateral Raises (Full ROM)',
+    muscleGroup: 'Shoulders',
+    secondaryMuscles: ['Traps'],
+    equipment: 'Dumbbell',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 8.5,
+    instructions: 'Raise dumbbells past horizontal all the way overhead until dumbbells lightly meet at top, lower slowly.',
+    tips: ['Strengthens entire deltoid and serratus anterior through full natural scapular rhythm']
+  },
+
+  // ==========================================
+  // FOREARMS & GRIP (NEW DEDICATED SECTION)
+  // ==========================================
+  {
+    id: 'barbell-behind-back-wrist-curl',
+    name: 'Barbell Behind-the-Back Wrist Curl',
+    muscleGroup: 'Forearms',
+    secondaryMuscles: [],
+    equipment: 'Barbell',
+    category: 'Isolation',
+    targetRepRange: [12, 20],
+    targetRpe: 8.5,
+    instructions: 'Stand holding barbell behind thighs with pronated grip. Allow bar to roll to fingertips, then curl wrists upward hard.',
+    tips: ['Great mass builder for forearm flexors without wrist hyperextension pain', 'Keep arms stationary']
+  },
+  {
+    id: 'seated-dumbbell-wrist-curl',
+    name: 'Seated Dumbbell Wrist Curl',
+    muscleGroup: 'Forearms',
+    secondaryMuscles: [],
+    equipment: 'Dumbbell',
+    category: 'Isolation',
+    targetRepRange: [12, 18],
+    targetRpe: 9,
+    instructions: 'Rest forearms on flat bench or thighs with wrists hanging off edge, palms up. Lower dumbbell and curl wrist upward.',
+    tips: ['Open fingers slightly at bottom for maximal flexor stretch, then squeeze at peak']
+  },
+  {
+    id: 'dumbbell-reverse-wrist-curl',
+    name: 'Dumbbell Reverse Wrist Curl',
+    muscleGroup: 'Forearms',
+    secondaryMuscles: [],
+    equipment: 'Dumbbell',
+    category: 'Isolation',
+    targetRepRange: [12, 18],
+    targetRpe: 8.5,
+    instructions: 'Forearms resting on bench, palms facing down. Curl wrists upward holding dumbbells.',
+    tips: ['High repetition burn for forearm extensor development and forearm ridge thickness']
+  },
+  {
+    id: 'standing-cable-wrist-curl',
+    name: 'Standing Cable Wrist Curl',
+    muscleGroup: 'Forearms',
+    secondaryMuscles: [],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [12, 18],
+    targetRpe: 8.5,
+    instructions: 'Attach straight bar to low pulley. Face away or towards stack and curl wrists upward under constant cable tension.',
+    tips: ['Constant mechanical resistance through the entire range of motion']
+  },
+  {
+    id: 'barbell-reverse-grip-curl',
+    name: 'Barbell Reverse Grip Curl',
+    muscleGroup: 'Forearms',
+    secondaryMuscles: ['Biceps'],
+    equipment: 'Barbell',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 8,
+    instructions: 'Grip straight or EZ-bar with palms facing down (overhand). Curl upward to shoulder level with locked elbows.',
+    tips: ['Heavily trains brachioradialis and upper forearm ridge', 'Keep wrists straight and rigid']
+  },
+  {
+    id: 'standing-cable-reverse-curl',
+    name: 'Standing Cable Reverse Curl',
+    muscleGroup: 'Forearms',
+    secondaryMuscles: ['Biceps'],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 8.5,
+    instructions: 'Attach straight bar to low cable. Grip overhand and curl upward, feeling intense forearm pump.',
+    tips: ['Keep elbows tucked against ribcage throughout']
+  },
+  {
+    id: 'dumbbell-cross-body-hammer-curl',
+    name: 'Dumbbell Cross-Body Hammer Curl',
+    muscleGroup: 'Forearms',
+    secondaryMuscles: ['Biceps'],
+    equipment: 'Dumbbell',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Hold dumbbell with neutral grip. Curl across chest toward opposite clavicle, contracting brachialis and forearm.',
+    tips: ['Forces extreme brachialis activation for arm thickness']
+  },
+  {
+    id: 'farmers-walk-carry',
+    name: "Farmer's Walk / Loaded Carry",
+    muscleGroup: 'Forearms',
+    secondaryMuscles: ['Traps', 'Core'],
+    equipment: 'Dumbbell',
+    category: 'Compound',
+    targetRepRange: [30, 60],
+    targetRpe: 9,
+    instructions: 'Pick up heavy pair of dumbbells or kettlebells. Walk with upright posture, chest proud, gripping handles tightly.',
+    tips: ['Tests isometric crush grip, forearm stamina, and traps simultaneously']
+  },
+  {
+    id: 'dead-hang-grip',
+    name: 'Dead Hang (Grip & Forearm Resilience)',
+    muscleGroup: 'Forearms',
+    secondaryMuscles: ['Back', 'Shoulders'],
+    equipment: 'Bodyweight',
+    category: 'Compound',
+    targetRepRange: [30, 60],
+    targetRpe: 9,
+    instructions: 'Grip pullup bar with overhand grip and hang passively with relaxed shoulders and engaged grip for prescribed time.',
+    tips: ['Decompresses spine while building massive grip endurance']
+  },
+  {
+    id: 'plate-pinch-hold',
+    name: 'Plate Pinch Grip Hold',
+    muscleGroup: 'Forearms',
+    secondaryMuscles: [],
+    equipment: 'Other',
+    category: 'Isolation',
+    targetRepRange: [20, 45],
+    targetRpe: 9,
+    instructions: 'Pinch two weight plates smooth-sides out between thumb and fingers. Stand tall and hold for time.',
+    tips: ['Builds unmatched thumb adductor pinch grip power']
+  },
+
+  // ==========================================
+  // QUADS & LOWER BODY
+  // ==========================================
+  {
+    id: 'barbell-back-squat',
+    name: 'Barbell Back Squat',
+    muscleGroup: 'Quads',
+    secondaryMuscles: ['Glutes', 'Hamstrings'],
+    equipment: 'Barbell',
+    category: 'Compound',
+    targetRepRange: [6, 10],
+    targetRpe: 8,
+    instructions: 'Bar resting on upper traps. Descend until hip crease is below knee level. Drive out of the hole with chest up.',
+    tips: ['Keep knees tracking over toes', 'Breathe deep into belly and brace core']
+  },
+  {
+    id: 'sled-hack-squat',
+    name: 'Sled Hack Squat',
+    muscleGroup: 'Quads',
+    secondaryMuscles: ['Glutes'],
+    equipment: 'Machine',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 9,
+    instructions: 'Place shoulders under pads, feet mid-platform. Lower smoothly until knees are deeply flexed, drive back up.',
+    tips: ['Keep lower back flush against back pad', 'Control the eccentric for 3 seconds for maximum quad stretch']
+  },
+  {
+    id: 'pendulum-squat',
+    name: 'Pendulum Squat',
+    muscleGroup: 'Quads',
+    secondaryMuscles: ['Glutes'],
+    equipment: 'Machine',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 9,
+    instructions: 'Position shoulders under pads. Squat deep into the arc, feeling intense stretch on the rectus femoris and vastus lateralis.',
+    tips: ['The pinnacle quad hypertrophy machine; zero spinal loading']
+  },
+  {
+    id: 'bulgarian-split-squat',
+    name: 'Bulgarian Split Squat (Dumbbell)',
+    muscleGroup: 'Quads',
+    secondaryMuscles: ['Glutes', 'Hamstrings'],
+    equipment: 'Dumbbell',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Rear foot elevated on bench. Lower hips until front thigh is parallel to ground, drive through front heel.',
+    tips: ['Stay slightly upright for quad focus or lean forward 20 degrees for glute focus']
+  },
+  {
+    id: 'leg-press-45',
+    name: '45-Degree Incline Leg Press',
+    muscleGroup: 'Quads',
+    secondaryMuscles: ['Glutes'],
+    equipment: 'Machine',
+    category: 'Compound',
+    targetRepRange: [10, 15],
+    targetRpe: 8.5,
+    instructions: 'Feet shoulder-width on carriage. Lower weight until 90-degree knee bend, press without locking knees.',
+    tips: ['Do not allow tailbone to tuck or peel off seat pad', 'Smooth, continuous tension']
+  },
+  {
+    id: 'leg-extension',
+    name: 'Leg Extension',
+    muscleGroup: 'Quads',
+    secondaryMuscles: [],
+    equipment: 'Machine',
+    category: 'Isolation',
+    targetRepRange: [12, 18],
+    targetRpe: 9,
+    instructions: 'Align knee joint with machine pivot axis. Extend legs fully, squeeze quads for 1 second at top, lower slowly.',
+    tips: ['Point toes slightly inward or straight', 'Avoid throwing weight up with hips']
+  },
+  {
+    id: 'walking-dumbbell-lunge',
+    name: 'Walking Dumbbell Lunge',
+    muscleGroup: 'Quads',
+    secondaryMuscles: ['Glutes', 'Hamstrings'],
+    equipment: 'Dumbbell',
+    category: 'Compound',
+    targetRepRange: [10, 14],
+    targetRpe: 8.5,
+    instructions: 'Step forward into deep lunge, rear knee kissing floor gently. Drive up through front heel into next step.',
+    tips: ['Keep torso upright for quad focus', 'Take controlled, deliberate strides']
+  },
+
+  // ==========================================
+  // HAMSTRINGS & GLUTES
+  // ==========================================
+  {
+    id: 'romanian-deadlift-barbell',
+    name: 'Barbell Romanian Deadlift (RDL)',
+    muscleGroup: 'Hamstrings',
+    secondaryMuscles: ['Glutes', 'Back'],
+    equipment: 'Barbell',
+    category: 'Compound',
+    targetRepRange: [6, 10],
+    targetRpe: 8,
+    instructions: 'Slight knee bend. Push hips back as far as possible, sliding bar down shins until deep hamstring stretch. Drive hips forward.',
+    tips: ['Hips move backward, not downward', 'Keep bar glued to thighs']
+  },
+  {
+    id: 'dumbbell-romanian-deadlift',
+    name: 'Dumbbell Romanian Deadlift (DB RDL)',
+    muscleGroup: 'Hamstrings',
+    secondaryMuscles: ['Glutes'],
+    equipment: 'Dumbbell',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Hold dumbbells at sides. Push hips backward keeping back rigid until deep stretch in hamstrings.',
+    tips: ['Dumbbells allow more natural wrist alignment and greater hip hinge range']
+  },
+  {
+    id: 'barbell-hip-thrust',
+    name: 'Barbell Hip Thrust',
+    muscleGroup: 'Glutes',
+    secondaryMuscles: ['Hamstrings'],
+    equipment: 'Barbell',
+    category: 'Compound',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Upper back on bench, barbell over hips. Drive through heels until hips are fully extended and locked at top.',
+    tips: ['Squeeze glutes hard at top for 1 full second', 'Keep chin tucked to prevent lower back hyperextension']
+  },
+  {
+    id: 'lying-leg-curl',
+    name: 'Lying Leg Curl',
+    muscleGroup: 'Hamstrings',
+    secondaryMuscles: ['Calves'],
+    equipment: 'Machine',
+    category: 'Isolation',
+    targetRepRange: [10, 14],
+    targetRpe: 9,
+    instructions: 'Lie prone with knees just off pad. Curl heels towards glutes smoothly, squeeze at peak, control the descent.',
+    tips: ['Keep hips pinned to pad; do not let lower back arch', 'Flex toes toward shins']
+  },
+  {
+    id: 'seated-leg-curl',
+    name: 'Seated Leg Curl',
+    muscleGroup: 'Hamstrings',
+    secondaryMuscles: [],
+    equipment: 'Machine',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 9,
+    instructions: 'Thigh pad snug against thighs. Curl roller down and back beneath seat, feeling deep hamstring contraction.',
+    tips: ['Seated position places hamstrings at longer muscle length for superior hypertrophy']
+  },
+
+  // ==========================================
+  // BICEPS
+  // ==========================================
+  {
+    id: 'barbell-bicep-curl',
+    name: 'Standing Barbell Bicep Curl',
+    muscleGroup: 'Biceps',
+    secondaryMuscles: ['Forearms'],
+    equipment: 'Barbell',
+    category: 'Isolation',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Shoulder-width underhand grip. Pin elbows to sides, curl barbell up to upper chest height.',
+    tips: ['Do not swing torso back', 'Lower the bar slowly for 2-3 seconds']
+  },
+  {
+    id: 'incline-dumbbell-curl',
+    name: 'Incline Dumbbell Bicep Curl',
+    muscleGroup: 'Biceps',
+    secondaryMuscles: ['Forearms'],
+    equipment: 'Dumbbell',
+    category: 'Isolation',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Sit on 45-60 degree incline. Arms hanging straight down behind torso. Curl dumbbells up with supination.',
+    tips: ['Places biceps long head under heavy passive stretch at bottom']
+  },
+  {
+    id: 'bayesian-cable-curl',
+    name: 'Bayesian Cable Curl (Behind-the-Back)',
+    muscleGroup: 'Biceps',
+    secondaryMuscles: ['Forearms'],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 9,
+    instructions: 'Set cable low. Face away from cable machine, arm extended behind body. Curl forward and upward.',
+    tips: ['Maximum long head stretch and tension throughout full range']
+  },
+  {
+    id: 'dumbbell-hammer-curl',
+    name: 'Standing Dumbbell Hammer Curl',
+    muscleGroup: 'Biceps',
+    secondaryMuscles: ['Forearms'],
+    equipment: 'Dumbbell',
+    category: 'Isolation',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Neutral grip (palms facing each other). Curl dumbbells upward keeping thumbs pointed up.',
+    tips: ['Heavy focus on brachialis and brachioradialis for arm thickness']
+  },
+  {
+    id: 'cable-rope-hammer-curl',
+    name: 'Cable Rope Hammer Curl',
+    muscleGroup: 'Biceps',
+    secondaryMuscles: ['Forearms'],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [10, 14],
+    targetRpe: 9,
+    instructions: 'Low pulley with rope attachment. Curl up with neutral grip, spreading rope handles slightly at top.',
+    tips: ['Keep continuous mechanical tension without rest at bottom']
+  },
+  {
+    id: 'lever-preacher-curl',
+    name: 'Lever Machine Preacher Curl',
+    muscleGroup: 'Biceps',
+    secondaryMuscles: ['Forearms'],
+    equipment: 'Machine',
+    category: 'Isolation',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Sit with upper arms flushed on angled pad. Curl lever handle up smoothly, squeeze at peak.',
+    tips: ['Great continuous mechanical resistance profile with zero shoulder involvement']
+  },
+  {
+    id: 'cable-overhead-curl',
+    name: 'Cable Overhead / High Pulley Bicep Curl',
+    muscleGroup: 'Biceps',
+    secondaryMuscles: [],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 9,
+    instructions: 'Stand between two high cable pulleys. Curl handles towards ears, flexing biceps hard.',
+    tips: ['Peak contraction at highest bicep shortened position']
+  },
+
+  // ==========================================
+  // TRICEPS
+  // ==========================================
+  {
+    id: 'triceps-rope-pushdown',
+    name: 'Cable Triceps Rope Pushdown',
+    muscleGroup: 'Triceps',
+    secondaryMuscles: [],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [10, 14],
+    targetRpe: 9,
+    instructions: 'High pulley with rope. Pin elbows to ribs, push rope down and flare ends outward at lockout.',
+    tips: ['Keep elbows tucked in stationary position', 'Squeeze outer tricep lateral head']
+  },
+  {
+    id: 'cable-triceps-pushdown-vbar',
+    name: 'Cable Triceps Pushdown (V-bar)',
+    muscleGroup: 'Triceps',
+    secondaryMuscles: [],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [8, 12],
+    targetRpe: 9,
+    instructions: 'High pulley with V-bar. Pin elbows tight to sides, push bar downward to complete lockout.',
+    tips: ['Allows slightly heavier loads for tricep mechanical tension']
+  },
+  {
+    id: 'overhead-cable-triceps-extension',
+    name: 'Overhead Cable Rope Triceps Extension',
+    muscleGroup: 'Triceps',
+    secondaryMuscles: [],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 9,
+    instructions: 'Set cable to chest height. Lean forward, extend rope overhead and forward until arms are locked out.',
+    tips: ['Crucial for the tricep long head which only gets stretched with shoulder in flexion']
+  },
+  {
+    id: 'skull-crushers-ez-bar',
+    name: 'EZ-Bar Skull Crushers (Lying Triceps Extension)',
+    muscleGroup: 'Triceps',
+    secondaryMuscles: [],
+    equipment: 'Barbell',
+    category: 'Isolation',
+    targetRepRange: [8, 12],
+    targetRpe: 8.5,
+    instructions: 'Lie on flat bench, hold EZ-bar above chest. Lower bar towards forehead or crown of head by bending elbows.',
+    tips: ['Keep upper arms angled slightly back toward head to keep constant tension on triceps']
+  },
+  {
+    id: 'overhead-dumbbell-extension',
+    name: 'Seated Overhead Dumbbell Triceps Extension',
+    muscleGroup: 'Triceps',
+    secondaryMuscles: [],
+    equipment: 'Dumbbell',
+    category: 'Isolation',
+    targetRepRange: [10, 14],
+    targetRpe: 8.5,
+    instructions: 'Sit upright, cup heavy dumbbell overhead with both hands. Lower behind head until elbows bend 90 degrees, press upward.',
+    tips: ['Keep elbows pointed up and in, avoid flaring excessively']
+  },
+  {
+    id: 'close-grip-bench-press',
+    name: 'Close-Grip Barbell Bench Press',
+    muscleGroup: 'Triceps',
+    secondaryMuscles: ['Chest', 'Shoulders'],
+    equipment: 'Barbell',
+    category: 'Compound',
+    targetRepRange: [6, 10],
+    targetRpe: 8,
+    instructions: 'Grip bar shoulder-width apart. Keep elbows tucked tight to sides, lower bar to sternum and press.',
+    tips: ['Do not grip too close (wrist strain); shoulder-width is optimal for tricep torque']
+  },
+
+  // ==========================================
+  // CALVES
+  // ==========================================
+  {
+    id: 'standing-calf-raise',
+    name: 'Standing Calf Machine Raise',
+    muscleGroup: 'Calves',
+    secondaryMuscles: [],
+    equipment: 'Machine',
+    category: 'Isolation',
+    targetRepRange: [12, 18],
+    targetRpe: 9,
+    instructions: 'Shoulders under pads, balls of feet on edge. Drop heels for full 2-second stretch, press onto big toes and hold peak.',
+    tips: ['Straight knee position targets gastrocnemius head', 'Pause 1 second at bottom to eliminate Achilles elastic rebound']
+  },
+  {
+    id: 'seated-machine-calf-raise',
+    name: 'Seated Machine Calf Raise',
+    muscleGroup: 'Calves',
+    secondaryMuscles: [],
+    equipment: 'Machine',
+    category: 'Isolation',
+    targetRepRange: [12, 20],
+    targetRpe: 9,
+    instructions: 'Sit with knee pads secured. Lower heels deep into stretch, press up onto balls of feet.',
+    tips: ['Bent knee removes gastrocnemius and isolates the deep soleus muscle']
+  },
+  {
+    id: 'leg-press-calf-press',
+    name: 'Leg Press Machine Calf Press',
+    muscleGroup: 'Calves',
+    secondaryMuscles: [],
+    equipment: 'Machine',
+    category: 'Isolation',
+    targetRepRange: [12, 18],
+    targetRpe: 9,
+    instructions: 'Balls of feet on lower lip of footplate. Push sled back with ankle extension, control descent into deep ankle dorsiflexion.',
+    tips: ['Do not lock knees; keep slight soft microbend for joint safety']
+  },
+
+  // ==========================================
+  // ABS & CORE
+  // ==========================================
+  {
+    id: 'hanging-knee-raise',
+    name: 'Hanging Knee / Leg Raise',
+    muscleGroup: 'Abs',
+    secondaryMuscles: [],
+    equipment: 'Bodyweight',
+    category: 'Isolation',
+    targetRepRange: [10, 16],
+    targetRpe: 9,
+    instructions: 'Hang from pullup bar. Curl pelvis up towards chest, bringing knees into ribcage. Lower under control without swinging.',
+    tips: ['Focus on posterior pelvic tilt (curling pelvis), not just lifting thighs with hip flexors']
+  },
+  {
+    id: 'hanging-leg-raise',
+    name: 'Hanging Straight Leg Raise',
+    muscleGroup: 'Abs',
+    secondaryMuscles: [],
+    equipment: 'Bodyweight',
+    category: 'Isolation',
+    targetRepRange: [8, 14],
+    targetRpe: 9,
+    instructions: 'Hang from bar with straight legs. Raise toes towards bar level, flexing rectus abdominis.',
+    tips: ['Do not use swinging momentum; initiate movement strictly from core']
+  },
+  {
+    id: 'cable-kneeling-crunch',
+    name: 'Cable Kneeling Rope Crunch',
+    muscleGroup: 'Abs',
+    secondaryMuscles: [],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [12, 18],
+    targetRpe: 9,
+    instructions: 'Kneel holding rope at temples. Curl ribcage toward pelvis like rolling up a carpet. Do not sit back on heels.',
+    tips: ['Keep hips locked in space; round upper spine to fully contract abs']
+  },
+  {
+    id: 'ab-wheel-rollout',
+    name: 'Ab Wheel Rollout',
+    muscleGroup: 'Abs',
+    secondaryMuscles: ['Back', 'Shoulders'],
+    equipment: 'Bodyweight',
+    category: 'Compound',
+    targetRepRange: [8, 14],
+    targetRpe: 9,
+    instructions: 'Kneel with wheel in front. Roll forward extending arms until body is near floor with braced core. Pull back with abs.',
+    tips: ['Keep hips tucked; do not let lower back sag or hyperextend']
+  },
+  {
+    id: 'cable-woodchoppers',
+    name: 'High-to-Low Cable Woodchoppers',
+    muscleGroup: 'Abs',
+    secondaryMuscles: ['Shoulders'],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 8.5,
+    instructions: 'High cable position. Pull handle diagonally downward across body toward opposite hip, rotating with core and hips.',
+    tips: ['Pivot on rear foot and engage obliques throughout rotational arc']
+  },
+  {
+    id: 'pallof-press',
+    name: 'Cable Pallof Press (Anti-Rotation Core)',
+    muscleGroup: 'Abs',
+    secondaryMuscles: ['Shoulders'],
+    equipment: 'Cable',
+    category: 'Isolation',
+    targetRepRange: [10, 15],
+    targetRpe: 8,
+    instructions: 'Stand sideways to cable stack at chest height. Press handle directly forward and hold against rotational pull.',
+    tips: ['Resist rotation completely; holds for 2 seconds at full arm extension']
   }
 ];

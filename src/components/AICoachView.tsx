@@ -52,9 +52,10 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
   }, [messages, loading]);
 
   const quickPrompts = [
+    'Generate a 4-Day Push/Pull/Legs Split',
+    'Create a 3-Day Full Body Hypertrophy Split',
     'Swap Hack Squat for Sled Leg Press on Tuesday',
     'Change Friday to focus more on arms & delts',
-    'Reduce my Wednesday workout to 3 exercises',
     'How do I break my Incline Bench plateau?'
   ];
 
@@ -164,8 +165,9 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
         };
       } else {
         // Append new routine
+        const cleanDay = (action.weekday || 'custom').toLowerCase().replace(/\s+/g, '-');
         updatedRoutines.push({
-          id: `routine-${Date.now()}`,
+          id: `routine-${cleanDay}-${routines.length + 1}`,
           name: action.routineName || `${action.weekday} Routine`,
           description: action.description || 'Customized by AI Coach',
           weekday: action.weekday as any,

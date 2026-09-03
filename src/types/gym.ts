@@ -149,6 +149,22 @@ export interface UserSettings {
   heightCm?: number;
   age?: number;
   targetWeightKg?: number;
+  bodyWeightLogs?: BodyWeightEntry[];
+}
+
+export interface BodyWeightEntry {
+  id: string;
+  date: string;
+  weightKg: number;
+  note?: string;
+}
+
+export interface MuscleVolumeLandmark {
+  muscle: MuscleGroup;
+  sets: number;
+  status: 'Maintenance' | 'Minimum Effective' | 'Optimal Growth' | 'Max Recoverable';
+  recommendedRange: [number, number];
+  color: string;
 }
 
 export interface PlateCalculation {

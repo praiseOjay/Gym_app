@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X, Sparkles, RefreshCw, CheckCircle2, ArrowRight } from 'lucide-react';
 import type { Exercise } from '../types/gym';
 import { getSmartExerciseSwap } from '../services/geminiService';
@@ -25,7 +25,7 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
     recommendedWeightAdj: string;
   } | null>(null);
 
-  const fetchSwap = async (customReason?: string) => {
+  const fetchSwap = useCallback(async (customReason?: string) => {
     setLoading(true);
     try {
       const swap = await getSmartExerciseSwap(exercise, customReason || reason, apiKey);
@@ -35,11 +35,11 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [exercise, reason, apiKey]);
 
   useEffect(() => {
     fetchSwap();
-  }, [exercise]);
+  }, [fetchSwap]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>

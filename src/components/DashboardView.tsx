@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import type {
   WorkoutSession,
   Routine,
@@ -8,10 +8,16 @@ import type {
 } from '../types/gym';
 import { MuscleRecoveryHeatmap } from './MuscleRecoveryHeatmap';
 import { kgToLbs } from '../engine/overloadEngine';
+import { getPreWorkoutPrimer } from '../services/geminiService';
+import { triggerHaptic } from '../utils/haptics';
 import {
   Play,
   Flame,
-  Calendar
+  Calendar,
+  Sparkles,
+  X,
+  Loader2,
+  CheckCircle2
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -33,7 +39,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onStartRoutine,
   onNavigateTab
 }) => {
-  // Determine next routine in the 5-day cycle based on the last completed workout
+  const [primerData, setPrimerData] = useState<{
+    headline: string;
+    focusPoints: string[];
+    recoveryNote: string;
+  } | null>(null);
+  const [loadingPrimer, setLoadingPrimer] = useState(false);
+
+  // Determine next routine in the cycle based on the last completed workout
   const lastSession = historySessions[0];
   let nextRoutineIndex = 0;
   if (lastSession?.routineId) {
@@ -44,16 +57,47 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   }
   const nextRoutine = routines[nextRoutineIndex] || routines[0];
 
-  // Calculate 7-day volume
-  const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const recentSessions = historySessions.filter(
-    (s) => new Date(s.date).getTime() > oneWeekAgo
-  );
-  const weeklyVolumeKg = recentSessions.reduce((sum, s) => sum + s.totalVolumeKg, 0);
+  // Calculate 7-day volume safely
+  const [mountTime] = useState(() => Date.now());
+  const recentSessions = useMemo(() => {
+    const cutoff = mountTime - 7 * 24 * 60 * 60 * 1000;
+    return historySessions.filter((s) => new Date(s.date).getTime() > cutoff);
+  }, [historySessions, mountTime]);
+
+  const weeklyVolumeKg = useMemo(() => {
+    return recentSessions.reduce((sum, s) => sum + s.totalVolumeKg, 0);
+  }, [recentSessions]);
 
   const displayVolume = (kg: number) => {
     if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
     return `${kg} kg`;
+  };
+
+  const handleFetchPrimer = async () => {
+    if (!nextRoutine || loadingPrimer) return;
+    setLoadingPrimer(true);
+    triggerHaptic('light', settings.vibrationEnabled);
+
+    try {
+      const result = await getPreWorkoutPrimer(
+        nextRoutine,
+        recoveryStates,
+        settings.geminiApiKey
+      );
+      setPrimerData(result);
+      triggerHaptic('success', settings.vibrationEnabled);
+    } catch {
+      setPrimerData({
+        headline: 'Maximum Tension & Progressive Overload',
+        focusPoints: [
+          'Aim to beat last session by +1 rep or +2.5kg on opening compound lifts.',
+          'Control eccentrics for 2-3 seconds to maximize mechanical tension.'
+        ],
+        recoveryNote: 'Muscles are primed. Execute with high intent.'
+      });
+    } finally {
+      setLoadingPrimer(false);
+    }
   };
 
   return (
@@ -70,7 +114,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-volt)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-              3 Upper / 2 Lower Hypertrophy Split
+              Hypertrophy & Progressive Overload
             </span>
             <h1 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#fff', marginTop: 2 }}>
               Ready to Overload, {settings.userName}?
@@ -205,7 +249,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 Progress & Calendar Hub
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>
-                View progression graph, monthly logs & consistency streak
+                Progression graphs, weekly MEV/MRV sets & 1RM calculator
               </div>
             </div>
           </div>
@@ -225,7 +269,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 Next Scheduled Session
               </span>
             </div>
-            <span className="section-tag">{nextRoutine.dayTag}</span>
+            <span className="section-tag">{nextRoutine.dayTag || nextRoutine.weekday}</span>
           </div>
 
           <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>
@@ -260,14 +304,30 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          <button
-            className="btn-primary"
-            style={{ width: '100%' }}
-            onClick={() => onStartRoutine(nextRoutine)}
-          >
-            <Play size={18} fill="#050D0A" />
-            Start {nextRoutine.dayTag} Workout
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className="btn-secondary"
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              onClick={handleFetchPrimer}
+              disabled={loadingPrimer}
+            >
+              {loadingPrimer ? (
+                <Loader2 size={16} className="spinner" />
+              ) : (
+                <Sparkles size={16} color="var(--accent-cyan)" />
+              )}
+              <span>AI Tactical Primer</span>
+            </button>
+
+            <button
+              className="btn-primary"
+              style={{ flex: 1.5 }}
+              onClick={() => onStartRoutine(nextRoutine)}
+            >
+              <Play size={18} fill="#050D0A" />
+              Start {nextRoutine.dayTag || 'Workout'}
+            </button>
+          </div>
         </div>
       )}
 
@@ -338,6 +398,66 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         )}
       </div>
+
+      {/* AI Pre-Workout Tactical Primer Modal */}
+      {primerData && nextRoutine && (
+        <div className="modal-overlay" onClick={() => setPrimerData(null)}>
+          <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-handle" />
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+              <div>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--accent-volt)', textTransform: 'uppercase' }}>
+                  Pre-Workout Tactical Brief
+                </span>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', marginTop: 2 }}>
+                  {primerData.headline}
+                </h3>
+              </div>
+              <button
+                onClick={() => setPrimerData(null)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            {/* Tactical Cues */}
+            <div style={{ background: 'var(--bg-card)', padding: '14px', borderRadius: 'var(--radius-lg)', marginBottom: 12 }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-cyan)', textTransform: 'uppercase', marginBottom: 8 }}>
+                🎯 Tactical Cues for Today
+              </div>
+              <ul style={{ paddingLeft: 18, fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                {primerData.focusPoints.map((pt, idx) => (
+                  <li key={idx} style={{ marginBottom: 6 }}>{pt}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Physiological Readiness Note */}
+            <div style={{ background: 'var(--bg-surface)', padding: '12px 14px', borderRadius: 'var(--radius-md)', marginBottom: 16 }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-volt)', textTransform: 'uppercase', marginBottom: 4 }}>
+                ⚡ Muscle Recovery Status
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                {primerData.recoveryNote}
+              </p>
+            </div>
+
+            <button
+              className="btn-primary"
+              style={{ width: '100%' }}
+              onClick={() => {
+                setPrimerData(null);
+                onStartRoutine(nextRoutine);
+              }}
+            >
+              <CheckCircle2 size={18} />
+              Start Workout with Cues
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

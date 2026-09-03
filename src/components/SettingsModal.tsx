@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { UserSettings } from '../types/gym';
 import { kgToLbs, lbsToKg } from '../engine/overloadEngine';
+import { StorageService } from '../db/storage';
+import { triggerHaptic } from '../utils/haptics';
 import {
   X,
   Key,
@@ -10,7 +12,11 @@ import {
   User,
   Check,
   RotateCcw,
-  Target
+  Target,
+  Database,
+  Download,
+  Upload,
+  FileSpreadsheet
 } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -29,6 +35,49 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [localSettings, setLocalSettings] = useState<UserSettings>({ ...settings });
   const [showKey, setShowKey] = useState(false);
   const [savedAlert, setSavedAlert] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const downloadFile = (content: string, fileName: string, contentType: string) => {
+    const a = document.createElement('a');
+    const file = new Blob([content], { type: contentType });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const handleExportJSON = () => {
+    const json = StorageService.exportFullBackupJSON();
+    const dateStr = new Date().toISOString().split('T')[0];
+    downloadFile(json, `overload-ai-backup-${dateStr}.json`, 'application/json');
+    triggerHaptic('success');
+  };
+
+  const handleExportCSV = () => {
+    const csv = StorageService.exportWorkoutsCSV();
+    const dateStr = new Date().toISOString().split('T')[0];
+    downloadFile(csv, `overload-ai-workouts-${dateStr}.csv`, 'text/csv');
+    triggerHaptic('success');
+  };
+
+  const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      const res = StorageService.importFullBackupJSON(content);
+      if (res.success) {
+        triggerHaptic('success');
+        alert('Backup restored successfully! The app will now reload.');
+        window.location.reload();
+      } else {
+        triggerHaptic('warning');
+        alert(res.message);
+      }
+    };
+    reader.readAsText(file);
+  };
 
   const handleSave = () => {
     onSave(localSettings);
@@ -357,6 +406,59 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             onChange={(e) => setLocalSettings({ ...localSettings, userName: e.target.value })}
             placeholder="Athlete"
           />
+        </div>
+
+        {/* Data Management & Backups */}
+        <div className="gym-card" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <Database size={18} color="var(--accent-volt)" />
+            <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Data Safety & Backups</span>
+          </div>
+          <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginBottom: 12, lineHeight: 1.45 }}>
+            Export full JSON backups to prevent data loss or export CSV spreadsheets of all your workout sets.
+          </p>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".json"
+            style={{ display: 'none' }}
+            onChange={handleImportJSON}
+          />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{ padding: '10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                onClick={handleExportJSON}
+                title="Download full JSON backup of all workouts, routines, and PRs"
+              >
+                <Download size={14} /> Export Backup (JSON)
+              </button>
+
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{ padding: '10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                onClick={() => fileInputRef.current?.click()}
+                title="Restore workouts and splits from JSON backup"
+              >
+                <Upload size={14} /> Import Backup (JSON)
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ width: '100%', padding: '10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              onClick={handleExportCSV}
+              title="Download CSV spreadsheet of all workout sets"
+            >
+              <FileSpreadsheet size={14} color="var(--accent-volt)" /> Export Workout Logs (CSV)
+            </button>
+          </div>
         </div>
 
         {/* Action Buttons */}
