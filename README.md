@@ -40,6 +40,7 @@ An elite personal bodybuilding and progressive overload web app built for lifter
 ## Getting Started
 
 ### 1. Clone & Install Dependencies
+
 ```bash
 git clone https://github.com/praiseOjay/Gym_app.git
 cd Gym_app
@@ -47,27 +48,80 @@ npm install
 ```
 
 ### 2. Configure Environment Variables
+
 Copy `.env.example` to `.env` and add your Gemini API key:
+
 ```bash
 cp .env.example .env
 ```
+
 Add your key in `.env`:
+
 ```env
 VITE_GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 ### 3. Run Development Server
+
 ```bash
 npm run dev
 ```
+
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ### 4. Build for Production
+
 ```bash
 npm run build
 ```
 
 ---
 
+## 📱 Running on Your Phone (Android)
+
+### Option 1: Automated APK Download via GitHub Actions (Zero Local Setup)
+
+This repository includes a GitHub Actions workflow that automatically compiles and packages `OverloadAI-debug.apk`:
+
+1. Push your changes to GitHub:
+
+   ```bash
+   git add .
+   git commit -m "Add Android Capacitor support"
+   git push origin main
+   ```
+
+2. Navigate to your repository on GitHub and click the **Actions** tab.
+3. Click the latest **Build Android APK** workflow run.
+4. Under **Artifacts**, download `OverloadAI-debug-apk`.
+5. Transfer or download the `.apk` directly onto your Android phone, tap to install, and enjoy Overload AI natively on your device!
+
+### Option 2: Local Android Studio Build
+
+If you have Android Studio installed on your computer:
+
+```bash
+# Sync web assets to Android
+npm run cap:sync
+
+# Open project in Android Studio
+npm run cap:open
+```
+
+In Android Studio, connect your phone via USB (with USB Debugging enabled) and click **Run**, or select **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
+
+### Option 3: Instant Local Wi-Fi Testing
+
+To test immediately on your phone without installing an APK:
+
+```bash
+npm run dev -- --host
+```
+
+Open `http://<your-computer-ip>:5173` on Chrome on your Android phone connected to the same Wi-Fi. Tap the browser menu (3 dots) and select **"Add to Home screen"** or **"Install app"**.
+
+---
+
 ## License
+
 MIT
