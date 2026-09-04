@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { Routine, Exercise, RoutineExerciseTemplate } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import { triggerHaptic } from '../utils/haptics';
 import { sounds } from '../utils/audio';
+import { getTodayWorkoutState } from '../utils/dateUtils';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
 import {
   Play,
@@ -29,8 +30,9 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
   onStartRoutine,
   onUpdateRoutines
 }) => {
+  const todayWorkout = useMemo(() => getTodayWorkoutState(routines), [routines]);
   const [selectedRoutineId, setSelectedRoutineId] = useState<string>(
-    routines[0]?.id || ''
+    todayWorkout.routine?.id || routines[0]?.id || ''
   );
   const [inspectExercise, setInspectExercise] = useState<Exercise | null>(null);
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
@@ -151,6 +153,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
         >
           {routines.map((routine) => {
             const isSelected = currentRoutine?.id === routine.id;
+            const isToday = todayWorkout.routine?.id === routine.id && todayWorkout.isScheduledToday;
             return (
               <button
                 key={routine.id}
@@ -159,17 +162,36 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  color: isSelected ? '#FFFFFF' : 'var(--text-muted)',
+                  color: isSelected ? '#FFFFFF' : isToday ? 'var(--accent-volt)' : 'var(--text-muted)',
                   fontSize: '1rem',
                   fontWeight: isSelected ? 800 : 600,
                   cursor: 'pointer',
-                  padding: '6px 4px 8px',
+                  padding: '6px 6px 8px',
                   position: 'relative',
                   whiteSpace: 'nowrap',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6
                 }}
               >
-                {routine.dayTag || routine.weekday}
+                <span>{routine.dayTag || routine.weekday}</span>
+                {isToday && (
+                  <span
+                    style={{
+                      fontSize: '0.62rem',
+                      fontWeight: 800,
+                      background: 'var(--accent-volt)',
+                      color: '#050A0F',
+                      padding: '1px 5px',
+                      borderRadius: 'var(--radius-full)',
+                      letterSpacing: '0.3px',
+                      lineHeight: 1.2
+                    }}
+                  >
+                    TODAY
+                  </span>
+                )}
                 {isSelected && (
                   <span
                     style={{

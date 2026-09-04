@@ -10,6 +10,7 @@ import { MuscleRecoveryHeatmap } from './MuscleRecoveryHeatmap';
 import { kgToLbs } from '../engine/overloadEngine';
 import { getPreWorkoutPrimer } from '../services/geminiService';
 import { triggerHaptic } from '../utils/haptics';
+import { getTodayWorkoutState } from '../utils/dateUtils';
 import {
   Play,
   Flame,
@@ -46,16 +47,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   } | null>(null);
   const [loadingPrimer, setLoadingPrimer] = useState(false);
 
-  // Determine next routine in the cycle based on the last completed workout
-  const lastSession = historySessions[0];
-  let nextRoutineIndex = 0;
-  if (lastSession?.routineId) {
-    const lastIdx = routines.findIndex((r) => r.id === lastSession.routineId);
-    if (lastIdx >= 0) {
-      nextRoutineIndex = (lastIdx + 1) % routines.length;
-    }
-  }
-  const nextRoutine = routines[nextRoutineIndex] || routines[0];
+  // Determine scheduled routine for today (or next in split)
+  const todayWorkout = useMemo(
+    () => getTodayWorkoutState(routines, historySessions),
+    [routines, historySessions]
+  );
+  const nextRoutine = todayWorkout.routine;
 
   // Calculate 7-day volume safely
   const [mountTime] = useState(() => Date.now());
@@ -264,12 +261,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="gym-card gym-card-highlight">
           <div className="section-header" style={{ marginBottom: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-volt)' }} />
-              <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-volt)', textTransform: 'uppercase' }}>
-                Next Scheduled Session
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: todayWorkout.isScheduledToday ? 'var(--accent-volt)' : '#38BDF8' }} />
+              <span style={{ fontSize: '0.75rem', fontWeight: 800, color: todayWorkout.isScheduledToday ? 'var(--accent-volt)' : '#38BDF8', textTransform: 'uppercase' }}>
+                {todayWorkout.isScheduledToday
+                  ? `Today's Target · ${todayWorkout.dayName}`
+                  : `Next Up · ${todayWorkout.dayName} (Rest Day)`}
               </span>
             </div>
-            <span className="section-tag">{nextRoutine.dayTag || nextRoutine.weekday}</span>
+            <span className="section-tag">{todayWorkout.isScheduledToday ? 'TODAY' : nextRoutine.dayTag || nextRoutine.weekday}</span>
           </div>
 
           <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>
@@ -279,7 +278,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {nextRoutine.description}
           </p>
 
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
             <div
               style={{
                 fontSize: '0.75rem',
@@ -302,6 +301,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             >
               ⏱️ ~50-60 min
             </div>
+            {todayWorkout.isAlreadyCompletedToday && (
+              <div
+                style={{
+                  fontSize: '0.75rem',
+                  color: 'var(--accent-volt)',
+                  background: 'rgba(0, 245, 155, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: 'var(--radius-md)',
+                  fontWeight: 700
+                }}
+              >
+                ✓ Completed Today
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: 8 }}>
@@ -325,7 +338,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               onClick={() => onStartRoutine(nextRoutine)}
             >
               <Play size={18} fill="#050D0A" />
-              Start {nextRoutine.dayTag || 'Workout'}
+              {todayWorkout.isAlreadyCompletedToday
+                ? `Repeat ${nextRoutine.dayTag || 'Workout'}`
+                : `Start ${nextRoutine.dayTag || 'Workout'}`}
             </button>
           </div>
         </div>

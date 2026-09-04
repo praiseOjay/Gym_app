@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type {
   WorkoutSession,
   Routine,
@@ -19,7 +19,8 @@ import { AnalyticsView } from './components/AnalyticsView';
 import { AICoachView } from './components/AICoachView';
 import { WorkoutSummaryModal } from './components/WorkoutSummaryModal';
 import { SettingsModal } from './components/SettingsModal';
-import { Dumbbell, Play } from 'lucide-react';
+import { getTodayWorkoutState } from './utils/dateUtils';
+import { Dumbbell, Play, CheckCircle2 } from 'lucide-react';
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
@@ -30,6 +31,12 @@ export function App() {
   const [activeSession, setActiveSession] = useState<WorkoutSession | null>(() => StorageService.getActiveWorkout());
   const [justCompletedSession, setJustCompletedSession] = useState<WorkoutSession | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+
+  // Compute today's scheduled workout from current day of week
+  const todayWorkout = useMemo(
+    () => getTodayWorkoutState(routines, workouts),
+    [routines, workouts]
+  );
 
   // Save active workout whenever it updates
   const handleUpdateActiveSession = (updated: WorkoutSession) => {
@@ -214,37 +221,141 @@ export function App() {
               onCancelWorkout={handleCancelWorkout}
             />
           ) : (
-            <div className="view-content" style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <div className="view-content" style={{ textAlign: 'center', padding: '24px 16px' }}>
               <div
                 style={{
-                  width: 64,
-                  height: 64,
+                  width: 58,
+                  height: 58,
                   borderRadius: 'var(--radius-xl)',
                   background: 'var(--bg-card)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  margin: '0 auto 16px',
-                  color: 'var(--accent-volt)'
+                  margin: '0 auto 14px',
+                  color: 'var(--accent-volt)',
+                  boxShadow: '0 0 24px rgba(0, 245, 155, 0.2)'
                 }}
               >
-                <Dumbbell size={32} />
+                <Dumbbell size={28} />
               </div>
               <h2 style={{ fontSize: '1.3rem', fontWeight: 800 }}>No Active Workout</h2>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: 4, marginBottom: 24 }}>
-                Choose a session from your 5-Day Hypertrophy split or start today's recommended workout.
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: 4, marginBottom: 20 }}>
+                {todayWorkout.isScheduledToday
+                  ? `Today is ${todayWorkout.formattedDate} · Scheduled Split Session`
+                  : `Today is ${todayWorkout.formattedDate} · Scheduled Rest & Recovery Day`}
               </p>
 
-              {routines.length > 0 && (
+              {/* Today's Target Card */}
+              <div
+                style={{
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-medium)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '16px',
+                  textAlign: 'left',
+                  marginBottom: '16px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.35)'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      fontWeight: 800,
+                      color: todayWorkout.isScheduledToday ? 'var(--accent-volt)' : '#38BDF8',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      background: todayWorkout.isScheduledToday ? 'rgba(0, 245, 155, 0.12)' : 'rgba(56, 189, 248, 0.12)',
+                      padding: '3px 8px',
+                      borderRadius: 'var(--radius-full)'
+                    }}
+                  >
+                    {todayWorkout.isScheduledToday
+                      ? `📅 TODAY · ${todayWorkout.dayName.toUpperCase()}`
+                      : `🧘 ${todayWorkout.dayName.toUpperCase()} · REST DAY`}
+                  </span>
+
+                  {todayWorkout.isAlreadyCompletedToday && (
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        color: 'var(--accent-volt)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4
+                      }}
+                    >
+                      <CheckCircle2 size={13} /> Completed Today
+                    </span>
+                  )}
+                </div>
+
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF', marginBottom: 4 }}>
+                  {todayWorkout.routine.name}
+                </h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 12 }}>
+                  {todayWorkout.routine.description}
+                </p>
+
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+                  <span
+                    style={{
+                      fontSize: '0.74rem',
+                      color: 'var(--text-muted)',
+                      background: 'var(--bg-surface)',
+                      padding: '3px 8px',
+                      borderRadius: 'var(--radius-sm)'
+                    }}
+                  >
+                    🏋️ {todayWorkout.routine.exercises.length} Exercises
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.74rem',
+                      color: 'var(--text-muted)',
+                      background: 'var(--bg-surface)',
+                      padding: '3px 8px',
+                      borderRadius: 'var(--radius-sm)'
+                    }}
+                  >
+                    ⏱️ ~45–60 min
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.74rem',
+                      color: 'var(--text-muted)',
+                      background: 'var(--bg-surface)',
+                      padding: '3px 8px',
+                      borderRadius: 'var(--radius-sm)'
+                    }}
+                  >
+                    ⚡ {todayWorkout.routine.splitType}
+                  </span>
+                </div>
+
                 <button
                   className="btn-primary"
-                  style={{ margin: '0 auto', maxWidth: 280 }}
-                  onClick={() => handleStartRoutine(routines[0])}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                  onClick={() => handleStartRoutine(todayWorkout.routine)}
                 >
                   <Play size={18} fill="#050D0A" />
-                  Start {routines[0].dayTag} Workout
+                  {todayWorkout.isAlreadyCompletedToday
+                    ? `Repeat ${todayWorkout.routine.dayTag || todayWorkout.dayName} Workout`
+                    : todayWorkout.isScheduledToday
+                    ? `Start ${todayWorkout.routine.dayTag || todayWorkout.dayName} Workout`
+                    : `Train Anyway: Start ${todayWorkout.routine.dayTag || todayWorkout.routine.name}`}
                 </button>
-              )}
+              </div>
+
+              {/* Option to choose other day */}
+              <button
+                className="btn-secondary"
+                style={{ width: '100%', fontSize: '0.82rem' }}
+                onClick={() => setCurrentTab('routines')}
+              >
+                Browse All Workout Splits & Days
+              </button>
             </div>
           )
         )}
