@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, Eye, Gauge } from 'lucide-react';
 import type { MuscleGroup } from '../types/gym';
+import { getExerciseVisual } from '../data/exerciseVisualMap';
 
 interface ExerciseMotionPlayerProps {
+  exerciseId?: string;
   exerciseName: string;
   muscleGroup: MuscleGroup;
   equipment?: string;
@@ -26,14 +28,29 @@ type MotionPattern =
   | 'ab_crunch';
 
 export const ExerciseMotionPlayer: React.FC<ExerciseMotionPlayerProps> = ({
+  exerciseId,
   exerciseName,
   muscleGroup,
   equipment = 'Barbell'
 }) => {
+  const visualData = getExerciseVisual(exerciseId || exerciseName);
+  const [viewMode, setViewMode] = useState<'anatomical' | 'vector'>(visualData?.gifUrl ? 'anatomical' : 'vector');
+  const [imgLoading, setImgLoading] = useState(true);
+  const [, setImgError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [showBarPath, setShowBarPath] = useState(true);
   const [activePhase, setActivePhase] = useState<'eccentric' | 'stretch' | 'concentric'>('eccentric');
+
+  useEffect(() => {
+    if (visualData?.gifUrl) {
+      setViewMode('anatomical');
+      setImgLoading(true);
+      setImgError(false);
+    } else {
+      setViewMode('vector');
+    }
+  }, [visualData?.gifUrl]);
 
   // Determine pattern from exercise name & muscle group
   const getPattern = (): MotionPattern => {
@@ -78,44 +95,150 @@ export const ExerciseMotionPlayer: React.FC<ExerciseMotionPlayerProps> = ({
 
   return (
     <div className="motion-player-container">
-      {/* Top HUD bar */}
+      {/* Top HUD bar with Mode Switcher */}
       <div className="motion-hud-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span className="live-indicator-dot" />
-          <span style={{ fontSize: '0.68rem', fontWeight: 900, color: 'var(--accent-volt)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Kinematic Motion Capture
-          </span>
+        <div className="anatomical-mode-pill">
+          <button
+            className={`anatomical-mode-btn ${viewMode === 'anatomical' ? 'active' : ''}`}
+            onClick={() => setViewMode('anatomical')}
+            type="button"
+          >
+            <span>🧬 Anatomy GIF</span>
+          </button>
+          <button
+            className={`anatomical-mode-btn ${viewMode === 'vector' ? 'active' : ''}`}
+            onClick={() => setViewMode('vector')}
+            type="button"
+          >
+            <span>⚡ Biomechanics</span>
+          </button>
         </div>
 
-        {/* Phase Pill */}
-        <div
-          className={`motion-phase-pill ${activePhase}`}
-          style={{
-            fontSize: '0.68rem',
-            fontWeight: 800,
-            padding: '3px 9px',
-            borderRadius: 'var(--radius-full)',
-            textTransform: 'uppercase',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4
-          }}
-        >
-          {activePhase === 'eccentric' && '📉 Eccentric (Lower)'}
-          {activePhase === 'stretch' && '⏸️ Lengthened Stretch'}
-          {activePhase === 'concentric' && '📈 Concentric (Drive)'}
-        </div>
+        {/* Phase Pill or Offline Cache Indicator */}
+        {viewMode === 'anatomical' ? (
+          <div
+            style={{
+              fontSize: '0.66rem',
+              fontWeight: 800,
+              color: 'var(--accent-volt)',
+              background: 'rgba(0, 245, 155, 0.12)',
+              border: '1px solid rgba(0, 245, 155, 0.3)',
+              padding: '3px 8px',
+              borderRadius: 'var(--radius-full)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5
+            }}
+          >
+            <span className="live-indicator-dot" />
+            <span>Cached Offline</span>
+          </div>
+        ) : (
+          <div
+            className={`motion-phase-pill ${activePhase}`}
+            style={{
+              fontSize: '0.68rem',
+              fontWeight: 800,
+              padding: '3px 9px',
+              borderRadius: 'var(--radius-full)',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4
+            }}
+          >
+            {activePhase === 'eccentric' && '📉 Eccentric (Lower)'}
+            {activePhase === 'stretch' && '⏸️ Lengthened Stretch'}
+            {activePhase === 'concentric' && '📈 Concentric (Drive)'}
+          </div>
+        )}
       </div>
 
-      {/* Main Kinematic Animation Stage */}
-      <div className="motion-stage">
-        <svg
-          viewBox="0 0 320 200"
-          className="motion-svg"
-          style={{
-            animationPlayState: isPlaying ? 'running' : 'paused'
-          }}
-        >
+      {/* Anatomical Illustration View */}
+      {viewMode === 'anatomical' && visualData?.gifUrl ? (
+        <div className="anatomical-stage">
+          <div className="anatomical-card-canvas">
+            {imgLoading && <div className="anatomical-skeleton" />}
+            <img
+              src={visualData.gifUrl}
+              alt={visualData.name}
+              className="anatomical-gif-img"
+              style={{ display: imgLoading ? 'none' : 'block' }}
+              onLoad={() => {
+                setImgLoading(false);
+                setImgError(false);
+              }}
+              onError={() => {
+                setImgLoading(false);
+                setImgError(true);
+                setViewMode('vector');
+              }}
+            />
+          </div>
+
+          {/* Highlighted Target Muscles Chips */}
+          <div
+            style={{
+              display: 'flex',
+              gap: 6,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              marginTop: 10,
+              padding: '0 4px'
+            }}
+          >
+            {visualData.targetMuscles.map((tm) => (
+              <span
+                key={tm}
+                style={{
+                  fontSize: '0.66rem',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  background: 'rgba(255, 77, 77, 0.16)',
+                  color: '#FF6B6B',
+                  border: '1px solid rgba(255, 77, 77, 0.35)',
+                  padding: '3px 9px',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}
+              >
+                🔴 {tm}
+              </span>
+            ))}
+            {visualData.secondaryMuscles.slice(0, 2).map((sm) => (
+              <span
+                key={sm}
+                style={{
+                  fontSize: '0.66rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  color: 'var(--text-secondary)',
+                  border: '1px solid var(--border-subtle)',
+                  padding: '3px 9px',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}
+              >
+                ⚪ {sm}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : (
+        /* Main Kinematic Animation Stage */
+        <div className="motion-stage">
+          <svg
+            viewBox="0 0 320 200"
+            className="motion-svg"
+            style={{
+              animationPlayState: isPlaying ? 'running' : 'paused'
+            }}
+          >
           <defs>
             <radialGradient id="stageGlow" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="rgba(0, 245, 155, 0.15)" />
@@ -778,44 +901,73 @@ export const ExerciseMotionPlayer: React.FC<ExerciseMotionPlayerProps> = ({
           )}
         </svg>
       </div>
+      )}
 
       {/* Media Player Controls Row */}
-      <div className="motion-controls-row">
-        {/* Play/Pause Toggle */}
-        <button
-          className="motion-ctrl-btn"
-          onClick={() => setIsPlaying(!isPlaying)}
-          title={isPlaying ? 'Pause Animation' : 'Play Animation'}
-        >
-          {isPlaying ? <Pause size={15} color="#fff" /> : <Play size={15} color="var(--accent-volt)" fill="var(--accent-volt)" />}
-          <span>{isPlaying ? 'Pause' : 'Play'}</span>
-        </button>
+      {viewMode === 'vector' ? (
+        <div className="motion-controls-row">
+          {/* Play/Pause Toggle */}
+          <button
+            className="motion-ctrl-btn"
+            onClick={() => setIsPlaying(!isPlaying)}
+            title={isPlaying ? 'Pause Animation' : 'Play Animation'}
+          >
+            {isPlaying ? <Pause size={15} color="#fff" /> : <Play size={15} color="var(--accent-volt)" fill="var(--accent-volt)" />}
+            <span>{isPlaying ? 'Pause' : 'Play'}</span>
+          </button>
 
-        {/* Speed Stepper (0.5x, 1x, 1.5x) */}
-        <div className="motion-speed-selector">
-          <Gauge size={13} color="var(--text-muted)" />
-          {[0.5, 1, 1.5].map((spd) => (
-            <button
-              key={spd}
-              className={`motion-speed-chip ${playbackSpeed === spd ? 'active' : ''}`}
-              onClick={() => setPlaybackSpeed(spd)}
-              title={`${spd}x Playback Speed`}
-            >
-              {spd}x
-            </button>
-          ))}
+          {/* Speed Stepper (0.5x, 1x, 1.5x) */}
+          <div className="motion-speed-selector">
+            <Gauge size={13} color="var(--text-muted)" />
+            {[0.5, 1, 1.5].map((spd) => (
+              <button
+                key={spd}
+                className={`motion-speed-chip ${playbackSpeed === spd ? 'active' : ''}`}
+                onClick={() => setPlaybackSpeed(spd)}
+                title={`${spd}x Playback Speed`}
+              >
+                {spd}x
+              </button>
+            ))}
+          </div>
+
+          {/* Bar Path Trajectory Toggle */}
+          <button
+            className={`motion-ctrl-btn ${showBarPath ? 'active-glow' : ''}`}
+            onClick={() => setShowBarPath(!showBarPath)}
+            title="Toggle Bar Path Trajectory"
+          >
+            <Eye size={14} color={showBarPath ? 'var(--accent-cyan)' : 'var(--text-muted)'} />
+            <span style={{ fontSize: '0.7rem' }}>Vector</span>
+          </button>
         </div>
-
-        {/* Bar Path Trajectory Toggle */}
-        <button
-          className={`motion-ctrl-btn ${showBarPath ? 'active-glow' : ''}`}
-          onClick={() => setShowBarPath(!showBarPath)}
-          title="Toggle Bar Path Trajectory"
+      ) : (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 12px',
+            background: 'rgba(0, 0, 0, 0.25)',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--border-subtle)',
+            marginTop: 8
+          }}
         >
-          <Eye size={14} color={showBarPath ? 'var(--accent-cyan)' : 'var(--text-muted)'} />
-          <span style={{ fontSize: '0.7rem' }}>Vector</span>
-        </button>
-      </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+            <span style={{ color: 'var(--accent-volt)', fontWeight: 800 }}>3D Loop:</span>
+            <span style={{ textTransform: 'capitalize' }}>{visualData?.demonstrationTitle || exerciseName}</span>
+          </div>
+          <button
+            className="motion-ctrl-btn"
+            onClick={() => setViewMode('vector')}
+            style={{ padding: '3px 8px', fontSize: '0.68rem', gap: 4 }}
+          >
+            <Eye size={13} color="var(--accent-volt)" />
+            <span>Kinematics</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

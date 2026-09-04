@@ -204,6 +204,7 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
 
         {/* Animated Kinematic Motion Capture Player */}
         <ExerciseMotionPlayer
+          exerciseId={exercise.id}
           exerciseName={exercise.name}
           muscleGroup={exercise.muscleGroup}
           equipment={exercise.equipment}
