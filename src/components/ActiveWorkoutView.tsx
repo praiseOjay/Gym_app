@@ -9,7 +9,9 @@ import type {
   SetType,
   MuscleGroup,
   EquipmentType,
-  MesocycleBlock
+  MesocycleBlock,
+  AutoregulationCue,
+  WorkoutReadiness
 } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import {
@@ -20,6 +22,7 @@ import {
   lbsToKg
 } from '../engine/overloadEngine';
 import { estimateLiveSessionCalories } from '../engine/calorieEngine';
+import { evaluateAutoregulation } from '../engine/autoregulationEngine';
 import { sounds } from '../utils/audio';
 import { triggerHaptic } from '../utils/haptics';
 import { PlateCalculatorModal } from './PlateCalculatorModal';
@@ -27,6 +30,8 @@ import { SmartSwapModal } from './SmartSwapModal';
 import { RestTimerFloating } from './RestTimerFloating';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
 import { VoiceLoggerModal } from './VoiceLoggerModal';
+import { ReadinessCheckinModal } from './ReadinessCheckinModal';
+import { VoiceCoach } from '../services/voiceCoach';
 import type { ParsedVoiceCommand } from '../services/voiceLogger';
 import {
   Check,
@@ -43,7 +48,10 @@ import {
   Mic,
   Layers,
   Search,
-  Zap
+  Zap,
+  Volume2,
+  VolumeX,
+  AlertTriangle
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -89,6 +97,12 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     exerciseIdx: number;
     setIdx: number;
   } | null>(null);
+
+  // Tactical Intelligence state
+  const [showReadinessModal, setShowReadinessModal] = useState(true);
+  const [activeReadiness, setActiveReadiness] = useState<WorkoutReadiness | null>(null);
+  const [autoregCue, setAutoregCue] = useState<AutoregulationCue | null>(null);
+  const [voiceCoachEnabled, setVoiceCoachEnabled] = useState(false);
 
   // Live metabolic calorie burn calculation based on WorkoutX MET ratings
   const liveCalories = useMemo(() => {
@@ -340,6 +354,33 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
       exercises: updatedExercises,
       totalVolumeKg: totalVol
     });
+
+    // Tactical Intelligence: Autoregulation evaluation after set completion
+    if (isNowCompleted && currentSet.type !== 'warmup') {
+      const mesoRir = currentWeekConfig?.targetRir ?? 2;
+      const cue = evaluateAutoregulation(
+        setIdx,
+        updatedExercises[exIdx].sets,
+        mesoRir,
+        updatedExercises[exIdx].name,
+        settings.unit
+      );
+      if (cue) {
+        setAutoregCue({ ...cue, exerciseIdx: exIdx });
+        VoiceCoach.announceAutoregulation(cue.message);
+        setTimeout(() => setAutoregCue(null), 12000);
+      }
+
+      // Voice Coach: announce set completion
+      const restSec = updatedExercises[exIdx].restSeconds || settings.defaultRestSeconds || 90;
+      VoiceCoach.announceSetComplete(
+        currentSet.setNumber,
+        displayWeight(currentSet.weightKg),
+        currentSet.reps,
+        settings.unit,
+        restSec
+      );
+    }
   };
 
   // Cycle set type: working -> warmup -> drop -> failure
@@ -538,6 +579,16 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
   return (
     <div className="view-content" style={{ paddingBottom: 110 }}>
+      {/* Pre-Workout Readiness Check-In Modal */}
+      {showReadinessModal && (
+        <ReadinessCheckinModal
+          onComplete={(readiness) => {
+            setActiveReadiness(readiness);
+            setShowReadinessModal(false);
+          }}
+          onSkip={() => setShowReadinessModal(false)}
+        />
+      )}
       {/* PR Flash Notification */}
       {newPRNotice && (
         <div
@@ -597,76 +648,114 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
         className="gym-card"
         style={{
           background: 'linear-gradient(180deg, var(--bg-card) 0%, var(--bg-surface) 100%)',
+          padding: '12px 14px',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '14px 18px'
+          flexDirection: 'column',
+          gap: 10
         }}
       >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.72rem', color: 'var(--accent-volt)', fontWeight: 800, textTransform: 'uppercase' }}>
-              {session.dayTag || 'Hypertrophy'} Active
-            </span>
-            {currentWeekConfig && (
-              <span
-                style={{
-                  fontSize: '0.68rem',
-                  fontWeight: 800,
-                  background: currentWeekConfig.phaseName === 'Deload' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(0, 229, 255, 0.15)',
-                  color: currentWeekConfig.phaseName === 'Deload' ? '#C084FC' : 'var(--accent-cyan)',
-                  padding: '2px 8px',
-                  borderRadius: 'var(--radius-full)',
-                  border: currentWeekConfig.phaseName === 'Deload' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(0, 229, 255, 0.3)'
-                }}
-              >
-                W{currentWeekConfig.weekNumber}: {currentWeekConfig.targetRir} RIR ({currentWeekConfig.phaseName})
+        {/* Tier 1: Routine title + phase + actions */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--accent-volt)', fontWeight: 800, textTransform: 'uppercase' }}>
+                {session.dayTag || 'Hypertrophy'} Active
               </span>
-            )}
+              {currentWeekConfig && (
+                <span
+                  style={{
+                    fontSize: '0.66rem',
+                    fontWeight: 800,
+                    background: currentWeekConfig.phaseName === 'Deload' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(0, 229, 255, 0.15)',
+                    color: currentWeekConfig.phaseName === 'Deload' ? '#C084FC' : 'var(--accent-cyan)',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-full)',
+                    border: currentWeekConfig.phaseName === 'Deload' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(0, 229, 255, 0.3)'
+                  }}
+                >
+                  W{currentWeekConfig.weekNumber}: {currentWeekConfig.targetRir} RIR ({currentWeekConfig.phaseName})
+                </span>
+              )}
+            </div>
+            <h2 style={{ fontSize: '1.12rem', fontWeight: 800, color: '#fff', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {session.routineName}
+            </h2>
           </div>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', marginTop: 3 }}>
-            {session.routineName}
-          </h2>
+
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+            {/* Voice Coach Toggle */}
+            <button
+              type="button"
+              onClick={() => {
+                const next = !voiceCoachEnabled;
+                setVoiceCoachEnabled(next);
+                VoiceCoach.setEnabled(next);
+                if (next) VoiceCoach.speak('Voice coach activated. I\'ll guide you through each set.', true);
+                triggerHaptic('light', settings.vibrationEnabled);
+              }}
+              style={{
+                width: 34, height: 34, borderRadius: 'var(--radius-md)',
+                background: voiceCoachEnabled ? 'rgba(0, 245, 155, 0.15)' : 'rgba(255,255,255,0.06)',
+                border: voiceCoachEnabled ? '1px solid rgba(0, 245, 155, 0.4)' : '1px solid var(--border-subtle)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: voiceCoachEnabled ? '#00F59B' : 'var(--text-secondary)',
+                cursor: 'pointer', transition: 'all 0.2s ease'
+              }}
+              title={voiceCoachEnabled ? 'Mute Voice Coach' : 'Enable Voice Coach'}
+            >
+              {voiceCoachEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            </button>
+
+            <button
+              type="button"
+              className="btn-primary"
+              style={{ padding: '6px 10px', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: 5, height: 34 }}
+              onClick={() => handleOpenVoiceLogger()}
+              title="Hands-free voice logging for sets"
+            >
+              <Mic size={13} color="#050D0A" />
+              <span>Voice Log</span>
+            </button>
+          </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <button
-            type="button"
-            className="btn-primary"
-            style={{ padding: '6px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: 6 }}
-            onClick={() => handleOpenVoiceLogger()}
-            title="Hands-free voice logging for sets"
-          >
-            <Mic size={14} color="#050D0A" />
-            <span>Voice Log</span>
-          </button>
-
-          <div style={{ display: 'flex', gap: 12, textAlign: 'right' }}>
-            <div>
-              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                Duration
-              </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.05rem', color: '#fff' }}>
-                {formatElapsed(elapsedSeconds)}
-              </div>
+        {/* Tier 2: 3-column metrics bar */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 4,
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            padding: '8px 10px',
+            textAlign: 'center'
+          }}
+        >
+          <div>
+            <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+              Duration
             </div>
-            <div>
-              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                Volume
-              </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.05rem', color: 'var(--accent-cyan)' }}>
-                {displayWeight(session.totalVolumeKg)} {settings.unit}
-              </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '0.96rem', color: '#fff', marginTop: 1 }}>
+              {formatElapsed(elapsedSeconds)}
             </div>
-            <div>
-              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                Active Burn
-              </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.05rem', color: '#FF7A00', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 2 }}>
-                <Flame size={13} color="#FF7A00" fill="#FF7A00" />
-                <span>{liveCalories}</span>
-                <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)' }}>kcal</span>
-              </div>
+          </div>
+          <div style={{ borderLeft: '1px solid var(--border-subtle)', borderRight: '1px solid var(--border-subtle)' }}>
+            <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+              Volume
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '0.96rem', color: 'var(--accent-cyan)', marginTop: 1 }}>
+              {displayWeight(session.totalVolumeKg)} <span style={{ fontSize: '0.62rem', fontWeight: 600 }}>{settings.unit}</span>
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+              Active Burn
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '0.96rem', color: '#FF7A00', marginTop: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+              <Flame size={12} color="#FF7A00" fill="#FF7A00" />
+              <span>{liveCalories}</span>
+              <span style={{ fontSize: '0.62rem', fontWeight: 600, color: 'var(--text-muted)' }}>kcal</span>
             </div>
           </div>
         </div>
@@ -689,6 +778,75 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
         >
           <Zap size={15} color="#C084FC" />
           <span><strong>Deload Protocol Active:</strong> Perform ~50% normal working sets at 3 RIR. Clear neuromuscular fatigue and repair connective tissue.</span>
+        </div>
+      )}
+
+      {/* Readiness Calibration Banner */}
+      {activeReadiness && (
+        <div
+          style={{
+            background: activeReadiness.status === 'optimal' ? 'rgba(0, 245, 155, 0.08)' : activeReadiness.status === 'moderate' ? 'rgba(251, 191, 36, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+            border: `1px solid ${activeReadiness.status === 'optimal' ? 'rgba(0, 245, 155, 0.3)' : activeReadiness.status === 'moderate' ? 'rgba(251, 191, 36, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+            borderRadius: 'var(--radius-md)',
+            padding: '8px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            fontSize: '0.78rem',
+            color: activeReadiness.status === 'optimal' ? '#00F59B' : activeReadiness.status === 'moderate' ? '#FBBF24' : '#F87171'
+          }}
+        >
+          <div style={{
+            width: 32, height: 32, borderRadius: 'var(--radius-md)',
+            background: activeReadiness.status === 'optimal' ? 'rgba(0, 245, 155, 0.15)' : activeReadiness.status === 'moderate' ? 'rgba(251, 191, 36, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: '0.82rem'
+          }}>
+            {activeReadiness.readinessScore}%
+          </div>
+          <div style={{ flex: 1 }}>
+            <strong>{activeReadiness.calibratedNote}</strong>
+          </div>
+          <button
+            onClick={() => setActiveReadiness(null)}
+            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2 }}
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
+      {/* Live Autoregulation Coaching Banner */}
+      {autoregCue && (
+        <div
+          style={{
+            background: autoregCue.type === 'undershoot' ? 'rgba(0, 229, 255, 0.08)' : 'rgba(251, 191, 36, 0.08)',
+            border: `1px solid ${autoregCue.type === 'undershoot' ? 'rgba(0, 229, 255, 0.3)' : 'rgba(251, 191, 36, 0.3)'}`,
+            borderRadius: 'var(--radius-md)',
+            padding: '10px 14px',
+            animation: 'slide-down 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <AlertTriangle size={15} color={autoregCue.type === 'undershoot' ? '#00E5FF' : '#FBBF24'} />
+            <span style={{ fontSize: '0.82rem', fontWeight: 800, color: autoregCue.type === 'undershoot' ? '#00E5FF' : '#FBBF24' }}>
+              {autoregCue.title}
+            </span>
+            <button
+              onClick={() => setAutoregCue(null)}
+              style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            >
+              <X size={14} />
+            </button>
+          </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+            {autoregCue.message}
+          </p>
+          {autoregCue.suggestedWeightKg && (
+            <div style={{ marginTop: 6, fontSize: '0.72rem', fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--accent-volt)' }}>
+              → Suggested: {displayWeight(autoregCue.suggestedWeightKg)} {settings.unit}
+            </div>
+          )}
         </div>
       )}
 

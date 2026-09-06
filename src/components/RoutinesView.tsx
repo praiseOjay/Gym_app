@@ -6,6 +6,7 @@ import { sounds } from '../utils/audio';
 import { getTodayWorkoutState } from '../utils/dateUtils';
 import { preloadRoutineGifs } from '../utils/offlineMedia';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
+import { auditRoutineKinematics } from '../engine/biomechanicsEngine';
 import {
   Play,
   Clock,
@@ -45,6 +46,11 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
   // Keep active selection valid
   const currentRoutine =
     routines.find((r) => r.id === selectedRoutineId) || routines[0];
+
+  const kinematicAudit = useMemo(() => {
+    if (!currentRoutine || currentRoutine.exercises.length === 0) return null;
+    return auditRoutineKinematics(currentRoutine.exercises.map((e) => e.exerciseId));
+  }, [currentRoutine]);
 
   const filteredExercises = useMemo(() => {
     const q = exerciseSearch.toLowerCase().trim();
@@ -450,6 +456,126 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                 </div>
               );
             })
+          )}
+        </div>
+      )}
+
+      {/* Kinematic Profile & Biomechanics Audit Card */}
+      {kinematicAudit && kinematicAudit.totalExercises >= 2 && (
+        <div
+          className="gym-card"
+          style={{
+            padding: '18px 20px',
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(6, 182, 212, 0.06))',
+            border: '1px solid rgba(139, 92, 246, 0.25)',
+            borderRadius: 'var(--radius-xl)'
+          }}
+        >
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div
+                style={{
+                  width: 32, height: 32, borderRadius: 'var(--radius-md)',
+                  background: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}
+              >
+                <TrendingUp size={16} color="#fff" />
+              </div>
+              <div>
+                <h4 style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fff' }}>Kinematic Profile Audit</h4>
+                <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Length-tension curve balance analysis</p>
+              </div>
+            </div>
+            <div
+              style={{
+                background: kinematicAudit.balanceScore >= 80 ? 'rgba(0, 245, 155, 0.15)' : kinematicAudit.balanceScore >= 60 ? 'rgba(251, 191, 36, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                color: kinematicAudit.balanceScore >= 80 ? '#00F59B' : kinematicAudit.balanceScore >= 60 ? '#FBBF24' : '#EF4444',
+                borderRadius: 'var(--radius-full)', padding: '4px 10px',
+                fontSize: '0.78rem', fontWeight: 800, fontFamily: 'var(--font-mono)'
+              }}
+            >
+              {kinematicAudit.balanceScore}%
+            </div>
+          </div>
+
+          {/* Profile Distribution Bars */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
+            {(['stretched', 'mid', 'shortened'] as const).map((profile) => {
+              const count = kinematicAudit.profileDistribution[profile];
+              const pct = kinematicAudit.totalExercises > 0 ? Math.round((count / kinematicAudit.totalExercises) * 100) : 0;
+              const colors = {
+                stretched: { bg: '#8B5CF6', label: 'Stretched' },
+                mid: { bg: '#06B6D4', label: 'Mid-Range' },
+                shortened: { bg: '#F59E0B', label: 'Shortened' }
+              };
+              return (
+                <div key={profile} style={{ minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4, flexWrap: 'wrap', gap: 2 }}>
+                    <span style={{ fontSize: '0.66rem', color: 'var(--text-secondary)', fontWeight: 600, whiteSpace: 'nowrap' }}>{colors[profile].label}</span>
+                    <span style={{ fontSize: '0.7rem', fontFamily: 'var(--font-mono)', fontWeight: 800, color: colors[profile].bg, whiteSpace: 'nowrap' }}>{count} ({pct}%)</span>
+                  </div>
+                  <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${pct}%`, background: colors[profile].bg, borderRadius: 3, transition: 'width 0.6s ease' }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Redundancy Warnings */}
+          {kinematicAudit.redundancies.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
+              {kinematicAudit.redundancies.map((warn, i) => (
+                <div
+                  key={i}
+                  style={{
+                    background: 'rgba(251, 191, 36, 0.08)',
+                    border: '1px solid rgba(251, 191, 36, 0.2)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '10px 12px'
+                  }}
+                >
+                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#FBBF24', marginBottom: 4 }}>
+                    ⚠️ {warn.muscle} — {warn.exerciseNames.length} redundant {warn.profile}-range exercises
+                  </div>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                    {warn.message}
+                  </p>
+                  {warn.suggestedAlternatives && warn.suggestedAlternatives.length > 0 && (
+                    <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {warn.suggestedAlternatives.map((alt, j) => (
+                        <span
+                          key={j}
+                          style={{
+                            background: 'rgba(139, 92, 246, 0.15)',
+                            color: '#A78BFA',
+                            borderRadius: 'var(--radius-full)',
+                            padding: '3px 10px',
+                            fontSize: '0.7rem',
+                            fontWeight: 600
+                          }}
+                        >
+                          💡 {alt.name} ({alt.profile})
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Recommendations */}
+          {kinematicAudit.recommendations.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {kinematicAudit.recommendations.slice(0, 3).map((rec, i) => (
+                <p key={i} style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                  {rec.startsWith('Excellent') ? '✅' : '💡'} {rec}
+                </p>
+              ))}
+            </div>
           )}
         </div>
       )}

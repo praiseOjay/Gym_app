@@ -36,6 +36,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [localSettings, setLocalSettings] = useState<UserSettings>({ ...settings });
   const [showKey, setShowKey] = useState(false);
   const [savedAlert, setSavedAlert] = useState(false);
+  const [exportStatus, setExportStatus] = useState<string | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,26 +60,89 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     } catch {}
   };
 
-  const downloadFile = (content: string, fileName: string, contentType: string) => {
-    const a = document.createElement('a');
-    const file = new Blob([content], { type: contentType });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-    URL.revokeObjectURL(a.href);
+  /**
+   * Universal export function supporting Mobile Web Share API, standalone PWAs, iOS Safari, Android, and desktop.
+   */
+  const exportFile = async (content: string, fileName: string, contentType: string) => {
+    setExportStatus(`Preparing ${fileName}...`);
+    try {
+      const blob = new Blob([content], { type: contentType });
+
+      // 1. Mobile Native Web Share API with File (iOS Safari, Android Chrome, and PWA standalone mode)
+      if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+        try {
+          const file = new File([blob], fileName, { type: contentType });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: fileName,
+              text: `Overload AI: ${fileName}`
+            });
+            setExportStatus(`✓ Shared / Saved ${fileName}!`);
+            setTimeout(() => setExportStatus(null), 4000);
+            return;
+          }
+        } catch (shareErr: any) {
+          if (shareErr.name === 'AbortError') {
+            setExportStatus(null);
+            return;
+          }
+          console.warn('Native file share failed, falling back to anchor download:', shareErr);
+        }
+      }
+
+      // 2. Fallback: DOM anchor download attached to body with safe delayed revocation
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = fileName;
+      a.setAttribute('download', fileName);
+      a.target = '_blank';
+      document.body.appendChild(a);
+
+      a.click();
+      setExportStatus(`✓ Download started: ${fileName}`);
+      setTimeout(() => setExportStatus(null), 4000);
+
+      // Keep URL alive for 60 seconds so mobile OS background workers can finish saving
+      setTimeout(() => {
+        try {
+          if (document.body.contains(a)) {
+            document.body.removeChild(a);
+          }
+          URL.revokeObjectURL(url);
+        } catch {}
+      }, 60000);
+    } catch (err: any) {
+      console.error('Export error:', err);
+      // 3. Fallback: Copy to clipboard if file writing is blocked by browser
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(content);
+          setExportStatus(`✓ Copied to clipboard! (Paste into Notes or file)`);
+          setTimeout(() => setExportStatus(null), 5000);
+          return;
+        }
+      } catch {}
+      setExportStatus(`⚠️ Export error: ${err.message || 'Could not save file'}`);
+      setTimeout(() => setExportStatus(null), 5000);
+    }
   };
 
-  const handleExportJSON = () => {
+  const handleExportJSON = async () => {
+    triggerHaptic('medium');
     const json = StorageService.exportFullBackupJSON();
     const dateStr = new Date().toISOString().split('T')[0];
-    downloadFile(json, `overload-ai-backup-${dateStr}.json`, 'application/json');
+    await exportFile(json, `overload-ai-backup-${dateStr}.json`, 'application/json');
     triggerHaptic('success');
   };
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
+    triggerHaptic('medium');
     const csv = StorageService.exportWorkoutsCSV();
     const dateStr = new Date().toISOString().split('T')[0];
-    downloadFile(csv, `overload-ai-workouts-${dateStr}.csv`, 'text/csv');
+    await exportFile(csv, `overload-ai-workouts-${dateStr}.csv`, 'text/csv');
     triggerHaptic('success');
   };
 
@@ -487,6 +551,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             style={{ display: 'none' }}
             onChange={handleImportJSON}
           />
+
+          {/* Real-time Export / Save Status Banner */}
+          {exportStatus && (
+            <div
+              style={{
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-md)',
+                background: exportStatus.startsWith('✓') ? 'rgba(0, 245, 155, 0.15)' : exportStatus.startsWith('⚠️') ? 'rgba(255, 51, 102, 0.15)' : 'rgba(0, 229, 255, 0.15)',
+                border: `1px solid ${exportStatus.startsWith('✓') ? 'rgba(0, 245, 155, 0.4)' : exportStatus.startsWith('⚠️') ? 'rgba(255, 51, 102, 0.4)' : 'rgba(0, 229, 255, 0.4)'}`,
+                color: exportStatus.startsWith('✓') ? '#00F59B' : exportStatus.startsWith('⚠️') ? '#FF3366' : 'var(--accent-cyan)',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                marginBottom: 10,
+                animation: 'slide-down 0.2s ease'
+              }}
+            >
+              <span>{exportStatus}</span>
+            </div>
+          )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>

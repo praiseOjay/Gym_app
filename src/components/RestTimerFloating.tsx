@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Timer, X, Plus, Minus } from 'lucide-react';
 import { sounds } from '../utils/audio';
+import { VoiceCoach } from '../services/voiceCoach';
 
 interface RestTimerFloatingProps {
   initialSeconds: number;
@@ -28,8 +29,14 @@ export const RestTimerFloating: React.FC<RestTimerFloatingProps> = ({
       if (soundEnabled) {
         sounds.playTimerComplete();
       }
+      VoiceCoach.announceRestComplete();
       onFinish();
       return;
+    }
+
+    // Voice cue at 15 seconds remaining
+    if (timeLeft === 15) {
+      VoiceCoach.announceRestApproaching(15);
     }
 
     // Warning beeps at 3, 2, 1

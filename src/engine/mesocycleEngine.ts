@@ -2,7 +2,9 @@ import type {
   MesocycleBlock,
   MesocycleWeekConfig,
   SystemicFatigueReport,
-  WorkoutSession
+  WorkoutSession,
+  MuscleRecoveryFeedback,
+  MuscleGroup
 } from '../types/gym';
 
 export interface MesocycleTemplateDefinition {
@@ -332,3 +334,84 @@ export function detectSystemicFatigue(workouts: WorkoutSession[]): SystemicFatig
     recommendedAction
   };
 }
+
+/**
+ * Adaptive Weekly Volume Auto-Scaler (Renaissance Periodization Model)
+ * Automatically adjusts prescribed weekly sets per muscle group based on post-workout soreness & pump ratings
+ */
+export function calculateAdaptiveVolumeAdjustment(
+  muscle: MuscleGroup,
+  feedbackHistory: MuscleRecoveryFeedback[],
+  currentWeeklySets: number = 12
+): {
+  recommendedSets: number;
+  deltaSets: number;
+  status: 'increase' | 'maintain' | 'decrease';
+  reason: string;
+} {
+  // Filter feedback for this muscle
+  const muscleLogs = feedbackHistory.filter((f) => f.muscle === muscle);
+
+  // If no feedback yet, maintain current volume
+  if (muscleLogs.length === 0) {
+    return {
+      recommendedSets: currentWeeklySets,
+      deltaSets: 0,
+      status: 'maintain',
+      reason: `No soreness or pump feedback logged yet for ${muscle}. Maintaining baseline ${currentWeeklySets} weekly sets.`
+    };
+  }
+
+  // Look at recent feedback (last 1 to 3 exposures)
+  const recent = muscleLogs.slice(0, 3);
+  const avgPump = recent.reduce((sum, f) => sum + f.pumpRating, 0) / recent.length;
+  const avgSoreness = recent.reduce((sum, f) => sum + f.sorenessRating, 0) / recent.length;
+  const avgWorkload = recent.reduce((sum, f) => sum + f.workloadRating, 0) / recent.length;
+
+  // Case 1: Exceeded MRV (Muscle was sore into training session or excessive workload)
+  if (avgSoreness >= 1.6 || avgWorkload >= 1.7) {
+    const delta = Math.max(-2, Math.min(-1, -Math.round(currentWeeklySets * 0.15)));
+    const recommended = Math.max(6, currentWeeklySets + delta);
+    return {
+      recommendedSets: recommended,
+      deltaSets: delta,
+      status: 'decrease',
+      reason: `${muscle} was still sore or overreached at session start (exceeding MRV). Reduced by ${Math.abs(
+        delta
+      )} set(s) to restore adaptive recovery.`
+    };
+  }
+
+  // Case 2: Optimal Hypertrophy Stimulus (Good pump + recovered on time)
+  if (avgPump >= 1.0 && avgSoreness <= 1.0 && avgWorkload <= 1.3) {
+    const delta = +1;
+    const recommended = Math.min(26, currentWeeklySets + delta);
+    return {
+      recommendedSets: recommended,
+      deltaSets: delta,
+      status: 'increase',
+      reason: `${muscle} achieved a potent pump and fully recovered on schedule. Progressing volume by +1 set toward peak MAV.`
+    };
+  }
+
+  // Case 3: Sub-threshold stimulus (No pump and zero soreness)
+  if (avgPump < 0.5 && avgSoreness === 0 && avgWorkload <= 0.5) {
+    const delta = +1;
+    const recommended = Math.min(24, currentWeeklySets + delta);
+    return {
+      recommendedSets: recommended,
+      deltaSets: delta,
+      status: 'increase',
+      reason: `Stimulus on ${muscle} was sub-threshold (no pump, zero soreness). Adding +1 set to reach Minimum Effective Volume (MEV).`
+    };
+  }
+
+  // Case 4: Balanced
+  return {
+    recommendedSets: currentWeeklySets,
+    deltaSets: 0,
+    status: 'maintain',
+    reason: `${muscle} stimulus and recovery are well balanced. Maintain current volume.`
+  };
+}
+

@@ -1,4 +1,14 @@
-import type { WorkoutSession, Routine, PRRecord, UserSettings, BodyWeightEntry, MesocycleBlock } from '../types/gym';
+import type {
+  WorkoutSession,
+  Routine,
+  PRRecord,
+  UserSettings,
+  BodyWeightEntry,
+  MesocycleBlock,
+  WorkoutReadiness,
+  MuscleRecoveryFeedback,
+  PlateauDiagnosis
+} from '../types/gym';
 import { PRESET_ROUTINES } from '../data/presetRoutines';
 import { IndexedDBService, STORES } from './indexedDb';
 import { createDefaultMesocycle } from '../engine/mesocycleEngine';
@@ -10,7 +20,10 @@ const STORAGE_KEYS = {
   SETTINGS: 'overload_settings_v3',
   ACTIVE_WORKOUT: 'overload_active_session_v3',
   BODYWEIGHT: 'overload_bodyweight_v3',
-  MESOCYCLE: 'overload_mesocycle_v3'
+  MESOCYCLE: 'overload_mesocycle_v3',
+  READINESS: 'overload_readiness_history_v1',
+  RECOVERY_FEEDBACK: 'overload_recovery_feedback_v1',
+  PLATEAU_RECORDS: 'overload_plateau_records_v1'
 };
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -227,13 +240,17 @@ export const StorageService = {
 
   exportFullBackupJSON(): string {
     const data = {
-      version: 2,
+      version: 3,
       exportedAt: new Date().toISOString(),
       workouts: this.getWorkouts(),
       routines: this.getRoutines(),
       prs: this.getPRs(),
       settings: this.getSettings(),
-      bodyWeightLogs: this.getBodyWeightLogs()
+      bodyWeightLogs: this.getBodyWeightLogs(),
+      mesocycleBlock: this.getMesocycleBlock(),
+      readinessHistory: this.getReadinessHistory(),
+      recoveryFeedback: this.getRecoveryFeedback(),
+      plateauRecords: this.getPlateauRecords()
     };
     return JSON.stringify(data, null, 2);
   },
@@ -259,6 +276,18 @@ export const StorageService = {
       }
       if (Array.isArray(parsed.bodyWeightLogs)) {
         this.saveBodyWeightLogs(parsed.bodyWeightLogs);
+      }
+      if (parsed.mesocycleBlock && typeof parsed.mesocycleBlock === 'object') {
+        this.saveMesocycleBlock(parsed.mesocycleBlock);
+      }
+      if (Array.isArray(parsed.readinessHistory)) {
+        this.saveReadinessHistory(parsed.readinessHistory);
+      }
+      if (Array.isArray(parsed.recoveryFeedback)) {
+        this.saveRecoveryFeedback(parsed.recoveryFeedback);
+      }
+      if (Array.isArray(parsed.plateauRecords)) {
+        this.savePlateauRecords(parsed.plateauRecords);
       }
 
       return { success: true, message: 'Data restored successfully!' };
@@ -327,6 +356,77 @@ export const StorageService = {
       localStorage.setItem(STORAGE_KEYS.MESOCYCLE, JSON.stringify(block));
     } catch (e) {
       console.error('Failed saving mesocycle:', e);
+    }
+  },
+
+  getReadinessHistory(): WorkoutReadiness[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.READINESS);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  saveReadinessHistory(history: WorkoutReadiness[]): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.READINESS, JSON.stringify(history));
+    } catch (e) {
+      console.error('Failed saving readiness history:', e);
+    }
+  },
+
+  addReadinessRecord(record: WorkoutReadiness): void {
+    const history = this.getReadinessHistory();
+    history.unshift(record);
+    this.saveReadinessHistory(history.slice(0, 60)); // keep last 60 days
+  },
+
+  getLatestReadiness(): WorkoutReadiness | null {
+    const history = this.getReadinessHistory();
+    if (history.length === 0) return null;
+    const latest = history[0];
+    const today = new Date().toISOString().split('T')[0];
+    return latest.date.startsWith(today) ? latest : null;
+  },
+
+  getRecoveryFeedback(): MuscleRecoveryFeedback[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.RECOVERY_FEEDBACK);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  saveRecoveryFeedback(feedback: MuscleRecoveryFeedback[]): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.RECOVERY_FEEDBACK, JSON.stringify(feedback));
+    } catch (e) {
+      console.error('Failed saving recovery feedback:', e);
+    }
+  },
+
+  addRecoveryFeedback(records: MuscleRecoveryFeedback[]): void {
+    const existing = this.getRecoveryFeedback();
+    const updated = [...records, ...existing].slice(0, 150);
+    this.saveRecoveryFeedback(updated);
+  },
+
+  getPlateauRecords(): PlateauDiagnosis[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.PLATEAU_RECORDS);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  savePlateauRecords(records: PlateauDiagnosis[]): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.PLATEAU_RECORDS, JSON.stringify(records));
+    } catch (e) {
+      console.error('Failed saving plateau records:', e);
     }
   },
 

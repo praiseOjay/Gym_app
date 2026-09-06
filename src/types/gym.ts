@@ -159,6 +159,7 @@ export interface UserSettings {
   age?: number;
   targetWeightKg?: number;
   bodyWeightLogs?: BodyWeightEntry[];
+  voiceCoachEnabled?: boolean;
 }
 
 export interface BodyWeightEntry {
@@ -226,4 +227,93 @@ export interface SystemicFatigueReport {
   reason: string;
   recommendedAction: string;
 }
+
+// Tactical Intelligence & Coaching Types
+
+export type ResistanceProfile = 'stretched' | 'mid' | 'shortened';
+
+export interface ExerciseBiomechanicProfile {
+  exerciseId: string;
+  resistanceProfile: ResistanceProfile;
+  primaryHead?: string;
+  lengthTensionNote: string;
+  stretchEmphasized: boolean;
+}
+
+export interface RedundancyWarning {
+  muscle: MuscleGroup;
+  profile: ResistanceProfile;
+  exerciseNames: string[];
+  severity: 'warning' | 'info';
+  message: string;
+  suggestedAlternatives: {
+    exerciseId: string;
+    name: string;
+    profile: ResistanceProfile;
+    reason: string;
+  }[];
+}
+
+export interface KinematicAuditResult {
+  totalExercises: number;
+  profileDistribution: Record<ResistanceProfile, number>;
+  balanceScore: number; // 0 to 100
+  redundancies: RedundancyWarning[];
+  recommendations: string[];
+}
+
+export interface WorkoutReadiness {
+  id: string;
+  date: string;
+  sleepHours: number;
+  energyRating: number; // 1 to 5
+  sorenessLevel: 'recovered' | 'mild' | 'sore';
+  readinessScore: number; // 0 to 100
+  status: 'optimal' | 'moderate' | 'fatigued';
+  calibratedRirDelta: number; // 0, +1 (easier if fatigued)
+  calibratedVolumeDelta: number; // 0 or -1 set if fatigued
+  calibratedNote: string;
+}
+
+export interface MuscleRecoveryFeedback {
+  id: string;
+  sessionId: string;
+  date: string;
+  muscle: MuscleGroup;
+  pumpRating: 0 | 1 | 2; // 0 = Poor/None, 1 = Good/Pumped, 2 = Skin-Splitting
+  workloadRating: 0 | 1 | 2; // 0 = Easy/Low, 1 = Ideal Overload, 2 = Excessive/Near Failure
+  sorenessRating: 0 | 1 | 2; // 0 = None, 1 = Mild/Recovered, 2 = Severe/Impairs Performance
+}
+
+export interface AutoregulationCue {
+  id: string;
+  exerciseIdx: number;
+  setIdx: number;
+  type: 'drop_off' | 'overshoot' | 'undershoot' | 'failure_limit' | 'warmup';
+  title: string;
+  message: string;
+  action: 'reduce_weight' | 'truncate_set' | 'increase_weight' | 'proceed';
+  suggestedWeightKg?: number;
+  suggestedReps?: number;
+  confidence: number;
+}
+
+export interface PlateauDiagnosis {
+  exerciseId: string;
+  exerciseName: string;
+  stalledSessions: number;
+  lastTopSet: {
+    weightKg: number;
+    reps: number;
+    date: string;
+  };
+  stickingPoint: string;
+  prescriptions: {
+    title: string;
+    detail: string;
+    strategy: 'microload' | 'rep_shift' | 'swap_variation';
+    recommendedValue?: string;
+  }[];
+}
+
 

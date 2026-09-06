@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import type { WorkoutSession, UserSettings, MesocycleBlock } from '../types/gym';
+import React, { useEffect, useState, useMemo } from 'react';
+import type { WorkoutSession, UserSettings, MesocycleBlock, MuscleRecoveryFeedback, MuscleGroup } from '../types/gym';
 import { analyzeWorkoutSessionWithAI } from '../services/geminiService';
 import { kgToLbs } from '../engine/overloadEngine';
+import { StorageService } from '../db/storage';
+import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import {
   Trophy,
   Sparkles,
   CheckCircle2,
   RefreshCw,
   Flame,
-  Activity
+  Activity,
+  Zap,
+  Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -54,6 +58,40 @@ export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
     };
     getDebrief();
   }, [session, settings]);
+
+  // RP Recovery feedback state
+  const [pumpRating, setPumpRating] = useState<0 | 1 | 2>(1); // 0 = Poor, 1 = Good, 2 = Insane
+  const [workloadRating, setWorkloadRating] = useState<0 | 1 | 2>(1); // 0 = Low, 1 = Ideal, 2 = Excessive
+  const [sorenessRating, setSorenessRating] = useState<0 | 1 | 2>(1); // 0 = None, 1 = Mild, 2 = Severe
+  const [feedbackSaved, setFeedbackSaved] = useState<boolean>(false);
+
+  // Discover trained muscle groups from session
+  const trainedMuscles = useMemo(() => {
+    const muscles = new Set<MuscleGroup>();
+    session.exercises.forEach((ex) => {
+      const meta = EXERCISE_LIBRARY.find(
+        (e) => e.id.toLowerCase() === (ex.exerciseId || '').toLowerCase() || e.name.toLowerCase() === ex.name.toLowerCase()
+      );
+      if (meta) muscles.add(meta.muscleGroup);
+      else if (session.dayTag) muscles.add('Chest');
+    });
+    return Array.from(muscles);
+  }, [session]);
+
+  const handleSaveFeedback = () => {
+    const targets = trainedMuscles.length > 0 ? trainedMuscles : (['Chest'] as MuscleGroup[]);
+    const records: MuscleRecoveryFeedback[] = targets.map((muscle) => ({
+      id: `mrf-${Date.now()}-${muscle}`,
+      sessionId: session.id,
+      date: session.date || new Date().toISOString(),
+      muscle,
+      pumpRating,
+      workloadRating,
+      sorenessRating
+    }));
+    StorageService.addRecoveryFeedback(records);
+    setFeedbackSaved(true);
+  };
 
   const displayVolume =
     settings.unit === 'lbs'
@@ -185,6 +223,176 @@ export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
             </span>
           </div>
         )}
+
+        {/* RP Hypertrophy Soreness & Pump Feedback Widget */}
+        <div
+          style={{
+            background: 'linear-gradient(180deg, rgba(0, 245, 155, 0.08) 0%, var(--bg-card) 100%)',
+            border: '1px solid rgba(0, 245, 155, 0.3)',
+            borderRadius: 'var(--radius-xl)',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Zap size={18} color="var(--accent-volt)" />
+              <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#fff' }}>
+                RP Hypertrophy Recovery Calibration
+              </span>
+            </div>
+            {feedbackSaved && (
+              <span
+                style={{
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  color: 'var(--accent-volt)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}
+              >
+                <Check size={14} /> Saved
+              </span>
+            )}
+          </div>
+
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>
+            Feeds Dr. Mike Israetel’s volume landmarks to auto-scale next week’s prescribed sets toward your MAV.
+          </p>
+
+          {/* 1. Pump Rating */}
+          <div>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: 6 }}>
+              MUSCLE PUMP RATING
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+              {[
+                { val: 0, label: 'Flat (0)' },
+                { val: 1, label: 'Solid Pump (1)' },
+                { val: 2, label: 'Insane Pump (2)' }
+              ].map((item) => (
+                <button
+                  key={item.val}
+                  type="button"
+                  disabled={feedbackSaved}
+                  onClick={() => setPumpRating(item.val as any)}
+                  style={{
+                    padding: '7px 4px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: pumpRating === item.val ? 'var(--accent-volt)' : 'rgba(255, 255, 255, 0.05)',
+                    color: pumpRating === item.val ? '#050D0A' : 'var(--text-secondary)',
+                    border: pumpRating === item.val ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    cursor: feedbackSaved ? 'default' : 'pointer'
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 2. Workload Strain */}
+          <div>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: 6 }}>
+              WORKLOAD STRAIN
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+              {[
+                { val: 0, label: 'Sub-MEV (0)' },
+                { val: 1, label: 'Ideal (1)' },
+                { val: 2, label: 'Brutal (2)' }
+              ].map((item) => (
+                <button
+                  key={item.val}
+                  type="button"
+                  disabled={feedbackSaved}
+                  onClick={() => setWorkloadRating(item.val as any)}
+                  style={{
+                    padding: '7px 4px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: workloadRating === item.val ? 'var(--accent-cyan)' : 'rgba(255, 255, 255, 0.05)',
+                    color: workloadRating === item.val ? '#050D0A' : 'var(--text-secondary)',
+                    border: workloadRating === item.val ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    cursor: feedbackSaved ? 'default' : 'pointer'
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. Anticipated Soreness */}
+          <div>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: 6 }}>
+              ANTICIPATED SORENESS
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+              {[
+                { val: 0, label: 'None (0)' },
+                { val: 1, label: 'Mild (1)' },
+                { val: 2, label: 'Severe (2)' }
+              ].map((item) => (
+                <button
+                  key={item.val}
+                  type="button"
+                  disabled={feedbackSaved}
+                  onClick={() => setSorenessRating(item.val as any)}
+                  style={{
+                    padding: '7px 4px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: sorenessRating === item.val ? '#FFB800' : 'rgba(255, 255, 255, 0.05)',
+                    color: sorenessRating === item.val ? '#050D0A' : 'var(--text-secondary)',
+                    border: sorenessRating === item.val ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    cursor: feedbackSaved ? 'default' : 'pointer'
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {!feedbackSaved ? (
+            <button
+              onClick={handleSaveFeedback}
+              style={{
+                background: 'rgba(0, 245, 155, 0.15)',
+                border: '1px solid rgba(0, 245, 155, 0.35)',
+                borderRadius: 'var(--radius-md)',
+                padding: '9px 12px',
+                color: 'var(--accent-volt)',
+                fontWeight: 800,
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                marginTop: 4
+              }}
+            >
+              Record Recovery Calibration
+            </button>
+          ) : (
+            <div
+              style={{
+                fontSize: '0.76rem',
+                color: 'var(--accent-volt)',
+                textAlign: 'center',
+                paddingTop: 4,
+                fontWeight: 700
+              }}
+            >
+              ✓ Logged to volume auto-scaler for {trainedMuscles.join(', ') || 'Chest'}
+            </div>
+          )}
+        </div>
 
         {/* AI Debrief Card */}
         <div

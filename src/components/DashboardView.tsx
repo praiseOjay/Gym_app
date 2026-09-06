@@ -123,15 +123,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           padding: '18px 20px'
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-volt)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
               Hypertrophy & Progressive Overload
             </span>
-            <h1 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#fff', marginTop: 2 }}>
+            <h1 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#fff', marginTop: 2, lineHeight: 1.25 }}>
               Ready to Overload, {settings.userName}?
             </h1>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: 4 }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 4, lineHeight: 1.4 }}>
               Progressive overload targets calculated. Lift with mechanical tension today.
             </p>
           </div>
