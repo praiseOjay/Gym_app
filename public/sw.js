@@ -1,5 +1,5 @@
-const CACHE_NAME = 'overload-ai-v2';
-const MEDIA_CACHE = 'overload-ai-media-v1';
+const CACHE_NAME = 'overload-ai-v3';
+const MEDIA_CACHE = 'overload-ai-media-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -39,7 +39,10 @@ self.addEventListener('fetch', (event) => {
   // Ignore google API requests (Gemini) so they are always network-direct
   if (event.request.url.includes('googleapis.com')) return;
 
-  const isExerciseMedia = event.request.url.includes('exercisedb.dev') || event.request.url.endsWith('.gif');
+  const isExerciseMedia =
+    event.request.url.includes('workoutxapp.com') ||
+    event.request.url.includes('exercisedb.dev') ||
+    event.request.url.endsWith('.gif');
 
   if (isExerciseMedia) {
     event.respondWith(

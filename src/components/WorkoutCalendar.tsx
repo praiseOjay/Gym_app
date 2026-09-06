@@ -484,8 +484,24 @@ export const WorkoutCalendar: React.FC<WorkoutCalendarProps> = ({
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: '0.92rem', color: '#fff' }}>
-                      {session.routineName}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#fff' }}>
+                        {session.routineName}
+                      </span>
+                      {session.mesocycleWeek && (
+                        <span
+                          style={{
+                            fontSize: '0.62rem',
+                            fontWeight: 800,
+                            padding: '1px 5px',
+                            borderRadius: 'var(--radius-xs)',
+                            background: session.isDeload ? 'rgba(168, 85, 247, 0.2)' : 'rgba(0, 229, 255, 0.15)',
+                            color: session.isDeload ? '#C084FC' : 'var(--accent-cyan)'
+                          }}
+                        >
+                          W{session.mesocycleWeek} {session.isDeload ? 'Deload' : ''}
+                        </span>
+                      )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 2 }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -497,6 +513,15 @@ export const WorkoutCalendar: React.FC<WorkoutCalendarProps> = ({
                         <Dumbbell size={12} />
                         {displayVolume(session.totalVolumeKg)}
                       </span>
+                      {session.caloriesBurned ? (
+                        <>
+                          <span>·</span>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: '#FF7A00', fontWeight: 700 }}>
+                            <Flame size={12} color="#FF7A00" fill="#FF7A00" />
+                            {session.caloriesBurned} kcal
+                          </span>
+                        </>
+                      ) : null}
                     </div>
                   </div>
 

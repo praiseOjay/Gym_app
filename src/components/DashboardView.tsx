@@ -4,10 +4,12 @@ import type {
   Routine,
   UserSettings,
   MuscleRecoveryState,
-  PRRecord
+  PRRecord,
+  MesocycleBlock
 } from '../types/gym';
 import { MuscleRecoveryHeatmap } from './MuscleRecoveryHeatmap';
-import { kgToLbs } from '../engine/overloadEngine';
+import { MesocycleCard } from './MesocycleCard';
+import { kgToLbs, calculateMuscleWeeklySets } from '../engine/overloadEngine';
 import { getPreWorkoutPrimer } from '../services/geminiService';
 import { triggerHaptic } from '../utils/haptics';
 import { getTodayWorkoutState } from '../utils/dateUtils';
@@ -18,7 +20,10 @@ import {
   Sparkles,
   X,
   Loader2,
-  CheckCircle2
+  CheckCircle2,
+  Layers,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -27,8 +32,10 @@ interface DashboardViewProps {
   recoveryStates: MuscleRecoveryState[];
   prs: PRRecord[];
   settings: UserSettings;
+  mesocycleBlock: MesocycleBlock;
   onStartRoutine: (routine: Routine) => void;
   onNavigateTab: (tab: any) => void;
+  onUpdateMesocycle: (updated: MesocycleBlock) => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -37,8 +44,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   recoveryStates,
   prs,
   settings,
+  mesocycleBlock,
   onStartRoutine,
-  onNavigateTab
+  onNavigateTab,
+  onUpdateMesocycle
 }) => {
   const [primerData, setPrimerData] = useState<{
     headline: string;
@@ -46,6 +55,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     recoveryNote: string;
   } | null>(null);
   const [loadingPrimer, setLoadingPrimer] = useState(false);
+  const [showAllLandmarks, setShowAllLandmarks] = useState(false);
+
+  // Weekly hypertrophy volume landmarks (MEV, MAV, MRV)
+  const weeklyLandmarks = useMemo(() => {
+    return calculateMuscleWeeklySets(historySessions, 7);
+  }, [historySessions]);
 
   // Determine scheduled routine for today (or next in split)
   const todayWorkout = useMemo(
@@ -123,18 +138,24 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           <div
             style={{
-              background: 'rgba(0, 245, 155, 0.15)',
-              border: '1px solid var(--accent-volt)',
-              padding: '6px 12px',
+              flexShrink: 0,
+              background: 'linear-gradient(135deg, rgba(0, 245, 155, 0.16) 0%, rgba(0, 229, 255, 0.08) 100%)',
+              border: '1px solid rgba(0, 245, 155, 0.4)',
+              padding: '7px 14px',
               borderRadius: 'var(--radius-full)',
               display: 'flex',
               alignItems: 'center',
-              gap: 6
+              gap: 6,
+              whiteSpace: 'nowrap',
+              boxShadow: '0 2px 12px rgba(0, 245, 155, 0.15)'
             }}
           >
-            <Flame size={16} color="var(--accent-volt)" />
-            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--accent-volt)' }}>
-              {recentSessions.length} Days This Wk
+            <Flame size={15} color="var(--accent-volt)" fill="var(--accent-volt)" />
+            <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#fff', letterSpacing: '0.2px' }}>
+              <strong style={{ color: 'var(--accent-volt)', fontWeight: 900, fontSize: '0.88rem' }}>
+                {recentSessions.length}
+              </strong>{' '}
+              {recentSessions.length === 1 ? 'Day' : 'Days'} This Wk
             </span>
           </div>
         </div>
@@ -214,6 +235,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         )}
       </div>
+
+      {/* Mesocycle Periodization & Auto-Deload HUD */}
+      <MesocycleCard
+        mesocycleBlock={mesocycleBlock}
+        workouts={historySessions}
+        onUpdateMesocycle={onUpdateMesocycle}
+      />
 
       {/* Progress & Calendar Quick Shortcut Card */}
       <div
@@ -348,6 +376,123 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       {/* Muscle Recovery Heatmap Component */}
       <MuscleRecoveryHeatmap recoveryStates={recoveryStates} />
+
+      {/* Weekly Hypertrophy Volume Landmarks Card (MEV / MAV / MRV) */}
+      <div className="gym-card">
+        <div className="section-header" style={{ marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Layers size={18} color="var(--accent-volt)" />
+            <h3 className="section-title" style={{ margin: 0 }}>Weekly Hypertrophy Volume</h3>
+          </div>
+          <span
+            style={{
+              fontSize: '0.68rem',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              color: 'var(--accent-volt)',
+              background: 'rgba(0, 245, 155, 0.12)',
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-full)'
+            }}
+          >
+            MEV · MAV · MRV
+          </span>
+        </div>
+
+        <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginBottom: 14, lineHeight: 1.4 }}>
+          Weekly working sets mapped against hypertrophy thresholds. Aim for <strong style={{ color: 'var(--accent-volt)' }}>10–18 sets</strong> (Optimal Growth) per target muscle.
+        </p>
+
+        {/* Landmarks List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {weeklyLandmarks
+            .filter((lm) => showAllLandmarks || lm.sets > 0)
+            .slice(0, showAllLandmarks ? undefined : 6)
+            .map((lm) => {
+              const maxTarget = 20;
+              const fillPct = Math.min(100, (lm.sets / maxTarget) * 100);
+
+              return (
+                <div
+                  key={lm.muscle}
+                  style={{
+                    background: 'var(--bg-surface)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '10px 12px'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontWeight: 800, fontSize: '0.86rem', color: '#fff' }}>
+                        {lm.muscle}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '0.66rem',
+                          fontWeight: 700,
+                          padding: '1px 6px',
+                          borderRadius: 'var(--radius-full)',
+                          background: `${lm.color}22`,
+                          color: lm.color,
+                          border: `1px solid ${lm.color}44`
+                        }}
+                      >
+                        {lm.status === 'Optimal Growth' ? '🎯 Optimal Growth' : lm.status}
+                      </span>
+                    </div>
+
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', fontWeight: 800, color: lm.color }}>
+                      {lm.sets} <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 400 }}>/ 18 MAV</span>
+                    </div>
+                  </div>
+
+                  {/* Visual Progress Bar */}
+                  <div
+                    style={{
+                      height: 6,
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      borderRadius: 'var(--radius-full)',
+                      overflow: 'hidden',
+                      position: 'relative'
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: '100%',
+                        width: `${fillPct}%`,
+                        background: lm.color,
+                        borderRadius: 'var(--radius-full)',
+                        transition: 'width 0.4s ease-out',
+                        boxShadow: `0 0 8px ${lm.color}66`
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+
+        {/* Toggle Show All / Show Active */}
+        <button
+          className="btn-secondary"
+          style={{ width: '100%', marginTop: 12, padding: '8px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+          onClick={() => {
+            setShowAllLandmarks(!showAllLandmarks);
+            triggerHaptic('light', settings.vibrationEnabled);
+          }}
+        >
+          {showAllLandmarks ? (
+            <>
+              <ChevronUp size={14} /> Show Active Muscles Only
+            </>
+          ) : (
+            <>
+              <ChevronDown size={14} /> View All 11 Muscle Volume Targets
+            </>
+          )}
+        </button>
+      </div>
 
       {/* Recent Workout Activity Card */}
       <div className="gym-card">

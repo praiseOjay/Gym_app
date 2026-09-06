@@ -13,7 +13,8 @@ export type MuscleGroup =
   | 'Traps'
   | 'Rear Delts'
   | 'Upper Chest'
-  | 'Core';
+  | 'Core'
+  | 'Cardio';
 
 export type EquipmentType =
   | 'Barbell'
@@ -23,6 +24,7 @@ export type EquipmentType =
   | 'Bodyweight'
   | 'Smith Machine'
   | 'Kettlebell'
+  | 'Cardio Machine'
   | 'Other';
 
 export type SetType = 'warmup' | 'working' | 'drop' | 'failure';
@@ -39,6 +41,8 @@ export interface Exercise {
   instructions?: string;
   tips?: string[];
   isCustom?: boolean;
+  met?: number;
+  caloriesPerMinute?: number;
 }
 
 export interface WorkoutSet {
@@ -65,6 +69,8 @@ export interface WorkoutExercise {
   sets: WorkoutSet[];
   notes?: string;
   restSeconds?: number;
+  supersetGroupId?: string;
+  supersetOrder?: number;
 }
 
 export interface WorkoutSession {
@@ -77,6 +83,9 @@ export interface WorkoutSession {
   exercises: WorkoutExercise[];
   totalVolumeKg: number;
   prCount: number;
+  caloriesBurned?: number;
+  mesocycleWeek?: number;
+  isDeload?: boolean;
   notes?: string;
   aiDebrief?: {
     summary: string;
@@ -180,3 +189,41 @@ export interface PlateCalculation {
   isExact: boolean;
   remainder: number;
 }
+
+export type MesocyclePhaseName =
+  | 'Accumulation'
+  | 'Progression'
+  | 'Overload'
+  | 'Overreach'
+  | 'Deload';
+
+export interface MesocycleWeekConfig {
+  weekNumber: number;
+  phaseName: MesocyclePhaseName;
+  targetRir: number; // e.g., 3, 2, 1, 0, or 3 (for deload)
+  targetRpe: number; // e.g., 7, 8, 9, 10, or 7
+  volumeMultiplier: number; // 1.0 = normal, 0.5 = deload
+  description: string;
+}
+
+export interface MesocycleBlock {
+  id: string;
+  name: string;
+  focus: 'Hypertrophy' | 'Strength' | 'Peak';
+  totalWeeks: number;
+  currentWeek: number; // 1-indexed
+  startDate: string;
+  weeks: MesocycleWeekConfig[];
+  status: 'active' | 'completed' | 'deload_pending';
+  lastDeloadDate?: string;
+}
+
+export interface SystemicFatigueReport {
+  isDeloadRecommended: boolean;
+  fatigueScore: number; // 0 to 100
+  consecutiveDropCount: number;
+  stalledExercises: string[];
+  reason: string;
+  recommendedAction: string;
+}
+

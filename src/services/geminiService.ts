@@ -24,11 +24,8 @@ export interface GeminiCallOptions {
 }
 
 const ACTIVE_MODELS = [
-  'gemini-3.6-flash',
-  'gemini-3.7-flash',
-  'gemini-3.8-flash',
   'gemini-3.5-flash-lite',
-  'gemini-3.5-flash',
+  'gemini-3.6-flash',
   'gemini-flash-latest'
 ];
 
@@ -316,7 +313,7 @@ Return ONLY valid JSON. No extra text.`;
 
 
 export interface CoachProposedAction {
-  action: 'UPDATE_ROUTINE' | 'UPDATE_ALL_ROUTINES';
+  action: 'UPDATE_ROUTINE' | 'UPDATE_ALL_ROUTINES' | 'MODIFY_ACTIVE_WORKOUT';
   weekday?: string;
   routineName?: string;
   description?: string;
@@ -329,6 +326,24 @@ export interface CoachProposedAction {
     targetRpe: number;
     restSeconds: number;
   }[];
+  activeWorkoutChanges?: {
+    type: 'SWAP_EXERCISE' | 'ADD_EXERCISE' | 'REMOVE_EXERCISE' | 'UPDATE_TARGETS';
+    oldExerciseId?: string;
+    oldExerciseName?: string;
+    newExercise?: {
+      exerciseId: string;
+      name: string;
+      muscleGroup: string;
+      equipment: string;
+      sets: number;
+      targetWeightKg?: number;
+      targetReps?: number;
+      restSeconds?: number;
+    };
+    targetWeightKg?: number;
+    targetReps?: number;
+    targetRpe?: number;
+  };
   routines?: Routine[];
 }
 
@@ -348,10 +363,12 @@ export async function chatWithAICoach(
     prs: string[];
     userSettings: UserSettings;
     currentRoutines?: Routine[];
+    activeSession?: WorkoutSession | null;
+    recoveryStates?: MuscleRecoveryState[];
   }
 ): Promise<AICoachReply> {
   const historyText = conversation
-    .slice(-6)
+    .slice(-8)
     .map((m) => `${m.role === 'user' ? 'User' : 'Coach'}: ${m.text}`)
     .join('\n');
 
@@ -364,80 +381,156 @@ export async function chatWithAICoach(
         .join('\n')
     : '5-Day Hypertrophy Split';
 
-  const prompt = `You are "Overload AI", an elite personal bodybuilding coach and biomechanics expert.
-User Profile:
-- Name: ${context.userSettings.userName}
-- Age: ${context.userSettings.age ? `${context.userSettings.age} yrs` : 'Not specified'} | Height: ${context.userSettings.heightCm ? `${context.userSettings.heightCm} cm` : 'Not specified'}
-- Current Weight: ${context.userSettings.bodyWeightKg ? `${context.userSettings.bodyWeightKg} kg` : 'Not specified'} | Target Weight: ${context.userSettings.targetWeightKg ? `${context.userSettings.targetWeightKg} kg` : 'Not specified'}
-- Current Split: ${context.split}
-- Unit: ${context.userSettings.unit}
-- Goal: Hypertrophy & Progressive Overload
-- Recent Volume: ${context.recentVolume} kg
-- Notable PRs: ${context.prs.join(', ') || 'In training cycle'}
+  const activeWorkoutSummary = context.activeSession
+    ? `ACTIVE WORKOUT IN PROGRESS:
+- Name: "${context.activeSession.routineName}" (${context.activeSession.dayTag || 'Custom'})
+- Duration so far: ${Math.round(context.activeSession.durationSeconds / 60)} min
+- Logged Volume: ${context.activeSession.totalVolumeKg} ${context.userSettings.unit}
+- Exercises in active session:
+${context.activeSession.exercises.map((ex, i) => `  ${i + 1}. ${ex.name} (${ex.muscleGroup}): ${ex.sets.length} sets [${ex.sets.filter((s) => s.completed).length}/${ex.sets.length} completed]`).join('\n')}`
+    : 'NO active workout in progress currently.';
 
-Current Active Routines:
+  const recoverySummary = context.recoveryStates && context.recoveryStates.length > 0
+    ? `MUSCLE RECOVERY READINESS:
+- Fresh / Ready (>=80%): ${context.recoveryStates.filter((r) => r.recoveryPercentage >= 80).map((r) => `${r.muscle} (${r.recoveryPercentage}%)`).join(', ') || 'All standard'}
+- Fatigued / Sore (<60%): ${context.recoveryStates.filter((r) => r.recoveryPercentage < 60).map((r) => `${r.muscle} (${r.recoveryPercentage}%)`).join(', ') || 'None'}`
+    : 'Recovery: Fully primed.';
+
+  const prompt = `You are "Coach Overload" — the head AI hypertrophy scientist and personal bodybuilding coach in Overload AI.
+You combine the mechanical tension rigor of Dr. Mike Israetel and Jeff Nippard with the high-octane motivational intensity of an elite strength mentor.
+
+ATHLETE PROFILE:
+- Name: ${context.userSettings.userName || 'Athlete'}
+- Experience: ${context.userSettings.experienceLevel || 'Intermediate'} | Goal: ${context.userSettings.primaryGoal || 'Hypertrophy'}
+- Current Weight: ${context.userSettings.bodyWeightKg ? `${context.userSettings.bodyWeightKg} kg` : '80 kg'} | Target: ${context.userSettings.targetWeightKg ? `${context.userSettings.targetWeightKg} kg` : '85 kg'}
+- Unit Preference: ${context.userSettings.unit}
+- Recent Weekly Volume: ${context.recentVolume} ${context.userSettings.unit}
+- Notable Personal Records: ${context.prs.join(', ') || 'In training cycle'}
+
+${activeWorkoutSummary}
+
+${recoverySummary}
+
+CURRENT WEEKLY ROUTINE TEMPLATES:
 ${routinesSummary}
 
-Available Exercises Library includes:
-${EXERCISE_LIBRARY.map((e) => `${e.id} (${e.name})`).join(', ')}
+APP CAPABILITIES THAT YOU OWN & CAN GUIDE THE ATHLETE ON:
+- 🧬 3D Anatomical Demonstration GIFs & Biomechanical Vector Player for all 1,300+ WorkoutX exercises (including strength, hypertrophy, and cardio).
+- ⚡ Supersets & Giant Sets: 1-tap antagonist pairing (e.g. Biceps + Triceps) with deferred rest.
+- 🎯 Smart Drop-Sets: Instant -20% and -25% load calculation chips for metabolic fatigue.
+- 🏋️ Barbell Plate Calculator: Exact 20kg/15kg Olympic plate visualizer per side.
+- 📊 Weekly Volume Landmarks: Live tracking against Maintenance (MV), Optimal Growth (MAV: 10-18 sets 🎯), and Max Recoverable (MRV).
+- 🎙️ Hands-Free Voice Logger: Microphone logging for chalked hands in the gym.
+- 💾 Unlimited Offline Storage: Complete client-side IndexedDB persistence.
 
-CAPABILITY - PLAN & EXERCISE MODIFICATION:
-If the user asks to change, swap, add, remove exercises, adjust sets/reps/weights, or restructure any day or plan (e.g., "swap hack squat for leg press on Tuesday", "change Friday to focus on arms", "make my plan 4 days", "reduce Wednesday volume"):
-1. Provide a concise, motivating response (under 120 words) explaining your coaching decision and biomechanical rationale.
-2. At the very end of your response, output a single valid JSON block containing the updated routine so the app can apply it with 1 tap:
-\`\`\`json
+AVAILABLE EXERCISES IN LIBRARY (${EXERCISE_LIBRARY.length} TOTAL):
+${EXERCISE_LIBRARY.map((e) => `${e.id} (${e.name} [${e.muscleGroup}])`).join(', ')}
+
+COACHING RULES:
+1. Speak with authentic bodybuilding expertise, motivational fire, and scientific precision. Use concepts like lengthened stretch hypertrophy, mechanical tension, stimulus-to-fatigue ratio (SFR), and RPE/RIR naturally.
+2. If the user asks to modify an active workout (e.g. "swap hack squat for leg press right now", "add lateral raises to my workout"), create a "MODIFY_ACTIVE_WORKOUT" action.
+3. If the user asks to change, swap, or restructure a scheduled routine (e.g. "change Tuesday to Push", "swap hack squat on Tuesday"), create an "UPDATE_ROUTINE" action with a full list of balanced exercises.
+4. If the user asks to switch or create a multi-day split (e.g. "Push/Pull/Legs split", "Upper/Lower split"), create an "UPDATE_ROUTINE" action for the primary requested day.
+5. If the user is asking advice, form checks, recovery audits, or app questions, set "action" to null.
+6. CRITICAL: You MUST respond ONLY with a JSON object. Do NOT put raw JSON inside the "coachReply" text!
+Output format:
 {
-  "action": "UPDATE_ROUTINE",
-  "weekday": "Tuesday",
-  "routineName": "Tuesday: Lower Body A",
-  "description": "Short description",
-  "exercises": [
-    {
-      "exerciseId": "sled-45-leg-press",
-      "name": "Sled 45° Leg Press",
-      "defaultSets": 3,
-      "targetRepRange": [10, 14],
-      "defaultWeightKg": 160,
-      "targetRpe": 8.5,
-      "restSeconds": 60
-    }
-  ]
+  "coachReply": "Your response in rich, formatted markdown. Use bolding (**), bullet points (- ), and clear paragraph breaks for maximum readability. Never include raw JSON code in here.",
+  "action": null | {
+    "action": "UPDATE_ROUTINE" | "MODIFY_ACTIVE_WORKOUT" | "UPDATE_ALL_ROUTINES",
+    "weekday": "Monday",
+    "routineName": "Monday: Push A",
+    "description": "Chest, Delts & Triceps Focus",
+    "activeWorkoutChanges": {
+      "type": "SWAP_EXERCISE" | "ADD_EXERCISE" | "REMOVE_EXERCISE",
+      "oldExerciseName": "First exercise",
+      "newExercise": {
+        "exerciseId": "incline-dumbbell-press",
+        "name": "Incline Dumbbell Press",
+        "muscleGroup": "Chest",
+        "equipment": "Dumbbell",
+        "sets": 3,
+        "targetWeightKg": 24,
+        "targetReps": 10,
+        "restSeconds": 90
+      }
+    },
+    "exercises": [
+      {
+        "exerciseId": "smith-machine-incline-press",
+        "name": "Smith Machine Incline Bench Press",
+        "defaultSets": 3,
+        "targetRepRange": [8, 12],
+        "defaultWeightKg": 70,
+        "targetRpe": 8.5,
+        "restSeconds": 90
+      }
+    ]
+  }
 }
-\`\`\`
-If the user is only asking general fitness questions (not asking to change a workout), answer normally without any JSON block.
 
-Conversation:
+Conversation History:
 ${historyText}
 
-Coach Response:`;
+Output valid JSON:`;
 
   try {
-    const rawReply = await callGemini(prompt, context.userSettings.geminiApiKey);
+    const rawReply = await callGemini(prompt, {
+      apiKey: context.userSettings.geminiApiKey,
+      responseMimeType: 'application/json',
+      temperature: 0.7,
+      maxOutputTokens: 2500
+    });
 
-    // Check if reply contains a JSON action block (markdown codeblock or embedded action object)
-    const jsonMatch =
-      rawReply.match(/```(?:json)?\s*([\s\S]*?)\s*```/) ||
-      rawReply.match(/(\{[\s\S]*"action"\s*:\s*"(?:UPDATE_ROUTINE|UPDATE_ALL_ROUTINES)"[\s\S]*\})/);
+    let coachReplyText = '';
+    let proposedAction: CoachProposedAction | undefined;
 
-    if (jsonMatch) {
-      try {
-        const jsonContent = (jsonMatch[1] || jsonMatch[0]).trim();
-        const parsedAction: CoachProposedAction = JSON.parse(jsonContent);
-        const cleanedText = rawReply.replace(jsonMatch[0], '').trim();
-        return {
-          text: cleanedText || 'I have updated your routine as requested! Review the proposed changes below and tap Apply.',
-          proposedAction: parsedAction
-        };
-      } catch (jsonErr) {
-        console.warn('Failed parsing coach JSON action:', jsonErr);
+    try {
+      const parsed = extractJson<any>(rawReply);
+      if (parsed && typeof parsed === 'object') {
+        coachReplyText = parsed.coachReply || parsed.reply || parsed.text || '';
+        if (parsed.action && typeof parsed.action === 'object' && parsed.action.action) {
+          proposedAction = parsed.action;
+        }
+      }
+    } catch {
+      // Fallback JSON parsing
+      const jsonMatch = rawReply.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          const parsed = JSON.parse(jsonMatch[0]);
+          coachReplyText = parsed.coachReply || parsed.reply || parsed.text || '';
+          if (parsed.action && parsed.action.action) {
+            proposedAction = parsed.action;
+          }
+        } catch {}
       }
     }
 
-    return { text: rawReply };
+    // Safety fallback if coachReplyText wasn't extracted
+    if (!coachReplyText) {
+      coachReplyText = rawReply;
+    }
+
+    // SANITIZATION: Completely strip any raw JSON or markdown code blocks from coachReplyText
+    coachReplyText = coachReplyText
+      .replace(/```(?:json)?[\s\S]*?```/g, '')
+      .replace(/\{[\s\S]*"action"\s*:[\s\S]*\}/g, '')
+      .trim();
+
+    if (!coachReplyText && proposedAction) {
+      coachReplyText = `I have dialed in the hypertrophy adjustments for your plan! Review the biomechanical breakdown below and tap **Apply** to lock it in.`;
+    }
+
+    return {
+      text: coachReplyText,
+      proposedAction
+    };
   } catch (err) {
     console.warn('AI Coach chat fallback:', err);
     return {
-      text: `You can customize any day in your split! To modify exercises, tell me what you'd like to change (e.g. "Swap Hack Squat for Sled Leg Press on Tuesday" or "Add Incline Curls to Friday") and I will generate and apply the routine updates for you.`
+      text: `Let's lock in your progressive overload! What would you like to adjust in your training? I can swap exercises in your active workout, restructure your weekly split, or audit your volume against MAV (10–18 sets) recovery landmarks.`
     };
   }
 }
+

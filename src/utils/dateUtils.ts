@@ -42,7 +42,14 @@ export function getTodayWorkoutState(
   const isAlreadyCompletedToday = todaysSessions.length > 0;
 
   if (!routines || routines.length === 0) {
-    throw new Error('No routines available');
+    return {
+      dayName,
+      formattedDate,
+      routine: null as unknown as Routine,
+      isScheduledToday: false,
+      isAlreadyCompletedToday,
+      todayCompletedCount: todaysSessions.length
+    };
   }
 
   // Find routine matching today's weekday (e.g. 'Friday' matching 'Friday' in weekday/dayTag/name)

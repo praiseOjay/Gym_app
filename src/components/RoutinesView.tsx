@@ -4,6 +4,7 @@ import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import { triggerHaptic } from '../utils/haptics';
 import { sounds } from '../utils/audio';
 import { getTodayWorkoutState } from '../utils/dateUtils';
+import { preloadRoutineGifs } from '../utils/offlineMedia';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
 import {
   Play,
@@ -16,7 +17,8 @@ import {
   Trash2,
   ArrowUp,
   ArrowDown,
-  Save
+  Save,
+  Search
 } from 'lucide-react';
 
 interface RoutinesViewProps {
@@ -38,13 +40,32 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
   const [showAddExercisePicker, setShowAddExercisePicker] = useState(false);
   const [exerciseFilterMuscle, setExerciseFilterMuscle] = useState<string>('All');
+  const [exerciseSearch, setExerciseSearch] = useState<string>('');
 
   // Keep active selection valid
   const currentRoutine =
     routines.find((r) => r.id === selectedRoutineId) || routines[0];
 
+  const filteredExercises = useMemo(() => {
+    const q = exerciseSearch.toLowerCase().trim();
+    return EXERCISE_LIBRARY.filter((e) => {
+      const matchMuscle = exerciseFilterMuscle === 'All' || e.muscleGroup === exerciseFilterMuscle;
+      if (!matchMuscle) return false;
+      if (!q) return true;
+      return (
+        e.name.toLowerCase().includes(q) ||
+        e.equipment.toLowerCase().includes(q) ||
+        e.id.toLowerCase().includes(q)
+      );
+    });
+  }, [exerciseFilterMuscle, exerciseSearch]);
+
   const getExerciseMeta = (id: string): Exercise | undefined => {
-    return EXERCISE_LIBRARY.find((e) => e.id === id);
+    if (!id) return undefined;
+    const lower = id.toLowerCase();
+    return EXERCISE_LIBRARY.find(
+      (e) => e.id.toLowerCase() === lower || e.name.toLowerCase() === lower
+    );
   };
 
   const handleStartEditing = (routine: Routine) => {
@@ -56,8 +77,8 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
     const newRoutine: Routine = {
       id: `routine-${Date.now()}`,
       name: 'New Custom Workout',
-      description: 'Custom hypertrophy training session',
-      weekday: 'Saturday',
+      description: 'Custom training session',
+      weekday: 'Monday',
       splitType: 'Custom',
       dayTag: 'Custom',
       exercises: []
@@ -82,21 +103,18 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
     }
 
     onUpdateRoutines(updated);
+    preloadRoutineGifs(editingRoutine).catch(() => {});
     setEditingRoutine(null);
     sounds.playSetComplete();
     triggerHaptic('success');
   };
 
   const handleDeleteRoutine = (routineId: string) => {
-    if (routines.length <= 1) {
-      alert('You must have at least one routine in your split.');
-      return;
-    }
     const target = routines.find((r) => r.id === routineId);
-    if (window.confirm(`Are you sure you want to delete "${target?.name}"?`)) {
+    if (window.confirm(`Are you sure you want to delete "${target?.name || 'this routine'}"?`)) {
       const updated = routines.filter((r) => r.id !== routineId);
       onUpdateRoutines(updated);
-      setSelectedRoutineId(updated[0].id);
+      setSelectedRoutineId(updated.length > 0 ? updated[0].id : '');
       triggerHaptic('medium');
     }
   };
@@ -233,6 +251,26 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
         </div>
       </div>
 
+      {/* Empty State when no routines exist */}
+      {routines.length === 0 && (
+        <div className="gym-card" style={{ textAlign: 'center', padding: '48px 24px', marginTop: 12 }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>⚡</div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', marginBottom: 8 }}>
+            Fresh App Ready
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', maxWidth: 420, margin: '0 auto 20px', lineHeight: 1.5 }}>
+            No routines in your split yet. You have full access to all 1,300+ WorkoutX exercises with accurate animated GIFs. Build your custom training routine!
+          </p>
+          <button
+            className="btn-primary"
+            style={{ margin: '0 auto', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', fontSize: '0.95rem' }}
+            onClick={handleCreateNewRoutine}
+          >
+            <Plus size={18} /> Create New Routine
+          </button>
+        </div>
+      )}
+
       {/* Routine Overview Header with Edit & Start Actions */}
       {currentRoutine && (
         <div
@@ -271,7 +309,10 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
             <button
               className="btn-primary"
               style={{ padding: '8px 16px', fontSize: '0.82rem' }}
-              onClick={() => onStartRoutine(currentRoutine)}
+              onClick={() => {
+                preloadRoutineGifs(currentRoutine).catch(() => {});
+                onStartRoutine(currentRoutine);
+              }}
             >
               <Play size={14} fill="#050D0A" />
               Start
@@ -705,9 +746,52 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
               </button>
             </div>
 
+            {/* Search Input */}
+            <div style={{ position: 'relative', marginBottom: 10 }}>
+              <Search
+                size={16}
+                color="var(--text-muted)"
+                style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+              />
+              <input
+                type="text"
+                placeholder="Search 1,300+ exercises by name or equipment..."
+                value={exerciseSearch}
+                onChange={(e) => setExerciseSearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-input)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '9px 12px 9px 36px',
+                  color: '#fff',
+                  fontSize: '0.85rem',
+                  outline: 'none'
+                }}
+              />
+              {exerciseSearch && (
+                <button
+                  onClick={() => setExerciseSearch('')}
+                  style={{
+                    position: 'absolute',
+                    right: 10,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: 2
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
             {/* Muscle Filter Tabs */}
-            <div className="quick-prompts-row" style={{ marginBottom: 12 }}>
-              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Biceps', 'Triceps', 'Forearms', 'Calves', 'Abs'].map(
+            <div className="quick-prompts-row" style={{ marginBottom: 10 }}>
+              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Glutes', 'Biceps', 'Triceps', 'Calves', 'Forearms', 'Abs', 'Cardio'].map(
                 (m) => (
                   <button
                     key={m}
@@ -725,11 +809,13 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
               )}
             </div>
 
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 8 }}>
+              Showing {Math.min(filteredExercises.length, 60)} of {filteredExercises.length} exercises
+            </div>
+
             {/* Exercises List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 380, overflowY: 'auto' }}>
-              {EXERCISE_LIBRARY.filter(
-                (e) => exerciseFilterMuscle === 'All' || e.muscleGroup === exerciseFilterMuscle
-              ).map((ex) => (
+              {filteredExercises.slice(0, 60).map((ex) => (
                 <div
                   key={ex.id}
                   style={{
@@ -753,6 +839,11 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                   <Plus size={18} color="var(--accent-volt)" />
                 </div>
               ))}
+              {filteredExercises.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '24px 12px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  No exercises found matching "{exerciseSearch}". Try another search term or filter.
+                </div>
+              )}
             </div>
           </div>
         </div>

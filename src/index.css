@@ -560,33 +560,55 @@ body {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .exercise-card-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .exercise-title-group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
+  flex: 1 1 0%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .exercise-name {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 800;
   color: #fff;
+  line-height: 1.3;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .exercise-meta-tags {
   display: flex;
   gap: 6px;
   align-items: center;
+  flex-wrap: wrap;
   font-size: 0.72rem;
   color: var(--text-secondary);
+  max-width: 100%;
+}
+
+.exercise-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .smart-swap-btn {
@@ -598,9 +620,11 @@ body {
   font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
@@ -1397,5 +1421,115 @@ body {
   background: var(--accent-volt);
   color: #060B0E;
   font-weight: 900;
+}
+
+/* ========================================================= */
+/* SUPERSET STYLES                                           */
+/* ========================================================= */
+.workout-exercise-card.in-superset {
+  border-left: 3px solid #00E5FF;
+  background: linear-gradient(180deg, rgba(0, 229, 255, 0.04) 0%, var(--bg-card) 100%);
+  position: relative;
+}
+
+.superset-pill {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #00E5FF;
+  background: rgba(0, 229, 255, 0.12);
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.4px;
+}
+
+/* ========================================================= */
+/* DROP SET QUICK CALC CHIPS                                 */
+/* ========================================================= */
+.drop-quick-calc-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+  padding-left: 4px;
+}
+
+.drop-quick-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #FF2A85;
+}
+
+.drop-calc-chip {
+  background: rgba(255, 42, 133, 0.12);
+  border: 1px solid rgba(255, 42, 133, 0.3);
+  color: #FF2A85;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.drop-calc-chip:hover {
+  background: rgba(255, 42, 133, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ========================================================= */
+/* VOICE LOGGER SOUNDWAVE & MIC ANIMATIONS                   */
+/* ========================================================= */
+.voice-wave-bar {
+  width: 5px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  animation: voiceWavePulse 1.2s infinite ease-in-out;
+}
+
+@keyframes voiceWavePulse {
+  0%, 100% {
+    height: 8px;
+    opacity: 0.4;
+  }
+  50% {
+    height: 36px;
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(0, 245, 155, 0.8));
+  }
+}
+
+.voice-mic-active {
+  animation: micPulse 1.4s infinite ease-in-out;
+}
+
+@keyframes micPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(0, 245, 155, 0.5));
+  }
+  50% {
+    transform: scale(1.18);
+    filter: drop-shadow(0 0 10px rgba(0, 245, 155, 0.9));
+  }
+}
+
+.chip-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip-btn:hover {
+  background: rgba(0, 245, 155, 0.12);
+  color: var(--accent-volt);
+  border-color: rgba(0, 245, 155, 0.35);
 }
 

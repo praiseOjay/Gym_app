@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type {
   WorkoutSession,
   WorkoutExercise,
@@ -6,7 +6,10 @@ import type {
   UserSettings,
   Exercise,
   PRRecord,
-  SetType
+  SetType,
+  MuscleGroup,
+  EquipmentType,
+  MesocycleBlock
 } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import {
@@ -16,12 +19,15 @@ import {
   kgToLbs,
   lbsToKg
 } from '../engine/overloadEngine';
+import { estimateLiveSessionCalories } from '../engine/calorieEngine';
 import { sounds } from '../utils/audio';
 import { triggerHaptic } from '../utils/haptics';
 import { PlateCalculatorModal } from './PlateCalculatorModal';
 import { SmartSwapModal } from './SmartSwapModal';
 import { RestTimerFloating } from './RestTimerFloating';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
+import { VoiceLoggerModal } from './VoiceLoggerModal';
+import type { ParsedVoiceCommand } from '../services/voiceLogger';
 import {
   Check,
   Plus,
@@ -33,7 +39,11 @@ import {
   ArrowUp,
   ArrowDown,
   Trash2,
-  Info
+  Info,
+  Mic,
+  Layers,
+  Search,
+  Zap
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -42,6 +52,7 @@ interface ActiveWorkoutViewProps {
   historySessions: WorkoutSession[];
   existingPRs: PRRecord[];
   settings: UserSettings;
+  mesocycleBlock?: MesocycleBlock;
   onUpdateSession: (updated: WorkoutSession) => void;
   onFinishWorkout: (completedSession: WorkoutSession) => void;
   onCancelWorkout: () => void;
@@ -52,6 +63,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   historySessions,
   existingPRs,
   settings,
+  mesocycleBlock,
   onUpdateSession,
   onFinishWorkout,
   onCancelWorkout
@@ -69,8 +81,23 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   } | null>(null);
   const [showAddExerciseModal, setShowAddExerciseModal] = useState(false);
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState<string>('All');
+  const [exerciseSearchQuery, setExerciseSearchQuery] = useState<string>('');
   const [newPRNotice, setNewPRNotice] = useState<string | null>(null);
+  const [supersetNotice, setSupersetNotice] = useState<string | null>(null);
   const [inspectExerciseDetails, setInspectExerciseDetails] = useState<Exercise | null>(null);
+  const [voiceLoggerTarget, setVoiceLoggerTarget] = useState<{
+    exerciseIdx: number;
+    setIdx: number;
+  } | null>(null);
+
+  // Live metabolic calorie burn calculation based on WorkoutX MET ratings
+  const liveCalories = useMemo(() => {
+    return estimateLiveSessionCalories(session.exercises, elapsedSeconds, settings.bodyWeightKg);
+  }, [session.exercises, elapsedSeconds, settings.bodyWeightKg]);
+
+  const currentWeekConfig = mesocycleBlock?.weeks.find(
+    (w) => w.weekNumber === mesocycleBlock.currentWeek
+  );
 
   // Live timer tick
   useEffect(() => {
@@ -79,13 +106,17 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
         const next = prev + 1;
         // Periodic sync to session
         if (next % 5 === 0) {
-          onUpdateSession({ ...session, durationSeconds: next });
+          onUpdateSession({
+            ...session,
+            durationSeconds: next,
+            caloriesBurned: estimateLiveSessionCalories(session.exercises, next, settings.bodyWeightKg)
+          });
         }
         return next;
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [session, onUpdateSession]);
+  }, [session, onUpdateSession, settings.bodyWeightKg]);
 
   const formatElapsed = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -102,6 +133,108 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   const toStorageWeight = (val: number) => {
     if (settings.unit === 'lbs') return lbsToKg(val);
     return val;
+  };
+
+  // Calculate session volume (excluding warmups)
+  const calculateTotalVolume = (exercises: WorkoutExercise[]) => {
+    return exercises.reduce((acc, ex) => {
+      return (
+        acc +
+        ex.sets.reduce((sSum, s) => {
+          return s.completed && s.type !== 'warmup' ? sSum + s.weightKg * s.reps : sSum;
+        }, 0)
+      );
+    }, 0);
+  };
+
+  // Determine superset label (e.g. A1, A2, B1, B2)
+  const getSupersetLabel = (groupId?: string, order?: number) => {
+    if (!groupId) return null;
+    const groupIds: string[] = [];
+    session.exercises.forEach((e) => {
+      if (e.supersetGroupId && !groupIds.includes(e.supersetGroupId)) {
+        groupIds.push(e.supersetGroupId);
+      }
+    });
+    const groupIdx = groupIds.indexOf(groupId);
+    const letter = String.fromCharCode(65 + (groupIdx >= 0 ? groupIdx : 0));
+    return `${letter}${order || 1}`;
+  };
+
+  // Link or unlink superset pairing with the following exercise
+  const handleToggleSupersetWithNext = (exIdx: number) => {
+    const updated = session.exercises.map((e) => ({ ...e }));
+    const current = updated[exIdx];
+    const next = updated[exIdx + 1];
+    if (!next) return;
+
+    if (current.supersetGroupId && current.supersetGroupId === next.supersetGroupId) {
+      // Unlink both
+      delete current.supersetGroupId;
+      delete current.supersetOrder;
+      delete next.supersetGroupId;
+      delete next.supersetOrder;
+    } else {
+      // Link as superset pair
+      const groupId = `ss-${Date.now()}`;
+      current.supersetGroupId = groupId;
+      current.supersetOrder = 1;
+      next.supersetGroupId = groupId;
+      next.supersetOrder = 2;
+    }
+
+    onUpdateSession({ ...session, exercises: updated });
+    triggerHaptic('medium', settings.vibrationEnabled);
+  };
+
+  // Open voice logger for next incomplete set
+  const handleOpenVoiceLogger = (preferredExIdx?: number) => {
+    const targetExIdx = preferredExIdx !== undefined ? preferredExIdx : session.exercises.findIndex((e) => e.sets.some((s) => !s.completed));
+    const activeExIdx = targetExIdx >= 0 ? targetExIdx : 0;
+    const targetSetIdx = session.exercises[activeExIdx].sets.findIndex((s) => !s.completed);
+    const activeSetIdx = targetSetIdx >= 0 ? targetSetIdx : Math.max(0, session.exercises[activeExIdx].sets.length - 1);
+    setVoiceLoggerTarget({ exerciseIdx: activeExIdx, setIdx: activeSetIdx });
+    triggerHaptic('light', settings.vibrationEnabled);
+  };
+
+  // Apply parsed speech commands to target set
+  const handleApplyVoiceCommand = (cmd: ParsedVoiceCommand) => {
+    if (!voiceLoggerTarget) return;
+    const { exerciseIdx, setIdx } = voiceLoggerTarget;
+    const updated = session.exercises.map((e) => ({
+      ...e,
+      sets: e.sets.map((s) => ({ ...s }))
+    }));
+    const targetSet = updated[exerciseIdx].sets[setIdx];
+    if (!targetSet) return;
+
+    if (cmd.setType) {
+      targetSet.type = cmd.setType;
+    }
+    if (cmd.weightKg !== undefined) {
+      targetSet.weightKg = cmd.weightKg;
+    }
+    if (cmd.reps !== undefined) {
+      targetSet.reps = cmd.reps;
+    }
+    if (cmd.rpe !== undefined) {
+      targetSet.rpe = cmd.rpe;
+    }
+
+    if (cmd.action === 'complete') {
+      targetSet.completed = true;
+      const totalVol = calculateTotalVolume(updated);
+      onUpdateSession({ ...session, exercises: updated, totalVolumeKg: totalVol });
+      handleToggleSetComplete(exerciseIdx, setIdx);
+      return;
+    }
+
+    if (cmd.action === 'rest' && cmd.restSeconds) {
+      setActiveRestSeconds(cmd.restSeconds);
+    }
+
+    const totalVol = calculateTotalVolume(updated);
+    onUpdateSession({ ...session, exercises: updated, totalVolumeKg: totalVol });
   };
 
   // Set updates
@@ -124,20 +257,12 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     });
   };
 
-  const calculateTotalVolume = (exercises: WorkoutExercise[]) => {
-    return exercises.reduce((sum, ex) => {
-      return (
-        sum +
-        ex.sets.reduce((sSum, s) => {
-          return s.completed && s.type !== 'warmup' ? sSum + s.weightKg * s.reps : sSum;
-        }, 0)
-      );
-    }, 0);
-  };
-
   // Toggle set completion
   const handleToggleSetComplete = (exIdx: number, setIdx: number) => {
-    const updatedExercises = [...session.exercises];
+    const updatedExercises = session.exercises.map((e) => ({
+      ...e,
+      sets: e.sets.map((s) => ({ ...s }))
+    }));
     const currentSet = updatedExercises[exIdx].sets[setIdx];
     const isNowCompleted = !currentSet.completed;
 
@@ -176,9 +301,31 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
         triggerHaptic('light', settings.vibrationEnabled);
       }
 
-      // Trigger Rest Timer
-      const restSec = currentSet.type === 'warmup' ? 45 : (updatedExercises[exIdx].restSeconds || settings.defaultRestSeconds || 90);
-      setActiveRestSeconds(restSec);
+      // Check if this exercise is in a superset pair
+      const currentEx = updatedExercises[exIdx];
+      let deferRestTimer = false;
+
+      if (currentEx.supersetGroupId && currentEx.supersetOrder === 1) {
+        // Find partner in superset (order === 2)
+        const partnerEx = updatedExercises.find(
+          (e, i) => i !== exIdx && e.supersetGroupId === currentEx.supersetGroupId && e.supersetOrder === 2
+        );
+        if (partnerEx) {
+          const partnerMatchingSet = partnerEx.sets[setIdx] || partnerEx.sets.find((s) => !s.completed);
+          if (partnerMatchingSet && !partnerMatchingSet.completed) {
+            deferRestTimer = true;
+            setSupersetNotice(`⚡ SUPERSET: Move immediately to ${partnerEx.name} (Set #${partnerMatchingSet.setNumber})!`);
+            triggerHaptic('medium', settings.vibrationEnabled);
+            setTimeout(() => setSupersetNotice(null), 4500);
+          }
+        }
+      }
+
+      // Trigger Rest Timer if not deferred by active superset round
+      if (!deferRestTimer) {
+        const restSec = currentSet.type === 'warmup' ? 45 : (updatedExercises[exIdx].restSeconds || settings.defaultRestSeconds || 90);
+        setActiveRestSeconds(restSec);
+      }
     }
 
     updatedExercises[exIdx].sets[setIdx] = {
@@ -333,16 +480,41 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     setShowAddExerciseModal(false);
   };
 
+  const formatExerciseTitle = (rawName: string): string => {
+    if (!rawName) return 'Exercise';
+    if (rawName.includes(' ') && /[A-Z]/.test(rawName)) return rawName;
+    return rawName
+      .replace(/^db-/, 'dumbbell-')
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
   const handleApplySwap = (newExerciseName: string, equipment: string) => {
     if (!swapExercise) return;
+    const found = EXERCISE_LIBRARY.find(
+      (e) =>
+        e.name.toLowerCase() === newExerciseName.toLowerCase() ||
+        e.id.toLowerCase() === newExerciseName.toLowerCase() ||
+        e.name.toLowerCase().includes(newExerciseName.toLowerCase()) ||
+        newExerciseName.toLowerCase().includes(e.name.toLowerCase())
+    );
+
     const updated = [...session.exercises];
-    updated[swapExercise.exerciseIdx] = {
-      ...updated[swapExercise.exerciseIdx],
-      name: newExerciseName,
-      equipment: equipment as any
+    const targetIdx = swapExercise.exerciseIdx;
+    const oldEx = updated[targetIdx];
+
+    updated[targetIdx] = {
+      ...oldEx,
+      exerciseId: found?.id || oldEx.exerciseId,
+      name: found?.name || formatExerciseTitle(newExerciseName),
+      muscleGroup: (found?.muscleGroup || oldEx.muscleGroup) as MuscleGroup,
+      equipment: (found?.equipment || equipment) as EquipmentType
     };
+
     onUpdateSession({ ...session, exercises: updated });
     setSwapExercise(null);
+    if (settings.soundEnabled) sounds.playSetComplete();
+    triggerHaptic('medium', settings.vibrationEnabled);
   };
 
   const handleFinish = () => {
@@ -355,7 +527,10 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
       ...session,
       durationSeconds: elapsedSeconds,
       totalVolumeKg: calculateTotalVolume(session.exercises),
-      prCount: prsCount
+      prCount: prsCount,
+      caloriesBurned: liveCalories,
+      mesocycleWeek: mesocycleBlock?.currentWeek,
+      isDeload: currentWeekConfig?.phaseName === 'Deload'
     };
 
     onFinishWorkout(completed);
@@ -390,6 +565,33 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
         </div>
       )}
 
+      {/* Superset Immediate Cue Notification */}
+      {supersetNotice && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 70,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'linear-gradient(135deg, #00F59B, #00E5FF)',
+            color: '#050D0A',
+            padding: '10px 18px',
+            borderRadius: 'var(--radius-full)',
+            fontWeight: 800,
+            fontSize: '0.85rem',
+            zIndex: 100,
+            boxShadow: '0 8px 30px rgba(0, 245, 155, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            animation: 'slide-down 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        >
+          <Layers size={18} color="#050D0A" />
+          <span>{supersetNotice}</span>
+        </div>
+      )}
+
       {/* Top Session Stats Bar */}
       <div
         className="gym-card"
@@ -402,50 +604,119 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
         }}
       >
         <div>
-          <span style={{ fontSize: '0.72rem', color: 'var(--accent-volt)', fontWeight: 800, textTransform: 'uppercase' }}>
-            {session.dayTag || 'Hypertrophy'} Active
-          </span>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.72rem', color: 'var(--accent-volt)', fontWeight: 800, textTransform: 'uppercase' }}>
+              {session.dayTag || 'Hypertrophy'} Active
+            </span>
+            {currentWeekConfig && (
+              <span
+                style={{
+                  fontSize: '0.68rem',
+                  fontWeight: 800,
+                  background: currentWeekConfig.phaseName === 'Deload' ? 'rgba(168, 85, 247, 0.2)' : 'rgba(0, 229, 255, 0.15)',
+                  color: currentWeekConfig.phaseName === 'Deload' ? '#C084FC' : 'var(--accent-cyan)',
+                  padding: '2px 8px',
+                  borderRadius: 'var(--radius-full)',
+                  border: currentWeekConfig.phaseName === 'Deload' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(0, 229, 255, 0.3)'
+                }}
+              >
+                W{currentWeekConfig.weekNumber}: {currentWeekConfig.targetRir} RIR ({currentWeekConfig.phaseName})
+              </span>
+            )}
+          </div>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', marginTop: 3 }}>
             {session.routineName}
           </h2>
         </div>
 
-        <div style={{ display: 'flex', gap: 14, textAlign: 'right' }}>
-          <div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              Duration
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <button
+            type="button"
+            className="btn-primary"
+            style={{ padding: '6px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: 6 }}
+            onClick={() => handleOpenVoiceLogger()}
+            title="Hands-free voice logging for sets"
+          >
+            <Mic size={14} color="#050D0A" />
+            <span>Voice Log</span>
+          </button>
+
+          <div style={{ display: 'flex', gap: 12, textAlign: 'right' }}>
+            <div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                Duration
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.05rem', color: '#fff' }}>
+                {formatElapsed(elapsedSeconds)}
+              </div>
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.1rem', color: '#fff' }}>
-              {formatElapsed(elapsedSeconds)}
+            <div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                Volume
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.05rem', color: 'var(--accent-cyan)' }}>
+                {displayWeight(session.totalVolumeKg)} {settings.unit}
+              </div>
             </div>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              Volume
-            </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.1rem', color: 'var(--accent-cyan)' }}>
-              {displayWeight(session.totalVolumeKg)} {settings.unit}
+            <div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                Active Burn
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.05rem', color: '#FF7A00', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 2 }}>
+                <Flame size={13} color="#FF7A00" fill="#FF7A00" />
+                <span>{liveCalories}</span>
+                <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)' }}>kcal</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Deload Coaching Banner if Active Deload */}
+      {currentWeekConfig?.phaseName === 'Deload' && (
+        <div
+          style={{
+            background: 'rgba(168, 85, 247, 0.12)',
+            border: '1px solid rgba(168, 85, 247, 0.35)',
+            borderRadius: 'var(--radius-md)',
+            padding: '8px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: '0.78rem',
+            color: '#D8B4FE'
+          }}
+        >
+          <Zap size={15} color="#C084FC" />
+          <span><strong>Deload Protocol Active:</strong> Perform ~50% normal working sets at 3 RIR. Clear neuromuscular fatigue and repair connective tissue.</span>
+        </div>
+      )}
+
       {/* Exercises List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {session.exercises.map((ex, exIdx) => {
-          const exMeta = EXERCISE_LIBRARY.find((e) => e.id === ex.exerciseId);
+          const exMeta = EXERCISE_LIBRARY.find(
+            (e) => e.id.toLowerCase() === ex.exerciseId.toLowerCase() || e.name.toLowerCase() === ex.name.toLowerCase()
+          );
+          const displayName = exMeta?.name || formatExerciseTitle(ex.name);
+          const displayMuscle = exMeta?.muscleGroup || ex.muscleGroup;
+          const displayEquipment = exMeta?.equipment || ex.equipment;
           const overload = calculateProgressiveOverload(
             ex.exerciseId,
             exMeta?.targetRepRange || [8, 12],
             historySessions
           );
+          const supersetLabel = getSupersetLabel(ex.supersetGroupId, ex.supersetOrder);
 
           return (
-            <div key={ex.id || exIdx} className="workout-exercise-card">
+            <div
+              key={ex.id || exIdx}
+              className={`workout-exercise-card ${ex.supersetGroupId ? 'in-superset' : ''}`}
+            >
               <div className="exercise-card-header">
-                <div className="exercise-title-group" style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div className="exercise-card-controls">
+                <div className="exercise-title-group">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                    <div className="exercise-card-controls" style={{ flexShrink: 0, marginTop: 2 }}>
                       <button
                         className="icon-ctrl-btn"
                         disabled={exIdx === 0}
@@ -463,38 +734,45 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                         <ArrowDown size={13} />
                       </button>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div className="exercise-name">{ex.name}</div>
-                      <button
-                        type="button"
-                        className="icon-ctrl-btn"
-                        style={{ width: 22, height: 22, borderRadius: '50%', color: 'var(--accent-cyan)' }}
-                        onClick={() => {
-                          const fullMeta = EXERCISE_LIBRARY.find((e) => e.id === ex.exerciseId || e.name === ex.name);
-                          setInspectExerciseDetails(fullMeta || {
-                            id: ex.exerciseId,
-                            name: ex.name,
-                            muscleGroup: ex.muscleGroup,
-                            secondaryMuscles: [],
-                            equipment: ex.equipment,
-                            category: 'Compound',
-                            targetRepRange: [8, 12],
-                            targetRpe: 8
-                          });
-                          triggerHaptic('light', settings.vibrationEnabled);
-                        }}
-                        title="View visual demo, execution cues & video"
-                      >
-                        <Info size={12} />
-                      </button>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span className="exercise-name">{displayName}</span>
+                        {supersetLabel && (
+                          <span className="superset-pill">
+                            ⚡ SUPERSET {supersetLabel}
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          className="icon-ctrl-btn"
+                          style={{ width: 22, height: 22, borderRadius: '50%', color: 'var(--accent-cyan)', flexShrink: 0 }}
+                          onClick={() => {
+                            const fullMeta = EXERCISE_LIBRARY.find((e) => e.id === ex.exerciseId || e.name === ex.name);
+                            setInspectExerciseDetails(fullMeta || {
+                              id: ex.exerciseId,
+                              name: displayName,
+                              muscleGroup: displayMuscle,
+                              secondaryMuscles: [],
+                              equipment: displayEquipment,
+                              category: 'Compound',
+                              targetRepRange: [8, 12],
+                              targetRpe: 8
+                            });
+                            triggerHaptic('light', settings.vibrationEnabled);
+                          }}
+                          title="View visual demo, execution cues & video"
+                        >
+                          <Info size={12} />
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="exercise-meta-tags" style={{ marginTop: 4 }}>
-                    <span>{ex.muscleGroup}</span>
+                  <div className="exercise-meta-tags">
+                    <span>{displayMuscle}</span>
                     <span>•</span>
-                    <span>{ex.equipment}</span>
-                    {(ex.equipment === 'Barbell' || ex.equipment === 'Smith Machine') && (
+                    <span>{displayEquipment}</span>
+                    {(displayEquipment === 'Barbell' || displayEquipment === 'Smith Machine') && (
                       <button
                         className="plate-badge-btn"
                         onClick={() =>
@@ -511,27 +789,54 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                     )}
                     <button
                       className="timer-chip"
-                      style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 8px', color: '#FFA500' }}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', color: '#FFA500' }}
                       onClick={() => handleGenerateWarmups(exIdx)}
                       title="Auto-generate 4-stage progressive warmup ramp"
                     >
                       <Flame size={12} color="#FFA500" /> Warmup Ramp
                     </button>
+                    {/* Superset Link/Unlink Action */}
+                    {(exIdx < session.exercises.length - 1 || ex.supersetGroupId) && (
+                      <button
+                        className="timer-chip"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          padding: '2px 8px',
+                          color: ex.supersetGroupId ? '#00E5FF' : 'var(--text-muted)'
+                        }}
+                        onClick={() => handleToggleSupersetWithNext(exIdx)}
+                        title={ex.supersetGroupId ? 'Unlink superset pairing' : 'Link with next exercise as superset pair'}
+                      >
+                        <Layers size={11} /> {ex.supersetGroupId ? 'Unlink Superset' : 'Link Superset'}
+                      </button>
+                    )}
+                    {/* Mic Quick Voice Log Action */}
+                    <button
+                      className="timer-chip"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', color: 'var(--accent-volt)' }}
+                      onClick={() => handleOpenVoiceLogger(exIdx)}
+                      title="Voice log sets for this exercise"
+                    >
+                      <Mic size={11} /> Voice Log
+                    </button>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div className="exercise-header-actions">
                   <button
+                    id={`smart-swap-btn-${exIdx}`}
                     className="smart-swap-btn"
                     onClick={() =>
                       setSwapExercise({
                         exerciseIdx: exIdx,
                         exercise: exMeta || {
                           id: ex.exerciseId,
-                          name: ex.name,
-                          muscleGroup: ex.muscleGroup,
+                          name: displayName,
+                          muscleGroup: displayMuscle,
                           secondaryMuscles: [],
-                          equipment: ex.equipment,
+                          equipment: displayEquipment,
                           category: 'Compound',
                           targetRepRange: [8, 12],
                           targetRpe: 8
@@ -541,11 +846,11 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                     title="Swap if equipment is occupied"
                   >
                     <Sparkles size={13} />
-                    Swap
+                    <span>Swap</span>
                   </button>
                   <button
                     className="icon-ctrl-btn"
-                    style={{ color: 'var(--accent-crimson)' }}
+                    style={{ color: 'var(--accent-crimson)', flexShrink: 0 }}
                     onClick={() => handleRemoveExercise(exIdx)}
                     title="Remove exercise from workout"
                   >
@@ -606,10 +911,10 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
                 {ex.sets.map((set, setIdx) => {
                   return (
-                    <div
-                      key={set.id || setIdx}
-                      className={`set-row ${set.completed ? 'completed' : ''}`}
-                    >
+                    <React.Fragment key={set.id || setIdx}>
+                      <div
+                        className={`set-row ${set.completed ? 'completed' : ''}`}
+                      >
                       <div
                         className={`set-num-badge set-badge-${set.type || 'working'}`}
                         onClick={() => cycleSetType(exIdx, setIdx)}
@@ -698,8 +1003,42 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                         </button>
                       </div>
                     </div>
-                  );
-                })}
+
+                    {/* Smart Drop Set Auto-Calculate Chips */}
+                    {set.type === 'drop' && !set.completed && (
+                      <div className="drop-quick-calc-row">
+                        <span className="drop-quick-label">⚡ Quick Drop:</span>
+                        <button
+                          type="button"
+                          className="drop-calc-chip"
+                          onClick={() => {
+                            const prevLoad = setIdx > 0 ? ex.sets[setIdx - 1].weightKg : (overload.currentWeight || overload.targetWeight || 50);
+                            const drop20 = Math.max(2.5, Math.round((prevLoad * 0.8) / 2.5) * 2.5);
+                            handleSetChange(exIdx, setIdx, 'weightKg', drop20);
+                            triggerHaptic('light', settings.vibrationEnabled);
+                          }}
+                          title="Drop load by 20%"
+                        >
+                          -20% ({displayWeight(Math.max(2.5, Math.round(((setIdx > 0 ? ex.sets[setIdx - 1].weightKg : (overload.currentWeight || overload.targetWeight || 50)) * 0.8) / 2.5) * 2.5))} {settings.unit})
+                        </button>
+                        <button
+                          type="button"
+                          className="drop-calc-chip"
+                          onClick={() => {
+                            const prevLoad = setIdx > 0 ? ex.sets[setIdx - 1].weightKg : (overload.currentWeight || overload.targetWeight || 50);
+                            const drop25 = Math.max(2.5, Math.round((prevLoad * 0.75) / 2.5) * 2.5);
+                            handleSetChange(exIdx, setIdx, 'weightKg', drop25);
+                            triggerHaptic('light', settings.vibrationEnabled);
+                          }}
+                          title="Drop load by 25%"
+                        >
+                          -25% ({displayWeight(Math.max(2.5, Math.round(((setIdx > 0 ? ex.sets[setIdx - 1].weightKg : (overload.currentWeight || overload.targetWeight || 50)) * 0.75) / 2.5) * 2.5))} {settings.unit})
+                        </button>
+                      </div>
+                    )}
+                  </React.Fragment>
+                );
+              })}
               </div>
 
               {/* Set Type Legend */}
@@ -827,9 +1166,52 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
               </button>
             </div>
 
+            {/* Search Input */}
+            <div style={{ position: 'relative', marginBottom: 10 }}>
+              <Search
+                size={16}
+                color="var(--text-muted)"
+                style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+              />
+              <input
+                type="text"
+                placeholder="Search 1,300+ exercises by name or equipment..."
+                value={exerciseSearchQuery}
+                onChange={(e) => setExerciseSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-input)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '9px 12px 9px 36px',
+                  color: '#fff',
+                  fontSize: '0.85rem',
+                  outline: 'none'
+                }}
+              />
+              {exerciseSearchQuery && (
+                <button
+                  onClick={() => setExerciseSearchQuery('')}
+                  style={{
+                    position: 'absolute',
+                    right: 10,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: 2
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
             {/* Muscle Filter Tabs */}
-            <div className="quick-prompts-row">
-              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Biceps', 'Triceps', 'Forearms', 'Calves', 'Abs'].map(
+            <div className="quick-prompts-row" style={{ marginBottom: 10 }}>
+              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Glutes', 'Biceps', 'Triceps', 'Calves', 'Forearms', 'Abs', 'Cardio'].map(
                 (m) => (
                   <button
                     key={m}
@@ -847,35 +1229,60 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
               )}
             </div>
 
-            {/* Exercise Search/Select List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto' }}>
-              {EXERCISE_LIBRARY.filter(
-                (e) => selectedMuscleFilter === 'All' || e.muscleGroup === selectedMuscleFilter
-              ).map((ex) => (
-                <div
-                  key={ex.id}
-                  style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '12px 14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => handleAddExerciseToWorkout(ex)}
-                >
-                  <div>
-                    <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{ex.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                      {ex.muscleGroup} · {ex.equipment} · {ex.targetRepRange[0]}-{ex.targetRepRange[1]} reps
-                    </div>
+            {/* Filtered Exercise List with Slicing */}
+            {(() => {
+              const q = exerciseSearchQuery.toLowerCase().trim();
+              const filtered = EXERCISE_LIBRARY.filter((e) => {
+                const matchMuscle = selectedMuscleFilter === 'All' || e.muscleGroup === selectedMuscleFilter;
+                if (!matchMuscle) return false;
+                if (!q) return true;
+                return (
+                  e.name.toLowerCase().includes(q) ||
+                  e.equipment.toLowerCase().includes(q) ||
+                  e.id.toLowerCase().includes(q)
+                );
+              });
+
+              return (
+                <>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 8 }}>
+                    Showing {Math.min(filtered.length, 60)} of {filtered.length} exercises
                   </div>
-                  <Plus size={20} color="var(--accent-volt)" />
-                </div>
-              ))}
-            </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto' }}>
+                    {filtered.slice(0, 60).map((ex) => (
+                      <div
+                        key={ex.id}
+                        style={{
+                          background: 'var(--bg-card)',
+                          border: '1px solid var(--border-subtle)',
+                          borderRadius: 'var(--radius-md)',
+                          padding: '12px 14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => handleAddExerciseToWorkout(ex)}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{ex.name}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                            {ex.muscleGroup} · {ex.equipment} · {ex.targetRepRange[0]}-{ex.targetRepRange[1]} reps
+                          </div>
+                        </div>
+                        <Plus size={20} color="var(--accent-volt)" />
+                      </div>
+                    ))}
+                    {filtered.length === 0 && (
+                      <div style={{ textAlign: 'center', padding: '24px 12px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                        No exercises found matching "{exerciseSearchQuery}". Try another search term or filter.
+                      </div>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}
@@ -885,6 +1292,18 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
         <ExerciseDetailModal
           exercise={inspectExerciseDetails}
           onClose={() => setInspectExerciseDetails(null)}
+        />
+      )}
+
+      {/* Hands-Free Voice Logger Modal */}
+      {voiceLoggerTarget !== null && (
+        <VoiceLoggerModal
+          isOpen={true}
+          onClose={() => setVoiceLoggerTarget(null)}
+          activeExerciseName={session.exercises[voiceLoggerTarget.exerciseIdx]?.name || 'Exercise'}
+          activeSetNumber={voiceLoggerTarget.setIdx + 1}
+          unit={settings.unit}
+          onApplyCommand={handleApplyVoiceCommand}
         />
       )}
     </div>

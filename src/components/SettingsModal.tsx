@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { UserSettings } from '../types/gym';
 import { kgToLbs, lbsToKg } from '../engine/overloadEngine';
 import { StorageService } from '../db/storage';
@@ -16,7 +16,8 @@ import {
   Database,
   Download,
   Upload,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Smartphone
 } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -35,7 +36,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [localSettings, setLocalSettings] = useState<UserSettings>({ ...settings });
   const [showKey, setShowKey] = useState(false);
   const [savedAlert, setSavedAlert] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallPWA = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    try {
+      const choice = await deferredPrompt.userChoice;
+      if (choice && choice.outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    } catch {}
+  };
 
   const downloadFile = (content: string, fileName: string, contentType: string) => {
     const a = document.createElement('a');
@@ -406,6 +428,46 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             onChange={(e) => setLocalSettings({ ...localSettings, userName: e.target.value })}
             placeholder="Athlete"
           />
+        </div>
+
+        {/* PWA & Offline Engine Status */}
+        <div className="gym-card" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Smartphone size={18} color="var(--accent-volt)" />
+              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>App & Offline Storage</span>
+            </div>
+            <span
+              style={{
+                fontSize: '0.66rem',
+                fontWeight: 800,
+                color: 'var(--accent-volt)',
+                background: 'rgba(0, 245, 155, 0.12)',
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-full)'
+              }}
+            >
+              IndexedDB Active
+            </span>
+          </div>
+          <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginBottom: 12, lineHeight: 1.45 }}>
+            Overload AI runs offline with client-side high-capacity IndexedDB storage and cache-first service workers.
+          </p>
+
+          {deferredPrompt ? (
+            <button
+              type="button"
+              className="btn-primary"
+              style={{ width: '100%', padding: '10px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              onClick={handleInstallPWA}
+            >
+              <Smartphone size={16} /> Install Overload AI to Home Screen
+            </button>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+              <span>💡 Tip: Tap Share &gt; "Add to Home Screen" in Safari or Chrome for a full native app experience.</span>
+            </div>
+          )}
         </div>
 
         {/* Data Management & Backups */}

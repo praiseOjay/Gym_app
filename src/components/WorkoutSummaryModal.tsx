@@ -1,24 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import type { WorkoutSession, UserSettings } from '../types/gym';
+import type { WorkoutSession, UserSettings, MesocycleBlock } from '../types/gym';
 import { analyzeWorkoutSessionWithAI } from '../services/geminiService';
 import { kgToLbs } from '../engine/overloadEngine';
 import {
   Trophy,
   Sparkles,
   CheckCircle2,
-  RefreshCw
+  RefreshCw,
+  Flame,
+  Activity
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface WorkoutSummaryModalProps {
   session: WorkoutSession;
   settings: UserSettings;
+  mesocycleBlock?: MesocycleBlock;
   onClose: () => void;
 }
 
 export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
   session,
   settings,
+  mesocycleBlock,
   onClose
 }) => {
   const [loadingAI, setLoadingAI] = useState(true);
@@ -56,7 +60,12 @@ export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
       ? `${kgToLbs(session.totalVolumeKg)} lbs`
       : `${session.totalVolumeKg} kg`;
 
-  const minutes = Math.round(session.durationSeconds / 60);
+  const minutes = Math.max(1, Math.round(session.durationSeconds / 60));
+  const caloriesBurned = session.caloriesBurned || Math.round(minutes * 7.5);
+  const avgBurnRate = (caloriesBurned / minutes).toFixed(1);
+
+  const mesoWeekNumber = session.mesocycleWeek || mesocycleBlock?.currentWeek;
+  const mesoWeekConfig = mesocycleBlock?.weeks.find((w) => w.weekNumber === mesoWeekNumber);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -89,42 +98,93 @@ export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
           </p>
         </div>
 
-        {/* Quick Stats Grid */}
+        {/* Quick Stats Grid with Active Calorie Burn */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 8,
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 6,
             background: 'var(--bg-card)',
-            padding: '14px 10px',
+            padding: '14px 8px',
             borderRadius: 'var(--radius-lg)'
           }}
         >
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Duration
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.1rem', color: '#fff' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: '#fff' }}>
               {minutes}m
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              Total Volume
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+              Volume
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.1rem', color: 'var(--accent-volt)' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: 'var(--accent-volt)' }}>
               {displayVolume}
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              PRs Smashed
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+              Burned
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.1rem', color: '#FFD700' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: '#FF7A00', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+              <Flame size={12} color="#FF7A00" fill="#FF7A00" />
+              <span>{caloriesBurned}</span>
+            </div>
+            <div style={{ fontSize: '0.58rem', color: 'var(--text-muted)' }}>
+              ~{avgBurnRate} c/m
+            </div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+              PRs
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: '#FFD700' }}>
               {session.prCount}
             </div>
           </div>
         </div>
+
+        {/* Mesocycle Progress Strip */}
+        {mesoWeekNumber && mesocycleBlock && (
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(0, 245, 155, 0.06) 100%)',
+              border: '1px solid rgba(0, 229, 255, 0.25)',
+              borderRadius: 'var(--radius-md)',
+              padding: '10px 14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Activity size={16} color="var(--accent-cyan)" />
+              <div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#fff' }}>
+                  {mesocycleBlock.name}
+                </div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                  Week {mesoWeekNumber} of {mesocycleBlock.totalWeeks} ({mesoWeekConfig?.phaseName || 'Active'}) · Target {mesoWeekConfig?.targetRir ?? 2} RIR
+                </div>
+              </div>
+            </div>
+            <span
+              style={{
+                fontSize: '0.68rem',
+                fontWeight: 800,
+                color: 'var(--accent-volt)',
+                background: 'rgba(0, 245, 155, 0.12)',
+                padding: '3px 8px',
+                borderRadius: 'var(--radius-full)'
+              }}
+            >
+              Session Logged
+            </span>
+          </div>
+        )}
 
         {/* AI Debrief Card */}
         <div

@@ -4,10 +4,12 @@ import type {
   Routine,
   PRRecord,
   UserSettings,
-  WorkoutExercise
+  WorkoutExercise,
+  MesocycleBlock
 } from './types/gym';
 import { StorageService } from './db/storage';
 import { calculateMuscleRecovery, calculateProgressiveOverload } from './engine/overloadEngine';
+import { calculateSessionTotalCalories } from './engine/calorieEngine';
 import { EXERCISE_LIBRARY } from './data/exerciseLibrary';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
@@ -28,7 +30,26 @@ export function App() {
   const [routines, setRoutines] = useState<Routine[]>(() => StorageService.getRoutines());
   const [prs, setPrs] = useState<PRRecord[]>(() => StorageService.getPRs());
   const [settings, setSettings] = useState<UserSettings>(() => StorageService.getSettings());
-  const [activeSession, setActiveSession] = useState<WorkoutSession | null>(() => StorageService.getActiveWorkout());
+  const [mesocycleBlock, setMesocycleBlock] = useState<MesocycleBlock>(() => StorageService.getMesocycleBlock());
+  const [activeSession, setActiveSession] = useState<WorkoutSession | null>(() => {
+    const raw = StorageService.getActiveWorkout();
+    if (!raw) return null;
+    const sanitizedExercises = raw.exercises.map((ex) => {
+      const meta = EXERCISE_LIBRARY.find(
+        (e) => e.id.toLowerCase() === ex.exerciseId.toLowerCase() || e.name.toLowerCase() === ex.name.toLowerCase()
+      );
+      if (meta) {
+        return {
+          ...ex,
+          name: meta.name,
+          muscleGroup: meta.muscleGroup,
+          equipment: meta.equipment
+        };
+      }
+      return ex;
+    });
+    return { ...raw, exercises: sanitizedExercises };
+  });
   const [justCompletedSession, setJustCompletedSession] = useState<WorkoutSession | null>(null);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -44,11 +65,18 @@ export function App() {
     StorageService.saveActiveWorkout(updated);
   };
 
+  const handleUpdateMesocycle = (updated: MesocycleBlock) => {
+    setMesocycleBlock(updated);
+    StorageService.saveMesocycleBlock(updated);
+  };
+
   // Start a new workout session from a routine template
   const handleStartRoutine = (routine: Routine) => {
     // Generate exercises with progressive overload targets
     const workoutExercises: WorkoutExercise[] = routine.exercises.map((template, idx) => {
-      const exMeta = EXERCISE_LIBRARY.find((e) => e.id === template.exerciseId);
+      const exMeta = EXERCISE_LIBRARY.find(
+        (e) => e.id.toLowerCase() === template.exerciseId.toLowerCase() || e.name.toLowerCase() === template.exerciseId.toLowerCase()
+      );
       const overload = calculateProgressiveOverload(
         template.exerciseId,
         template.targetRepRange,
@@ -57,8 +85,8 @@ export function App() {
 
       return {
         id: `we-${Date.now()}-${idx}`,
-        exerciseId: template.exerciseId,
-        name: exMeta?.name || template.exerciseId,
+        exerciseId: exMeta?.id || template.exerciseId,
+        name: exMeta?.name || template.exerciseId.replace(/^db-/, 'Dumbbell ').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
         muscleGroup: exMeta?.muscleGroup || 'Chest',
         equipment: exMeta?.equipment || 'Barbell',
         restSeconds: template.restSeconds,
@@ -94,6 +122,13 @@ export function App() {
 
   // Finish and save workout
   const handleFinishWorkout = (completed: WorkoutSession) => {
+    // Caloric expenditure & mesocycle periodization tagging
+    const cals = calculateSessionTotalCalories(completed, settings.bodyWeightKg);
+    completed.caloriesBurned = cals.totalCalories;
+    completed.mesocycleWeek = mesocycleBlock.currentWeek;
+    const currentWeekPhase = mesocycleBlock.weeks.find((w) => w.weekNumber === mesocycleBlock.currentWeek);
+    completed.isDeload = currentWeekPhase?.phaseName === 'Deload';
+
     StorageService.addWorkout(completed);
     StorageService.saveActiveWorkout(null);
 
@@ -153,6 +188,7 @@ export function App() {
     localStorage.clear();
     setWorkouts(StorageService.getWorkouts());
     setPrs(StorageService.getPRs());
+    setMesocycleBlock(StorageService.getMesocycleBlock());
     setActiveSession(null);
     StorageService.saveActiveWorkout(null);
   };
@@ -204,8 +240,10 @@ export function App() {
             recoveryStates={recoveryStates}
             prs={prs}
             settings={settings}
+            mesocycleBlock={mesocycleBlock}
             onStartRoutine={handleStartRoutine}
             onNavigateTab={(tab) => setCurrentTab(tab)}
+            onUpdateMesocycle={handleUpdateMesocycle}
           />
         )}
 
@@ -216,6 +254,7 @@ export function App() {
               historySessions={workouts}
               existingPRs={prs}
               settings={settings}
+              mesocycleBlock={mesocycleBlock}
               onUpdateSession={handleUpdateActiveSession}
               onFinishWorkout={handleFinishWorkout}
               onCancelWorkout={handleCancelWorkout}
@@ -291,61 +330,81 @@ export function App() {
                   )}
                 </div>
 
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF', marginBottom: 4 }}>
-                  {todayWorkout.routine.name}
-                </h3>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 12 }}>
-                  {todayWorkout.routine.description}
-                </p>
+                {todayWorkout.routine ? (
+                  <>
+                    <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF', marginBottom: 4 }}>
+                      {todayWorkout.routine.name}
+                    </h3>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 12 }}>
+                      {todayWorkout.routine.description}
+                    </p>
 
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-                  <span
-                    style={{
-                      fontSize: '0.74rem',
-                      color: 'var(--text-muted)',
-                      background: 'var(--bg-surface)',
-                      padding: '3px 8px',
-                      borderRadius: 'var(--radius-sm)'
-                    }}
-                  >
-                    🏋️ {todayWorkout.routine.exercises.length} Exercises
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '0.74rem',
-                      color: 'var(--text-muted)',
-                      background: 'var(--bg-surface)',
-                      padding: '3px 8px',
-                      borderRadius: 'var(--radius-sm)'
-                    }}
-                  >
-                    ⏱️ ~45–60 min
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '0.74rem',
-                      color: 'var(--text-muted)',
-                      background: 'var(--bg-surface)',
-                      padding: '3px 8px',
-                      borderRadius: 'var(--radius-sm)'
-                    }}
-                  >
-                    ⚡ {todayWorkout.routine.splitType}
-                  </span>
-                </div>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+                      <span
+                        style={{
+                          fontSize: '0.74rem',
+                          color: 'var(--text-muted)',
+                          background: 'var(--bg-surface)',
+                          padding: '3px 8px',
+                          borderRadius: 'var(--radius-sm)'
+                        }}
+                      >
+                        🏋️ {todayWorkout.routine.exercises.length} Exercises
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '0.74rem',
+                          color: 'var(--text-muted)',
+                          background: 'var(--bg-surface)',
+                          padding: '3px 8px',
+                          borderRadius: 'var(--radius-sm)'
+                        }}
+                      >
+                        ⏱️ ~45–60 min
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '0.74rem',
+                          color: 'var(--text-muted)',
+                          background: 'var(--bg-surface)',
+                          padding: '3px 8px',
+                          borderRadius: 'var(--radius-sm)'
+                        }}
+                      >
+                        ⚡ {todayWorkout.routine.splitType}
+                      </span>
+                    </div>
 
-                <button
-                  className="btn-primary"
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-                  onClick={() => handleStartRoutine(todayWorkout.routine)}
-                >
-                  <Play size={18} fill="#050D0A" />
-                  {todayWorkout.isAlreadyCompletedToday
-                    ? `Repeat ${todayWorkout.routine.dayTag || todayWorkout.dayName} Workout`
-                    : todayWorkout.isScheduledToday
-                    ? `Start ${todayWorkout.routine.dayTag || todayWorkout.dayName} Workout`
-                    : `Train Anyway: Start ${todayWorkout.routine.dayTag || todayWorkout.routine.name}`}
-                </button>
+                    <button
+                      className="btn-primary"
+                      style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                      onClick={() => handleStartRoutine(todayWorkout.routine)}
+                    >
+                      <Play size={18} fill="#050D0A" />
+                      {todayWorkout.isAlreadyCompletedToday
+                        ? `Repeat ${todayWorkout.routine.dayTag || todayWorkout.dayName} Workout`
+                        : todayWorkout.isScheduledToday
+                        ? `Start ${todayWorkout.routine.dayTag || todayWorkout.dayName} Workout`
+                        : `Train Anyway: Start ${todayWorkout.routine.dayTag || todayWorkout.routine.name}`}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF', marginBottom: 4 }}>
+                      No Routines Configured
+                    </h3>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 16 }}>
+                      You have a fresh slate. Build a custom routine using any of the 1,300+ WorkoutX exercises!
+                    </p>
+                    <button
+                      className="btn-primary"
+                      style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                      onClick={() => setCurrentTab('routines')}
+                    >
+                      Go to Routines Split →
+                    </button>
+                  </>
+                )}
               </div>
 
               {/* Option to choose other day */}
@@ -391,6 +450,9 @@ export function App() {
               StorageService.saveRoutines(updated);
             }}
             onNavigateTab={(tab) => setCurrentTab(tab)}
+            activeSession={activeSession}
+            onUpdateActiveSession={handleUpdateActiveSession}
+            recoveryStates={recoveryStates}
           />
         )}
       </main>
@@ -407,6 +469,7 @@ export function App() {
         <WorkoutSummaryModal
           session={justCompletedSession}
           settings={settings}
+          mesocycleBlock={mesocycleBlock}
           onClose={() => setJustCompletedSession(null)}
         />
       )}
