@@ -3,6 +3,9 @@ import type { UserSettings } from '../types/gym';
 import { kgToLbs, lbsToKg } from '../engine/overloadEngine';
 import { StorageService } from '../db/storage';
 import { triggerHaptic } from '../utils/haptics';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
 import {
   X,
   Key,
@@ -17,7 +20,10 @@ import {
   Download,
   Upload,
   FileSpreadsheet,
-  Smartphone
+  Smartphone,
+  Copy,
+  Clipboard,
+  FileText
 } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -38,6 +44,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [savedAlert, setSavedAlert] = useState(false);
   const [exportStatus, setExportStatus] = useState<string | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showPasteModal, setShowPasteModal] = useState(false);
+  const [pastedJsonText, setPastedJsonText] = useState('');
+  const [pasteError, setPasteError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -61,14 +70,45 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   /**
-   * Universal export function supporting Mobile Web Share API, standalone PWAs, iOS Safari, Android, and desktop.
+   * Universal export function supporting Native Android/iOS Capacitor Share, Mobile Web Share API, and desktop fallbacks.
    */
   const exportFile = async (content: string, fileName: string, contentType: string) => {
     setExportStatus(`Preparing ${fileName}...`);
     try {
-      const blob = new Blob([content], { type: contentType });
+      // 1. Android / iOS Native Capacitor App Export
+      if (Capacitor.isNativePlatform()) {
+        try {
+          const fileResult = await Filesystem.writeFile({
+            path: fileName,
+            data: content,
+            directory: Directory.Cache,
+            encoding: Encoding.UTF8
+          });
 
-      // 1. Mobile Native Web Share API with File (iOS Safari, Android Chrome, and PWA standalone mode)
+          await Share.share({
+            title: fileName,
+            text: `Overload AI: ${fileName}`,
+            url: fileResult.uri,
+            dialogTitle: `Export ${fileName}`
+          });
+
+          setExportStatus(`✓ Exported ${fileName} via Android Share!`);
+          setTimeout(() => setExportStatus(null), 4000);
+          return;
+        } catch (nativeErr: any) {
+          console.warn('Capacitor native export failed, falling back:', nativeErr);
+          if (
+            nativeErr?.message?.toLowerCase().includes('canceled') ||
+            nativeErr?.message?.toLowerCase().includes('cancelled')
+          ) {
+            setExportStatus(null);
+            return;
+          }
+        }
+      }
+
+      // 2. Mobile Native Web Share API with File
+      const blob = new Blob([content], { type: contentType });
       if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
         try {
           const file = new File([blob], fileName, { type: contentType });
@@ -91,7 +131,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         }
       }
 
-      // 2. Fallback: DOM anchor download attached to body with safe delayed revocation
+      // 3. Fallback: DOM anchor download attached to body
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
@@ -105,7 +145,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       setExportStatus(`✓ Download started: ${fileName}`);
       setTimeout(() => setExportStatus(null), 4000);
 
-      // Keep URL alive for 60 seconds so mobile OS background workers can finish saving
       setTimeout(() => {
         try {
           if (document.body.contains(a)) {
@@ -116,7 +155,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       }, 60000);
     } catch (err: any) {
       console.error('Export error:', err);
-      // 3. Fallback: Copy to clipboard if file writing is blocked by browser
+      // 4. Fallback: Copy to clipboard if writing is blocked
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           await navigator.clipboard.writeText(content);
@@ -138,6 +177,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     triggerHaptic('success');
   };
 
+  const handleCopyJSON = async () => {
+    triggerHaptic('medium');
+    try {
+      const json = StorageService.exportFullBackupJSON();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(json);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = json;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      triggerHaptic('success');
+      setExportStatus('✓ Full backup JSON copied to clipboard!');
+      setTimeout(() => setExportStatus(null), 4000);
+    } catch (err: any) {
+      setExportStatus(`⚠️ Could not copy: ${err.message}`);
+      setTimeout(() => setExportStatus(null), 4000);
+    }
+  };
+
   const handleExportCSV = async () => {
     triggerHaptic('medium');
     const csv = StorageService.exportWorkoutsCSV();
@@ -146,23 +210,83 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     triggerHaptic('success');
   };
 
-  const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
+  const processBackupString = (content: string): boolean => {
+    if (!content || !content.trim()) {
+      setExportStatus('⚠️ Empty backup content provided.');
+      setTimeout(() => setExportStatus(null), 4000);
+      return false;
+    }
+    try {
+      setExportStatus('Validating and restoring backup...');
       const res = StorageService.importFullBackupJSON(content);
       if (res.success) {
         triggerHaptic('success');
-        alert('Backup restored successfully! The app will now reload.');
-        window.location.reload();
+        setExportStatus('✓ Backup restored successfully! Reloading...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1200);
+        return true;
       } else {
         triggerHaptic('warning');
-        alert(res.message);
+        setExportStatus(`⚠️ ${res.message}`);
+        setTimeout(() => setExportStatus(null), 6000);
+        return false;
       }
+    } catch (err: any) {
+      triggerHaptic('warning');
+      setExportStatus(`⚠️ Invalid JSON: ${err.message}`);
+      setTimeout(() => setExportStatus(null), 6000);
+      return false;
+    }
+  };
+
+  const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // Reset immediately so subsequent file selections always fire onChange
+    if (!file) return;
+
+    setExportStatus(`Reading ${file.name}...`);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      processBackupString(content);
+    };
+    reader.onerror = () => {
+      setExportStatus('⚠️ Could not read file from device.');
+      setTimeout(() => setExportStatus(null), 4000);
     };
     reader.readAsText(file);
+  };
+
+  const handlePasteFromClipboard = async () => {
+    triggerHaptic('light');
+    setPasteError(null);
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          setPastedJsonText(text);
+          triggerHaptic('success');
+          return;
+        }
+      }
+    } catch (err: any) {
+      console.warn('Clipboard auto-read failed:', err);
+    }
+    setPasteError('Could not auto-read clipboard. Please long-press inside the box and tap Paste.');
+  };
+
+  const handleConfirmPastedRestore = () => {
+    if (!pastedJsonText.trim()) {
+      setPasteError('Please paste your backup JSON text first.');
+      return;
+    }
+    const ok = processBackupString(pastedJsonText);
+    if (ok) {
+      setShowPasteModal(false);
+    } else {
+      setPasteError('Invalid backup JSON format. Please verify the copied text.');
+    }
   };
 
   const handleSave = () => {
@@ -547,8 +671,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <input
             type="file"
             ref={fileInputRef}
-            accept=".json"
-            style={{ display: 'none' }}
+            accept="application/json,text/plain,*/*,.json"
+            style={{
+              position: 'fixed',
+              top: -9999,
+              left: -9999,
+              opacity: 0,
+              pointerEvents: 'none',
+              width: 1,
+              height: 1
+            }}
             onChange={handleImportJSON}
           />
 
@@ -581,7 +713,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 className="btn-secondary"
                 style={{ padding: '10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                 onClick={handleExportJSON}
-                title="Download full JSON backup of all workouts, routines, and PRs"
+                title="Download full JSON backup or share to Drive/WhatsApp/Files"
               >
                 <Download size={14} /> Export Backup (JSON)
               </button>
@@ -591,9 +723,34 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 className="btn-secondary"
                 style={{ padding: '10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                 onClick={() => fileInputRef.current?.click()}
-                title="Restore workouts and splits from JSON backup"
+                title="Restore workouts and splits from JSON file"
               >
-                <Upload size={14} /> Import Backup (JSON)
+                <Upload size={14} /> Import File (.json)
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{ padding: '10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                onClick={handleCopyJSON}
+                title="Copy entire JSON backup text directly to clipboard"
+              >
+                <Copy size={14} /> Copy Backup JSON
+              </button>
+
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{ padding: '10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                onClick={() => {
+                  setPasteError(null);
+                  setShowPasteModal(true);
+                }}
+                title="Paste JSON text to restore without needing file picker"
+              >
+                <FileText size={14} /> Paste JSON Text
               </button>
             </div>
 
@@ -645,6 +802,99 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Paste JSON Modal Dialog */}
+      {showPasteModal && (
+        <div
+          className="modal-overlay"
+          style={{ zIndex: 9999 }}
+          onClick={() => setShowPasteModal(false)}
+        >
+          <div
+            className="modal-sheet"
+            style={{ maxHeight: '85vh', overflowY: 'auto' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-handle" />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Database size={18} color="var(--accent-volt)" />
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>
+                  Paste Backup JSON
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPasteModal(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 4 }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: 10, lineHeight: 1.4 }}>
+              Paste your backup JSON directly or tap <strong>Paste from Clipboard</strong> to restore your history, routines, and PRs without needing file access permissions.
+            </p>
+
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ width: '100%', marginBottom: 10, padding: '8px 12px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              onClick={handlePasteFromClipboard}
+            >
+              <Clipboard size={14} color="var(--accent-volt)" /> Paste from Clipboard
+            </button>
+
+            <textarea
+              value={pastedJsonText}
+              onChange={(e) => {
+                setPastedJsonText(e.target.value);
+                setPasteError(null);
+              }}
+              placeholder='Paste {"version": 3, "workouts": [...]} here...'
+              style={{
+                width: '100%',
+                height: 160,
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border-medium)',
+                borderRadius: 'var(--radius-md)',
+                color: '#fff',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.72rem',
+                padding: '10px',
+                resize: 'vertical',
+                marginBottom: 10,
+                boxSizing: 'border-box'
+              }}
+            />
+
+            {pasteError && (
+              <div style={{ fontSize: '0.75rem', color: 'var(--accent-crimson)', marginBottom: 10, fontWeight: 700 }}>
+                ⚠️ {pasteError}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{ flex: 1 }}
+                onClick={() => setShowPasteModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn-primary"
+                style={{ flex: 2 }}
+                onClick={handleConfirmPastedRestore}
+              >
+                Restore Backup Data
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

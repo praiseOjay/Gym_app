@@ -9,6 +9,7 @@ import type {
   MuscleVolumeLandmark
 } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
+import { getExerciseTrackingType, formatDuration } from '../utils/trackingTypeUtils';
 
 /**
  * Calculates Estimated One Rep Max (1RM) using Epley's formula.
@@ -46,17 +47,80 @@ export function formatWeight(weightKg: number, unit: 'kg' | 'lbs'): string {
 }
 
 /**
- * Determines whether a set is a Personal Record (PR).
+ * Checks if a just-completed set sets a new Personal Record (PR).
  * Automatically excludes warmup sets from PR detection.
+ * Supports weight, reps, distance, and duration PRs.
  */
 export function checkIfPR(
   exerciseId: string,
   weightKg: number,
   reps: number,
   existingPRs: PRRecord[],
-  setType?: string
-): { isPR: boolean; type?: '1RM' | 'MaxWeight' | 'MaxVolume'; prevRecord?: number } {
-  if (weightKg <= 0 || reps <= 0 || setType === 'warmup') return { isPR: false };
+  setType?: string,
+  durationSeconds?: number,
+  distanceKm?: number
+): { isPR: boolean; type?: '1RM' | 'MaxWeight' | 'MaxVolume' | 'MaxDistance' | 'MaxDuration' | 'FastestPace'; prevRecord?: number } {
+  if (setType === 'warmup') return { isPR: false };
+
+  // 1. Check Distance PR (e.g. longest run or cycle)
+  if (distanceKm && distanceKm > 0) {
+    const existingDistPR = existingPRs.find(
+      (p) => p.exerciseId === exerciseId && p.type === 'MaxDistance'
+    );
+    if (!existingDistPR || distanceKm > existingDistPR.value) {
+      return {
+        isPR: true,
+        type: 'MaxDistance',
+        prevRecord: existingDistPR ? existingDistPR.value : undefined
+      };
+    }
+  }
+
+  // 2. Check Pace PR (seconds per km, lower is faster, minimum 0.5km to qualify)
+  if (distanceKm && distanceKm >= 0.5 && durationSeconds && durationSeconds > 60) {
+    const paceSecondsPerKm = Math.round(durationSeconds / distanceKm);
+    const existingPacePR = existingPRs.find(
+      (p) => p.exerciseId === exerciseId && p.type === 'FastestPace'
+    );
+    if (!existingPacePR || paceSecondsPerKm < existingPacePR.value) {
+      return {
+        isPR: true,
+        type: 'FastestPace',
+        prevRecord: existingPacePR ? existingPacePR.value : undefined
+      };
+    }
+  }
+
+  // 3. Check Duration PR (for timed holds, planks, jump rope)
+  if (durationSeconds && durationSeconds > 0 && (!distanceKm || distanceKm <= 0)) {
+    const existingDurPR = existingPRs.find(
+      (p) => p.exerciseId === exerciseId && p.type === 'MaxDuration'
+    );
+    if (!existingDurPR || durationSeconds > existingDurPR.value) {
+      return {
+        isPR: true,
+        type: 'MaxDuration',
+        prevRecord: existingDurPR ? existingDurPR.value : undefined
+      };
+    }
+  }
+
+  // 4. Check Reps-only PR (e.g. burpees, bodyweight reps)
+  if (weightKg <= 0 && reps > 0) {
+    const existingRepPR = existingPRs.find(
+      (p) => p.exerciseId === exerciseId && p.type === 'MaxVolume'
+    );
+    if (!existingRepPR || reps > existingRepPR.value) {
+      return {
+        isPR: true,
+        type: 'MaxVolume',
+        prevRecord: existingRepPR ? existingRepPR.value : undefined
+      };
+    }
+  }
+
+  // 5. Check Weight / 1RM PR for resistance exercises
+  if (weightKg <= 0 || reps <= 0) return { isPR: false };
 
   const est1RM = calculate1RM(weightKg, reps);
   const existing1RMPR = existingPRs.find(
@@ -94,6 +158,8 @@ export function calculateProgressiveOverload(
   historySessions: WorkoutSession[]
 ): OverloadRecommendation {
   const [minRep, maxRep] = targetRepRange;
+  const exerciseMeta = EXERCISE_LIBRARY.find((e) => e.id === exerciseId);
+  const trackingType = getExerciseTrackingType(exerciseMeta);
 
   // Find all past logs for this exercise across sessions (sorted most recent first)
   const pastExerciseLogs: { date: string; sets: WorkoutSet[] }[] = [];
@@ -107,8 +173,48 @@ export function calculateProgressiveOverload(
     }
   }
 
-  // If no history exists, provide standard baseline suggestion
+  // If no history exists, provide baseline suggestion matching modality
   if (pastExerciseLogs.length === 0) {
+    if (trackingType === 'distance_time') {
+      return {
+        exerciseId,
+        currentWeight: 0,
+        currentReps: 0,
+        targetWeight: 0,
+        targetReps: 0,
+        targetRpe: 7.5,
+        strategy: 'maintain',
+        badgeText: 'BASELINE CARDIO',
+        explanation: 'First session tracking this cardio exercise. Target a comfortable 15–20 min baseline pace.'
+      };
+    }
+    if (trackingType === 'time_only') {
+      return {
+        exerciseId,
+        currentWeight: 0,
+        currentReps: 0,
+        targetWeight: 0,
+        targetReps: 0,
+        targetRpe: 8,
+        strategy: 'maintain',
+        badgeText: 'BASELINE HOLD',
+        explanation: 'First session tracking this timed exercise. Establish a clean 30–60 second baseline hold.'
+      };
+    }
+    if (trackingType === 'reps_only') {
+      return {
+        exerciseId,
+        currentWeight: 0,
+        currentReps: 0,
+        targetWeight: 0,
+        targetReps: minRep || 15,
+        targetRpe: 8,
+        strategy: 'maintain',
+        badgeText: 'BASELINE REPS',
+        explanation: `First session tracking this movement. Aim for ${minRep || 15} controlled reps.`
+      };
+    }
+
     return {
       exerciseId,
       currentWeight: 0,
@@ -128,6 +234,16 @@ export function calculateProgressiveOverload(
   );
   const bestSet = (lastWorkingSets.length > 0 ? lastWorkingSets : lastSession.sets).reduce(
     (max, set) => {
+      if (trackingType === 'distance_time') {
+        const setDist = set.distanceKm || 0;
+        const maxDist = max.distanceKm || 0;
+        return setDist > maxDist ? set : max;
+      }
+      if (trackingType === 'time_only') {
+        const setDur = set.durationSeconds || 0;
+        const maxDur = max.durationSeconds || 0;
+        return setDur > maxDur ? set : max;
+      }
       const currentScore = calculate1RM(set.weightKg, set.reps);
       const maxScore = calculate1RM(max.weightKg, max.reps);
       return currentScore > maxScore ? set : max;
@@ -135,12 +251,75 @@ export function calculateProgressiveOverload(
     lastSession.sets[0]
   );
 
-  const currWeight = bestSet.weightKg;
-  const currReps = bestSet.reps;
+  const currWeight = bestSet.weightKg || 0;
+  const currReps = bestSet.reps || 0;
   const currRpe = bestSet.rpe || 8;
+  const currDist = bestSet.distanceKm || 0;
+  const currDur = bestSet.durationSeconds || 0;
 
-  // Detect exercise equipment to know weight increments (dumbbells vs barbells vs cables)
-  const exerciseMeta = EXERCISE_LIBRARY.find((e) => e.id === exerciseId);
+  // Modality-specific progressive overload:
+  // Mode 1: Distance & Time Cardio
+  if (trackingType === 'distance_time') {
+    if (currDist > 0) {
+      const nextDist = Math.round((currDist + 0.25) * 100) / 100;
+      return {
+        exerciseId,
+        currentWeight: 0,
+        currentReps: 0,
+        targetWeight: 0,
+        targetReps: 0,
+        targetRpe: 8,
+        strategy: 'increase_reps',
+        badgeText: 'DISTANCE +0.25KM',
+        explanation: `Previous best was ${currDist} km. Aim for ${nextDist} km or beat your previous split pace today!`
+      };
+    }
+    return {
+      exerciseId,
+      currentWeight: 0,
+      currentReps: 0,
+      targetWeight: 0,
+      targetReps: 0,
+      targetRpe: 8,
+      strategy: 'maintain',
+      badgeText: 'TARGET: 20 MINS',
+      explanation: 'Target a sustained 20-minute aerobic interval with steady nasal breathing.'
+    };
+  }
+
+  // Mode 2: Time Only (e.g. planks, jump rope intervals)
+  if (trackingType === 'time_only') {
+    const nextDur = currDur > 0 ? currDur + 10 : 45;
+    return {
+      exerciseId,
+      currentWeight: 0,
+      currentReps: 0,
+      targetWeight: 0,
+      targetReps: 0,
+      targetRpe: 8.5,
+      strategy: 'increase_reps',
+      badgeText: `DURATION: ${formatDuration(nextDur)}`,
+      explanation: `Last hold was ${formatDuration(currDur)}. Push for +10s longer hold today (${formatDuration(nextDur)}) with tight core brace!`
+    };
+  }
+
+  // Mode 3: Calisthenics Reps Only (burpees, climbers)
+  if (trackingType === 'reps_only') {
+    const nextReps = currReps >= maxRep ? currReps + 2 : Math.max(minRep, currReps + 1);
+    return {
+      exerciseId,
+      currentWeight: 0,
+      currentReps: currReps,
+      targetWeight: 0,
+      targetReps: nextReps,
+      targetRpe: 8.5,
+      strategy: 'increase_reps',
+      badgeText: `TARGET: ${nextReps} REPS`,
+      explanation: `Great pace! Last set was ${currReps} reps. Aim for ${nextReps} reps with explosive rhythm.`
+    };
+  }
+
+  // Mode 4: Weight & Reps standard resistance progression
   const isDumbbell = exerciseMeta?.equipment === 'Dumbbell';
   const isCableOrMachine = exerciseMeta?.equipment === 'Cable' || exerciseMeta?.equipment === 'Machine';
   const weightIncrement = isDumbbell ? 2 : isCableOrMachine ? 2.5 : 2.5;

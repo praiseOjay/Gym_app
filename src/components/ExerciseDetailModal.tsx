@@ -243,7 +243,9 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
                   fontWeight: 700
                 }}
               >
-                🎯 {repRange[0]}–{repRange[1]} Reps
+                {exercise.muscleGroup === 'Cardio' || exercise.equipment === 'Cardio Machine'
+                  ? '🏃 Cardio Endurance'
+                  : `🎯 ${repRange[0]}–${repRange[1]} Reps`}
               </span>
               <span
                 style={{
@@ -382,7 +384,7 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
           style={{ width: '100%', marginTop: 6 }}
           onClick={onClose}
         >
-          Got It, Let's Lift
+          Got It, Let's Train
         </button>
       </div>
     </div>

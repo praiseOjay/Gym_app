@@ -13,6 +13,7 @@ import {
 import type { ParsedVoiceCommand } from '../services/voiceLogger';
 import { triggerHaptic } from '../utils/haptics';
 import { kgToLbs } from '../engine/overloadEngine';
+import { displayDistance, distanceUnitLabel, formatDuration } from '../utils/trackingTypeUtils';
 
 interface VoiceLoggerModalProps {
   isOpen: boolean;
@@ -229,7 +230,7 @@ export const VoiceLoggerModal: React.FC<VoiceLoggerModalProps> = ({
         </div>
 
         {/* Parsed Result Card */}
-        {parsedCmd && (parsedCmd.weightKg !== undefined || parsedCmd.reps !== undefined || parsedCmd.action || parsedCmd.setType) && (
+        {parsedCmd && (parsedCmd.weightKg !== undefined || parsedCmd.reps !== undefined || parsedCmd.distanceKm !== undefined || parsedCmd.durationSeconds !== undefined || parsedCmd.action || parsedCmd.setType) && (
           <div
             style={{
               background: 'rgba(0, 245, 155, 0.08)',
@@ -279,6 +280,18 @@ export const VoiceLoggerModal: React.FC<VoiceLoggerModalProps> = ({
                 </span>
               )}
 
+              {parsedCmd.distanceKm !== undefined && (
+                <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>
+                  🏃 {displayDistance(parsedCmd.distanceKm, unit)} {distanceUnitLabel(unit)}
+                </span>
+              )}
+
+              {parsedCmd.durationSeconds !== undefined && (
+                <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#FFA500' }}>
+                  ⏱️ {formatDuration(parsedCmd.durationSeconds)}
+                </span>
+              )}
+
               {parsedCmd.rpe !== undefined && (
                 <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>
                   ⚡ RPE {parsedCmd.rpe}
@@ -288,17 +301,19 @@ export const VoiceLoggerModal: React.FC<VoiceLoggerModalProps> = ({
           </div>
         )}
 
-        {/* Quick Voice Simulation Buttons for testing / loud gym environments */}
-        <div style={{ marginBottom: 18 }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>
-            Quick Gym Voice Presets
+        {/* Quick Voice Phrases Suggestion */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase' }}>
+            Try Saying:
           </div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[
-              '80 kilos for 8 reps',
-              '100 kg 6 reps at rpe 8',
+              '80kg for 8 reps',
+              '100kg 6 reps rpe 8',
+              '20 minutes 5 km',
+              '15 minutes',
+              '45 seconds',
               'Drop set 60kg 10 reps',
-              'Warmup 40kg 10 reps',
               'Complete set'
             ].map((phrase) => (
               <button

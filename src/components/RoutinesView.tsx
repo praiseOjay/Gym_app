@@ -7,6 +7,7 @@ import { getTodayWorkoutState } from '../utils/dateUtils';
 import { preloadRoutineGifs } from '../utils/offlineMedia';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
 import { auditRoutineKinematics } from '../engine/biomechanicsEngine';
+import { getExerciseTrackingType, formatDuration } from '../utils/trackingTypeUtils';
 import {
   Play,
   Clock,
@@ -145,13 +146,17 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
 
   const handleAddExerciseToEditor = (ex: Exercise) => {
     if (!editingRoutine) return;
+    const trackingType = ex.trackingType || getExerciseTrackingType(ex);
     const template: RoutineExerciseTemplate = {
       exerciseId: ex.id,
       defaultSets: 3,
       targetRepRange: ex.targetRepRange || [8, 12],
-      defaultWeightKg: 20,
+      defaultWeightKg: trackingType === 'weight_reps' ? 20 : 0,
       targetRpe: ex.targetRpe || 8.5,
-      restSeconds: 60
+      restSeconds: 60,
+      trackingType,
+      defaultDistanceKm: trackingType === 'distance_time' ? 1.0 : undefined,
+      defaultDurationSeconds: trackingType === 'distance_time' ? 900 : trackingType === 'time_only' ? 45 : undefined
     };
     setEditingRoutine({
       ...editingRoutine,
@@ -346,6 +351,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
           ) : (
             currentRoutine.exercises.map((template, idx) => {
               const meta = getExerciseMeta(template.exerciseId);
+              const trackingType = getExerciseTrackingType(meta, template.trackingType);
               const targetWeight = template.defaultWeightKg || 20;
               const targetReps = template.targetRepRange[1] || 10;
               const restMins = Math.floor(template.restSeconds / 60);
@@ -445,13 +451,43 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                       <strong>{template.defaultSets} Sets</strong>
                     </div>
 
-                    <div style={{ color: 'var(--text-secondary)' }}>
-                      <strong style={{ color: '#fff' }}>{targetReps}</strong> Reps (RPE {template.targetRpe})
-                    </div>
-
-                    <div style={{ color: 'var(--accent-volt)', fontWeight: 800 }}>
-                      {targetWeight} Kg
-                    </div>
+                    {trackingType === 'distance_time' ? (
+                      <>
+                        <div style={{ color: 'var(--text-secondary)' }}>
+                          <strong style={{ color: '#fff' }}>{template.defaultDurationSeconds ? formatDuration(template.defaultDurationSeconds) : '20:00'}</strong> (Time)
+                        </div>
+                        <div style={{ color: 'var(--accent-cyan)', fontWeight: 800 }}>
+                          {template.defaultDistanceKm || 3.0} km
+                        </div>
+                      </>
+                    ) : trackingType === 'time_only' ? (
+                      <>
+                        <div style={{ color: 'var(--text-secondary)' }}>
+                          Target Time
+                        </div>
+                        <div style={{ color: 'var(--accent-cyan)', fontWeight: 800 }}>
+                          {formatDuration(template.defaultDurationSeconds || 60)}
+                        </div>
+                      </>
+                    ) : trackingType === 'reps_only' ? (
+                      <>
+                        <div style={{ color: 'var(--text-secondary)' }}>
+                          Bodyweight
+                        </div>
+                        <div style={{ color: 'var(--accent-volt)', fontWeight: 800 }}>
+                          {targetReps} Reps
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div style={{ color: 'var(--text-secondary)' }}>
+                          <strong style={{ color: '#fff' }}>{targetReps}</strong> Reps (RPE {template.targetRpe})
+                        </div>
+                        <div style={{ color: 'var(--accent-volt)', fontWeight: 800 }}>
+                          {targetWeight} Kg
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               );
@@ -710,6 +746,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {editingRoutine.exercises.map((template, idx) => {
                   const meta = getExerciseMeta(template.exerciseId);
+                  const trackingType = getExerciseTrackingType(meta, template.trackingType);
                   return (
                     <div
                       key={idx}
@@ -776,50 +813,196 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                           />
                         </div>
 
-                        <div>
-                          <span style={{ color: 'var(--text-muted)' }}>Min Reps</span>
-                          <input
-                            type="number"
-                            className="set-input-box"
-                            value={template.targetRepRange[0]}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value, 10) || 6;
-                              const updated = [...editingRoutine.exercises];
-                              updated[idx].targetRepRange = [val, updated[idx].targetRepRange[1]];
-                              setEditingRoutine({ ...editingRoutine, exercises: updated });
-                            }}
-                          />
-                        </div>
+                        {trackingType === 'distance_time' ? (
+                          <>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Dist (km)</span>
+                              <input
+                                type="number"
+                                step="0.1"
+                                className="set-input-box"
+                                value={template.defaultDistanceKm ?? 3.0}
+                                onChange={(e) => {
+                                  const val = parseFloat(e.target.value) || 0;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].defaultDistanceKm = val;
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Time (min)</span>
+                              <input
+                                type="number"
+                                className="set-input-box"
+                                value={Math.round((template.defaultDurationSeconds ?? 1200) / 60)}
+                                onChange={(e) => {
+                                  const mins = parseInt(e.target.value, 10) || 0;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].defaultDurationSeconds = mins * 60;
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Rest (s)</span>
+                              <input
+                                type="number"
+                                step="15"
+                                className="set-input-box"
+                                value={template.restSeconds}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value, 10) || 60;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].restSeconds = val;
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
+                          </>
+                        ) : trackingType === 'time_only' ? (
+                          <>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Time (s)</span>
+                              <input
+                                type="number"
+                                step="5"
+                                className="set-input-box"
+                                value={template.defaultDurationSeconds ?? 60}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value, 10) || 30;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].defaultDurationSeconds = val;
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Target RPE</span>
+                              <input
+                                type="number"
+                                min="1"
+                                max="10"
+                                className="set-input-box"
+                                value={template.targetRpe}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value, 10) || 8;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].targetRpe = val;
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Rest (s)</span>
+                              <input
+                                type="number"
+                                step="15"
+                                className="set-input-box"
+                                value={template.restSeconds}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value, 10) || 60;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].restSeconds = val;
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
+                          </>
+                        ) : trackingType === 'reps_only' ? (
+                          <>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Min Reps</span>
+                              <input
+                                type="number"
+                                className="set-input-box"
+                                value={template.targetRepRange[0]}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value, 10) || 5;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].targetRepRange = [val, updated[idx].targetRepRange[1]];
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Max Reps</span>
+                              <input
+                                type="number"
+                                className="set-input-box"
+                                value={template.targetRepRange[1]}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value, 10) || 12;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].targetRepRange = [updated[idx].targetRepRange[0], val];
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Rest (s)</span>
+                              <input
+                                type="number"
+                                step="15"
+                                className="set-input-box"
+                                value={template.restSeconds}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value, 10) || 60;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].restSeconds = val;
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Min Reps</span>
+                              <input
+                                type="number"
+                                className="set-input-box"
+                                value={template.targetRepRange[0]}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value, 10) || 6;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].targetRepRange = [val, updated[idx].targetRepRange[1]];
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
 
-                        <div>
-                          <span style={{ color: 'var(--text-muted)' }}>Max Reps</span>
-                          <input
-                            type="number"
-                            className="set-input-box"
-                            value={template.targetRepRange[1]}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value, 10) || 12;
-                              const updated = [...editingRoutine.exercises];
-                              updated[idx].targetRepRange = [updated[idx].targetRepRange[0], val];
-                              setEditingRoutine({ ...editingRoutine, exercises: updated });
-                            }}
-                          />
-                        </div>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Max Reps</span>
+                              <input
+                                type="number"
+                                className="set-input-box"
+                                value={template.targetRepRange[1]}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value, 10) || 12;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].targetRepRange = [updated[idx].targetRepRange[0], val];
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
 
-                        <div>
-                          <span style={{ color: 'var(--text-muted)' }}>Weight (kg)</span>
-                          <input
-                            type="number"
-                            className="set-input-box"
-                            value={template.defaultWeightKg ?? 20}
-                            onChange={(e) => {
-                              const val = parseFloat(e.target.value) || 0;
-                              const updated = [...editingRoutine.exercises];
-                              updated[idx].defaultWeightKg = val;
-                              setEditingRoutine({ ...editingRoutine, exercises: updated });
-                            }}
-                          />
-                        </div>
+                            <div>
+                              <span style={{ color: 'var(--text-muted)' }}>Weight (kg)</span>
+                              <input
+                                type="number"
+                                className="set-input-box"
+                                value={template.defaultWeightKg ?? 20}
+                                onChange={(e) => {
+                                  const val = parseFloat(e.target.value) || 0;
+                                  const updated = [...editingRoutine.exercises];
+                                  updated[idx].defaultWeightKg = val;
+                                  setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                              />
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   );

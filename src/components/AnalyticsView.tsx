@@ -13,6 +13,13 @@ import { WorkoutCalendar } from './WorkoutCalendar';
 import { ProgressGraph } from './ProgressGraph';
 import { WorkoutSummaryModal } from './WorkoutSummaryModal';
 import {
+  formatSetPerformance,
+  getExerciseTrackingType,
+  displayDistance,
+  distanceUnitLabel,
+  formatDuration
+} from '../utils/trackingTypeUtils';
+import {
   TrendingUp,
   Trophy,
   Flame,
@@ -369,7 +376,15 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                   <div>
                     <div style={{ fontWeight: 800, fontSize: '0.92rem' }}>{pr.exerciseName}</div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 2 }}>
-                      {pr.type === '1RM' ? 'Est. 1-Rep Max' : 'Max Working Weight'} ·{' '}
+                      {pr.type === '1RM'
+                        ? 'Est. 1-Rep Max'
+                        : pr.type === 'MaxDistance'
+                        ? 'Longest Distance'
+                        : pr.type === 'MaxDuration'
+                        ? 'Longest Duration'
+                        : pr.type === 'FastestPace'
+                        ? 'Fastest Pace'
+                        : 'Max Working Weight'} ·{' '}
                       {new Date(pr.date).toLocaleDateString(undefined, {
                         month: 'short',
                         day: 'numeric',
@@ -387,9 +402,15 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                         color: '#FFD700'
                       }}
                     >
-                      {displayWeight(pr.value)}
+                      {pr.type === 'MaxDistance'
+                        ? `${displayDistance(pr.value, settings.unit)} ${distanceUnitLabel(settings.unit)}`
+                        : pr.type === 'MaxDuration'
+                        ? formatDuration(pr.value)
+                        : pr.type === 'FastestPace'
+                        ? `${formatDuration(Math.round(pr.value))}/${distanceUnitLabel(settings.unit)}`
+                        : displayWeight(pr.value)}
                     </div>
-                    {pr.reps && (
+                    {pr.reps && pr.type !== 'MaxDistance' && pr.type !== 'MaxDuration' && pr.type !== 'FastestPace' && (
                       <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                         Based on {pr.reps} reps
                       </div>
@@ -705,20 +726,23 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                         gap: 8
                       }}
                     >
-                      {s.exercises.map((ex, exI) => (
-                        <div key={exI} style={{ fontSize: '0.8rem' }}>
-                          <div style={{ fontWeight: 700, color: '#fff' }}>{ex.name}</div>
-                          <div style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', marginTop: 2 }}>
-                            {ex.sets
-                              .filter((st) => st.completed)
-                              .map(
-                                (st, sIdx) =>
-                                  `Set ${sIdx + 1} (${st.type === 'warmup' ? 'W' : st.type === 'drop' ? 'D' : st.type === 'failure' ? 'F' : 'Wk'}): ${displayWeight(st.weightKg)} × ${st.reps}`
-                              )
-                              .join(' | ') || 'No sets recorded'}
+                      {s.exercises.map((ex, exI) => {
+                        const tType = getExerciseTrackingType(ex, ex.trackingType);
+                        return (
+                          <div key={exI} style={{ fontSize: '0.8rem' }}>
+                            <div style={{ fontWeight: 700, color: '#fff' }}>{ex.name}</div>
+                            <div style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', marginTop: 2 }}>
+                              {ex.sets
+                                .filter((st) => st.completed)
+                                .map(
+                                  (st, sIdx) =>
+                                    `Set ${sIdx + 1} (${st.type === 'warmup' ? 'W' : st.type === 'drop' ? 'D' : st.type === 'failure' ? 'F' : 'Wk'}): ${formatSetPerformance(st, tType, settings.unit)}`
+                                )
+                                .join(' | ') || 'No sets recorded'}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
 
                       {s.notes && (
                         <div style={{ fontSize: '0.75rem', color: 'var(--accent-volt)', marginTop: 4 }}>

@@ -1378,12 +1378,15 @@ export function calculateSetCalories(
 
   if (set.type === 'warmup') {
     // Warmups have lower intensity (~70% MET) and ~25s duration
-    const tutMinutes = 25 / 60;
+    const tutMinutes = (set.durationSeconds && set.durationSeconds > 0 ? set.durationSeconds : 25) / 60;
     return tutMinutes * (calsPerMin * 0.75);
   }
 
-  // Working / Failure / Drop sets: TUT estimated at ~3.5s per rep (minimum 30s)
-  const tutSeconds = Math.max(30, (set.reps || 10) * 3.5);
+  // If exact duration was tracked (e.g. cardio, planks, timed runs), use it directly
+  // Otherwise estimate TUT at ~3.5s per rep (minimum 30s)
+  const tutSeconds = set.durationSeconds && set.durationSeconds > 0
+    ? set.durationSeconds
+    : Math.max(30, (set.reps || 10) * 3.5);
   const tutMinutes = tutSeconds / 60;
 
   // Extra metabolic demand if set was taken to failure
@@ -1415,7 +1418,9 @@ export function calculateSessionTotalCalories(
       if (s.completed) {
         const setCal = calculateSetCalories(ex.exerciseId, s, safeWeight, ex.muscleGroup);
         activeCalories += setCal;
-        const tut = s.type === 'warmup' ? 25 : Math.max(30, (s.reps || 10) * 3.5);
+        const tut = s.durationSeconds && s.durationSeconds > 0
+          ? s.durationSeconds
+          : (s.type === 'warmup' ? 25 : Math.max(30, (s.reps || 10) * 3.5));
         totalTutSeconds += tut;
       }
     });
@@ -1458,7 +1463,10 @@ export function estimateLiveSessionCalories(
     ex.sets.forEach((s) => {
       if (s.completed) {
         completedSetCalories += calculateSetCalories(ex.exerciseId, s, safeWeight, ex.muscleGroup);
-        completedTutSec += s.type === 'warmup' ? 25 : Math.max(30, (s.reps || 10) * 3.5);
+        const tut = s.durationSeconds && s.durationSeconds > 0
+          ? s.durationSeconds
+          : (s.type === 'warmup' ? 25 : Math.max(30, (s.reps || 10) * 3.5));
+        completedTutSec += tut;
       }
     });
   });

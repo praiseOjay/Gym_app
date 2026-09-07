@@ -29,6 +29,12 @@ export type EquipmentType =
 
 export type SetType = 'warmup' | 'working' | 'drop' | 'failure';
 
+export type ExerciseTrackingType =
+  | 'weight_reps'     // Standard lifting: Weight + Reps
+  | 'distance_time'   // Cardio machine / endurance: Distance (km/mi) + Duration (min:sec)
+  | 'time_only'       // Timed holds / intervals: Duration (sec/min)
+  | 'reps_only';      // Calisthenics: Reps without weight (e.g. Burpees, Star Jumps)
+
 export interface Exercise {
   id: string;
   name: string;
@@ -43,6 +49,7 @@ export interface Exercise {
   isCustom?: boolean;
   met?: number;
   caloriesPerMinute?: number;
+  trackingType?: ExerciseTrackingType;
 }
 
 export interface WorkoutSet {
@@ -58,6 +65,16 @@ export interface WorkoutSet {
   previousWeightKg?: number;
   previousReps?: number;
   isPR?: boolean;
+  // Cardio and endurance tracking extensions
+  durationSeconds?: number;
+  targetDurationSeconds?: number;
+  previousDurationSeconds?: number;
+  distanceKm?: number;
+  targetDistanceKm?: number;
+  previousDistanceKm?: number;
+  incline?: number;
+  resistanceLevel?: number;
+  speedKmh?: number;
 }
 
 export interface WorkoutExercise {
@@ -71,6 +88,7 @@ export interface WorkoutExercise {
   restSeconds?: number;
   supersetGroupId?: string;
   supersetOrder?: number;
+  trackingType?: ExerciseTrackingType;
 }
 
 export interface WorkoutSession {
@@ -103,6 +121,9 @@ export interface RoutineExerciseTemplate {
   defaultWeightKg?: number;
   targetRpe: number;
   restSeconds: number;
+  trackingType?: ExerciseTrackingType;
+  defaultDurationSeconds?: number;
+  defaultDistanceKm?: number;
 }
 
 export interface Routine {
@@ -119,8 +140,8 @@ export interface PRRecord {
   id: string;
   exerciseId: string;
   exerciseName: string;
-  type: '1RM' | 'MaxWeight' | 'MaxVolume';
-  value: number; // in kg
+  type: '1RM' | 'MaxWeight' | 'MaxVolume' | 'MaxDistance' | 'MaxDuration' | 'FastestPace';
+  value: number; // weight in kg, or distance in km, or duration in seconds, or pace in s/km
   reps?: number;
   date: string;
 }

@@ -2,12 +2,15 @@
  * Web Speech Recognition Service for Hands-Free Gym Set Logging
  */
 import { lbsToKg } from '../engine/overloadEngine';
+import { milesToKm } from '../utils/trackingTypeUtils';
 import type { SetType } from '../types/gym';
 
 export interface ParsedVoiceCommand {
   rawTranscript: string;
   weightKg?: number;
   reps?: number;
+  durationSeconds?: number;
+  distanceKm?: number;
   rpe?: number;
   setType?: SetType;
   action?: 'complete' | 'next' | 'rest' | 'set_data';
@@ -27,8 +30,10 @@ export function isSpeechRecognitionSupported(): boolean {
  * - "80 kilos for 8 reps"
  * - "100 kg 6 reps at rpe 8"
  * - "185 pounds for 10"
+ * - "20 minutes 5 kilometers"
+ * - "15 minutes"
+ * - "45 seconds"
  * - "Drop set 60 kilos 12 reps"
- * - "Warmup 40 for 10"
  * - "Complete set" / "Done" / "Next set"
  * - "Rest 90 seconds"
  */
@@ -70,19 +75,43 @@ export function parseGymVoiceCommand(transcript: string, unit: 'kg' | 'lbs' = 'k
     }
   }
 
-  // 4. Detect Weight and Reps
+  // 4. Detect Distance (e.g. "5 km", "3.2 kilometers", "2 miles")
+  const distanceMatch = clean.match(/(\d+(?:\.\d+)?)\s*(?:km|kms|kilometers|kilometer|miles|mile|mi)\b/i);
+  if (distanceMatch) {
+    const rawDist = parseFloat(distanceMatch[1]);
+    const isMiles = /(?:miles|mile|mi)/i.test(distanceMatch[0]);
+    result.distanceKm = isMiles || unit === 'lbs' ? (isMiles ? milesToKm(rawDist) : rawDist) : rawDist;
+    result.action = result.action || 'set_data';
+  }
+
+  // 5. Detect Duration (e.g. "20 minutes", "15 mins", "45 seconds")
+  let detectedDuration = 0;
+  const minuteMatch = clean.match(/(\d+(?:\.\d+)?)\s*(?:minutes|minute|mins|min)\b/i);
+  if (minuteMatch) {
+    detectedDuration += Math.round(parseFloat(minuteMatch[1]) * 60);
+  }
+  const secondMatch = clean.match(/(\d+)\s*(?:seconds|second|secs|sec|s)\b/i);
+  if (secondMatch && !clean.includes('rest')) {
+    detectedDuration += parseInt(secondMatch[1], 10);
+  }
+  if (detectedDuration > 0) {
+    result.durationSeconds = detectedDuration;
+    result.action = result.action || 'set_data';
+  }
+
+  // 6. Detect Weight and Reps
   // Pattern A: "80 kg for 8 reps" or "80 kilos 8 reps" or "185 lbs for 5"
   let parsedWeight: number | undefined;
   let parsedReps: number | undefined;
 
-  const weightUnitMatch = clean.match(/(\d+(?:\.\d+)?)\s*(?:kg|kilos|kilo|pounds|lbs|lb)/i);
+  const weightUnitMatch = clean.match(/(\d+(?:\.\d+)?)\s*(?:kg|kilos|kilo|pounds|lbs|lb)\b/i);
   if (weightUnitMatch) {
     const val = parseFloat(weightUnitMatch[1]);
     const isLbsInSpeech = /(?:pounds|lbs|lb)/.test(weightUnitMatch[0]);
     parsedWeight = isLbsInSpeech || unit === 'lbs' ? (isLbsInSpeech ? lbsToKg(val) : val) : val;
   }
 
-  const repMatch = clean.match(/(?:for|x|by|\b)\s*(\d+)\s*(?:reps|rep)/i);
+  const repMatch = clean.match(/(?:for|x|by|\b)\s*(\d+)\s*(?:reps|rep)\b/i);
   if (repMatch) {
     parsedReps = parseInt(repMatch[1], 10);
   }
@@ -102,7 +131,7 @@ export function parseGymVoiceCommand(transcript: string, unit: 'kg' | 'lbs' = 'k
   }
 
   // Pattern C: standalone numbers if only two numbers in string (e.g. "100 8")
-  if (parsedWeight === undefined && parsedReps === undefined) {
+  if (parsedWeight === undefined && parsedReps === undefined && !result.distanceKm && !result.durationSeconds) {
     const numbers = clean.match(/\b\d+(?:\.\d+)?\b/g);
     if (numbers && numbers.length >= 2) {
       const rawW = parseFloat(numbers[0]);
@@ -126,7 +155,13 @@ export function parseGymVoiceCommand(transcript: string, unit: 'kg' | 'lbs' = 'k
     result.reps = parsedReps;
   }
 
-  if (result.weightKg !== undefined || result.reps !== undefined || result.setType !== undefined) {
+  if (
+    result.weightKg !== undefined ||
+    result.reps !== undefined ||
+    result.setType !== undefined ||
+    result.durationSeconds !== undefined ||
+    result.distanceKm !== undefined
+  ) {
     result.action = result.action || 'set_data';
   }
 

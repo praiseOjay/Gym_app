@@ -3,6 +3,12 @@ import type { WorkoutSession, UserSettings, PRRecord } from '../types/gym';
 import { kgToLbs } from '../engine/overloadEngine';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import {
+  getExerciseTrackingType,
+  displayDistance,
+  distanceUnitLabel,
+  formatDuration
+} from '../utils/trackingTypeUtils';
+import {
   TrendingUp,
   Award,
   Zap,
@@ -114,6 +120,8 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
         subLabel?: string;
       }[] = [];
 
+      const exMeta = EXERCISE_LIBRARY.find((e) => e.id === currentExerciseId);
+
       for (const s of filteredSessions) {
         const matchEx = s.exercises.find(
           (e) => e.exerciseId === currentExerciseId || e.name.toLowerCase() === currentExerciseId.toLowerCase()
@@ -121,20 +129,69 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
         if (matchEx) {
           const completedSets = matchEx.sets.filter((st) => st.completed);
           if (completedSets.length > 0) {
-            const topSet = completedSets.reduce((max, curr) => (curr.weightKg > max.weightKg ? curr : max), completedSets[0]);
-            const val = settings.unit === 'lbs' ? kgToLbs(topSet.weightKg) : topSet.weightKg;
-            const hasPR = completedSets.some((st) => st.isPR) || prs.some((p) => p.exerciseId === currentExerciseId && Math.abs(p.value - topSet.weightKg) < 0.5);
+            const trackingType = getExerciseTrackingType(exMeta, matchEx.trackingType);
             const d = new Date(s.date);
-            points.push({
-              id: `${s.id}-${matchEx.id}`,
-              date: s.date,
-              displayDate: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-              value: val,
-              displayValue: displayWeight(topSet.weightKg),
-              label: `${topSet.weightKg}kg × ${topSet.reps} reps`,
-              isPR: hasPR,
-              subLabel: `${completedSets.length} sets completed`
-            });
+            const displayDate = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+            if (trackingType === 'distance_time') {
+              const totalDist = completedSets.reduce((sum, st) => sum + (st.distanceKm || 0), 0);
+              const totalSecs = completedSets.reduce((sum, st) => sum + (st.durationSeconds || 0), 0);
+              const val = displayDistance(totalDist, settings.unit);
+              const unitStr = distanceUnitLabel(settings.unit);
+              const hasPR = completedSets.some((st) => st.isPR) || prs.some((p) => p.exerciseId === currentExerciseId && p.type === 'MaxDistance');
+              points.push({
+                id: `${s.id}-${matchEx.id}`,
+                date: s.date,
+                displayDate,
+                value: val,
+                displayValue: `${val} ${unitStr}`,
+                label: `${val} ${unitStr} (${formatDuration(totalSecs)})`,
+                isPR: hasPR,
+                subLabel: `${completedSets.length} sets completed`
+              });
+            } else if (trackingType === 'time_only') {
+              const topSet = completedSets.reduce((max, curr) => ((curr.durationSeconds || 0) > (max.durationSeconds || 0) ? curr : max), completedSets[0]);
+              const val = topSet.durationSeconds || 0;
+              const hasPR = completedSets.some((st) => st.isPR) || prs.some((p) => p.exerciseId === currentExerciseId && p.type === 'MaxDuration');
+              points.push({
+                id: `${s.id}-${matchEx.id}`,
+                date: s.date,
+                displayDate,
+                value: val,
+                displayValue: formatDuration(val),
+                label: `${formatDuration(val)} duration`,
+                isPR: hasPR,
+                subLabel: `${completedSets.length} sets completed`
+              });
+            } else if (trackingType === 'reps_only') {
+              const topSet = completedSets.reduce((max, curr) => ((curr.reps || 0) > (max.reps || 0) ? curr : max), completedSets[0]);
+              const val = topSet.reps || 0;
+              const hasPR = completedSets.some((st) => st.isPR);
+              points.push({
+                id: `${s.id}-${matchEx.id}`,
+                date: s.date,
+                displayDate,
+                value: val,
+                displayValue: `${val} reps`,
+                label: `${val} bodyweight reps`,
+                isPR: hasPR,
+                subLabel: `${completedSets.length} sets completed`
+              });
+            } else {
+              const topSet = completedSets.reduce((max, curr) => (curr.weightKg > max.weightKg ? curr : max), completedSets[0]);
+              const val = settings.unit === 'lbs' ? kgToLbs(topSet.weightKg) : topSet.weightKg;
+              const hasPR = completedSets.some((st) => st.isPR) || prs.some((p) => p.exerciseId === currentExerciseId && Math.abs(p.value - topSet.weightKg) < 0.5);
+              points.push({
+                id: `${s.id}-${matchEx.id}`,
+                date: s.date,
+                displayDate,
+                value: val,
+                displayValue: displayWeight(topSet.weightKg),
+                label: `${topSet.weightKg}kg × ${topSet.reps} reps`,
+                isPR: hasPR,
+                subLabel: `${completedSets.length} sets completed`
+              });
+            }
           }
         }
       }
@@ -280,6 +337,27 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
     const match = EXERCISE_LIBRARY.find((e) => e.id === currentExerciseId);
     return match?.name || loggedExercises.find((e) => e.id === currentExerciseId)?.name || 'Exercise';
   }, [currentExerciseId, loggedExercises]);
+
+  const currentTrackingType = useMemo(() => {
+    const match = EXERCISE_LIBRARY.find((e) => e.id === currentExerciseId);
+    return getExerciseTrackingType(match);
+  }, [currentExerciseId]);
+
+  const formatExerciseVal = useCallback(
+    (val: number) => {
+      if (currentTrackingType === 'distance_time') {
+        return `${val} ${distanceUnitLabel(settings.unit)}`;
+      }
+      if (currentTrackingType === 'time_only') {
+        return formatDuration(val);
+      }
+      if (currentTrackingType === 'reps_only') {
+        return `${val} reps`;
+      }
+      return displayWeight(val);
+    },
+    [currentTrackingType, settings.unit, displayWeight]
+  );
 
   return (
     <div className="gym-card" style={{ padding: '16px' }}>
@@ -710,7 +788,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
             {mode === 'volume'
               ? displayVolume(summaryMetrics.peakVal)
               : mode === 'exercise'
-              ? displayWeight(summaryMetrics.peakVal)
+              ? formatExerciseVal(summaryMetrics.peakVal)
               : `${summaryMetrics.peakVal} / wk`}
           </div>
         </div>

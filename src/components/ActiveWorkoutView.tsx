@@ -51,9 +51,19 @@ import {
   Zap,
   Volume2,
   VolumeX,
-  AlertTriangle
+  AlertTriangle,
+  Play,
+  Square
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import {
+  getExerciseTrackingType,
+  displayDistance,
+  toStorageDistance,
+  distanceUnitLabel,
+  formatDuration,
+  formatSetPerformance
+} from '../utils/trackingTypeUtils';
 
 interface ActiveWorkoutViewProps {
   session: WorkoutSession;
@@ -104,10 +114,40 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   const [autoregCue, setAutoregCue] = useState<AutoregulationCue | null>(null);
   const [voiceCoachEnabled, setVoiceCoachEnabled] = useState(false);
 
+  // Set-level live stopwatch (e.g. for timed runs, planks, intervals)
+  const [liveTimingKey, setLiveTimingKey] = useState<string | null>(null);
+  const [liveTimingSeconds, setLiveTimingSeconds] = useState<number>(0);
+
+  useEffect(() => {
+    if (!liveTimingKey) return;
+    const timer = setInterval(() => {
+      setLiveTimingSeconds((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [liveTimingKey]);
+
   // Live metabolic calorie burn calculation based on WorkoutX MET ratings
   const liveCalories = useMemo(() => {
     return estimateLiveSessionCalories(session.exercises, elapsedSeconds, settings.bodyWeightKg);
   }, [session.exercises, elapsedSeconds, settings.bodyWeightKg]);
+
+  // Aggregated cardio metrics for session header
+  const cardioTotals = useMemo(() => {
+    let totalKm = 0;
+    let totalSec = 0;
+    session.exercises.forEach((ex) => {
+      const trackingType = ex.trackingType || getExerciseTrackingType(ex);
+      if (trackingType === 'distance_time' || trackingType === 'time_only') {
+        ex.sets.forEach((s) => {
+          if (s.completed) {
+            if (s.distanceKm) totalKm += s.distanceKm;
+            if (s.durationSeconds) totalSec += s.durationSeconds;
+          }
+        });
+      }
+    });
+    return { totalKm, totalSec };
+  }, [session.exercises]);
 
   const currentWeekConfig = mesocycleBlock?.weeks.find(
     (w) => w.weekNumber === mesocycleBlock.currentWeek
@@ -149,13 +189,15 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     return val;
   };
 
-  // Calculate session volume (excluding warmups)
+  // Calculate session volume (excluding warmups and pure cardio)
   const calculateTotalVolume = (exercises: WorkoutExercise[]) => {
     return exercises.reduce((acc, ex) => {
+      const trackingType = ex.trackingType || getExerciseTrackingType(ex);
+      if (trackingType !== 'weight_reps') return acc;
       return (
         acc +
         ex.sets.reduce((sSum, s) => {
-          return s.completed && s.type !== 'warmup' ? sSum + s.weightKg * s.reps : sSum;
+          return s.completed && s.type !== 'warmup' ? sSum + (s.weightKg || 0) * (s.reps || 0) : sSum;
         }, 0)
       );
     }, 0);
@@ -231,6 +273,12 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     if (cmd.reps !== undefined) {
       targetSet.reps = cmd.reps;
     }
+    if (cmd.distanceKm !== undefined) {
+      targetSet.distanceKm = cmd.distanceKm;
+    }
+    if (cmd.durationSeconds !== undefined) {
+      targetSet.durationSeconds = cmd.durationSeconds;
+    }
     if (cmd.rpe !== undefined) {
       targetSet.rpe = cmd.rpe;
     }
@@ -280,23 +328,41 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     const currentSet = updatedExercises[exIdx].sets[setIdx];
     const isNowCompleted = !currentSet.completed;
 
+    // If live stopwatch was running for this set, commit elapsed time
+    const activeKey = `${exIdx}-${setIdx}`;
+    if (liveTimingKey === activeKey) {
+      currentSet.durationSeconds = liveTimingSeconds;
+      setLiveTimingKey(null);
+      setLiveTimingSeconds(0);
+    }
+
     let isPRFound = false;
     let prTitle = '';
 
-    if (isNowCompleted && currentSet.weightKg > 0 && currentSet.reps > 0) {
+    const hasPerformance =
+      (currentSet.weightKg > 0 && currentSet.reps > 0) ||
+      (currentSet.distanceKm !== undefined && currentSet.distanceKm > 0) ||
+      (currentSet.durationSeconds !== undefined && currentSet.durationSeconds > 0) ||
+      (currentSet.reps > 0);
+
+    if (isNowCompleted && hasPerformance) {
       if (currentSet.type !== 'warmup') {
         // Check PR (exclude warmup sets)
         const prCheck = checkIfPR(
           updatedExercises[exIdx].exerciseId,
-          currentSet.weightKg,
-          currentSet.reps,
+          currentSet.weightKg || 0,
+          currentSet.reps || 0,
           existingPRs,
-          currentSet.type
+          currentSet.type,
+          currentSet.durationSeconds,
+          currentSet.distanceKm
         );
 
         if (prCheck.isPR) {
           isPRFound = true;
-          prTitle = `🔥 NEW PR: ${updatedExercises[exIdx].name} (${displayWeight(currentSet.weightKg)} ${settings.unit} × ${currentSet.reps} reps)`;
+          const trackingType = updatedExercises[exIdx].trackingType || getExerciseTrackingType(updatedExercises[exIdx]);
+          const perfText = formatSetPerformance(currentSet, trackingType, settings.unit);
+          prTitle = `🔥 NEW PR: ${updatedExercises[exIdx].name} (${perfText})`;
           setNewPRNotice(prTitle);
           if (settings.soundEnabled) sounds.playPRCelebration();
           triggerHaptic('pr', settings.vibrationEnabled);
@@ -460,16 +526,24 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
   const handleAddSet = (exIdx: number) => {
     const updated = [...session.exercises];
-    const sets = updated[exIdx].sets;
+    const targetEx = updated[exIdx];
+    const sets = targetEx.sets;
     const lastSet = sets[sets.length - 1];
     const newSetNumber = sets.filter((s) => s.type !== 'warmup').length + 1;
+    const trackingType = targetEx.trackingType || getExerciseTrackingType(targetEx);
+
+    const isWeight = trackingType === 'weight_reps';
+    const isDist = trackingType === 'distance_time';
+    const isTimed = trackingType === 'time_only';
 
     const newSet: WorkoutSet = {
       id: `set-${Date.now()}-${newSetNumber}`,
       setNumber: newSetNumber,
       type: 'working',
-      weightKg: lastSet ? lastSet.weightKg : 20,
-      reps: lastSet ? lastSet.reps : 10,
+      weightKg: isWeight ? (lastSet ? lastSet.weightKg : 20) : 0,
+      reps: isDist || isTimed ? 0 : (lastSet ? lastSet.reps : 10),
+      distanceKm: isDist ? (lastSet?.distanceKm || 1.0) : undefined,
+      durationSeconds: isDist ? (lastSet?.durationSeconds || 900) : isTimed ? (lastSet?.durationSeconds || 45) : undefined,
       completed: false
     };
 
@@ -492,8 +566,13 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   };
 
   const handleAddExerciseToWorkout = (ex: Exercise) => {
+    const trackingType = ex.trackingType || getExerciseTrackingType(ex);
     // Generate overload recommendation for first set
     const overload = calculateProgressiveOverload(ex.id, ex.targetRepRange, historySessions);
+
+    const isWeight = trackingType === 'weight_reps';
+    const isDist = trackingType === 'distance_time';
+    const isTimed = trackingType === 'time_only';
 
     const newWorkoutEx: WorkoutExercise = {
       id: `we-${ex.id}-${session.exercises.length + 1}`,
@@ -501,16 +580,19 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
       name: ex.name,
       muscleGroup: ex.muscleGroup,
       equipment: ex.equipment,
+      trackingType,
       restSeconds: 90,
       sets: [
         {
           id: `set-${ex.id}-1`,
           setNumber: 1,
           type: 'working',
-          weightKg: overload.targetWeight || 20,
-          reps: overload.targetReps || 10,
-          targetWeightKg: overload.targetWeight,
-          targetReps: overload.targetReps,
+          weightKg: isWeight ? (overload.targetWeight || 20) : 0,
+          reps: isDist || isTimed ? 0 : (overload.targetReps || 10),
+          targetWeightKg: isWeight ? overload.targetWeight : 0,
+          targetReps: isDist || isTimed ? 0 : overload.targetReps,
+          distanceKm: isDist ? 1.0 : undefined,
+          durationSeconds: isDist ? 900 : isTimed ? 45 : undefined,
           completed: false
         }
       ]
@@ -742,11 +824,28 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
           </div>
           <div style={{ borderLeft: '1px solid var(--border-subtle)', borderRight: '1px solid var(--border-subtle)' }}>
             <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
-              Volume
+              {session.totalVolumeKg > 0 ? 'Volume' : (cardioTotals.totalKm > 0 ? 'Cardio Dist' : 'Volume')}
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '0.96rem', color: 'var(--accent-cyan)', marginTop: 1 }}>
-              {displayWeight(session.totalVolumeKg)} <span style={{ fontSize: '0.62rem', fontWeight: 600 }}>{settings.unit}</span>
+              {session.totalVolumeKg > 0 ? (
+                <>
+                  {displayWeight(session.totalVolumeKg)} <span style={{ fontSize: '0.62rem', fontWeight: 600 }}>{settings.unit}</span>
+                </>
+              ) : cardioTotals.totalKm > 0 ? (
+                <>
+                  {displayDistance(cardioTotals.totalKm, settings.unit)} <span style={{ fontSize: '0.62rem', fontWeight: 600 }}>{distanceUnitLabel(settings.unit)}</span>
+                </>
+              ) : (
+                <>
+                  0 <span style={{ fontSize: '0.62rem', fontWeight: 600 }}>{settings.unit}</span>
+                </>
+              )}
             </div>
+            {session.totalVolumeKg > 0 && cardioTotals.totalKm > 0 && (
+              <div style={{ fontSize: '0.6rem', color: 'var(--accent-volt)', fontWeight: 700, marginTop: 1 }}>
+                +{displayDistance(cardioTotals.totalKm, settings.unit)} {distanceUnitLabel(settings.unit)}
+              </div>
+            )}
           </div>
           <div>
             <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
@@ -864,6 +963,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
             exMeta?.targetRepRange || [8, 12],
             historySessions
           );
+          const trackingType = ex.trackingType || getExerciseTrackingType(exMeta || ex);
           const supersetLabel = getSupersetLabel(ex.supersetGroupId, ex.supersetOrder);
 
           return (
@@ -945,14 +1045,16 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                         <Calculator size={11} /> Plates
                       </button>
                     )}
-                    <button
-                      className="timer-chip"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', color: '#FFA500' }}
-                      onClick={() => handleGenerateWarmups(exIdx)}
-                      title="Auto-generate 4-stage progressive warmup ramp"
-                    >
-                      <Flame size={12} color="#FFA500" /> Warmup Ramp
-                    </button>
+                    {trackingType === 'weight_reps' && (
+                      <button
+                        className="timer-chip"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', color: '#FFA500' }}
+                        onClick={() => handleGenerateWarmups(exIdx)}
+                        title="Auto-generate 4-stage progressive warmup ramp"
+                      >
+                        <Flame size={12} color="#FFA500" /> Warmup Ramp
+                      </button>
+                    )}
                     {/* Superset Link/Unlink Action */}
                     {(exIdx < session.exercises.length - 1 || ex.supersetGroupId) && (
                       <button
@@ -1029,13 +1131,30 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                   gap: 3
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                   <span className={`overload-badge ${overload.strategy}`}>
                     {overload.badgeText}
                   </span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>
-                    Target: {displayWeight(overload.targetWeight)} {settings.unit} × {overload.targetReps} reps
-                  </span>
+                  {trackingType === 'weight_reps' && (
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>
+                      Target: {displayWeight(overload.targetWeight)} {settings.unit} × {overload.targetReps} reps
+                    </span>
+                  )}
+                  {trackingType === 'reps_only' && (
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>
+                      Target: {overload.targetReps} reps
+                    </span>
+                  )}
+                  {trackingType === 'distance_time' && (
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>
+                      Cardio Target
+                    </span>
+                  )}
+                  {trackingType === 'time_only' && (
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>
+                      Timed Interval Target
+                    </span>
+                  )}
                 </div>
                 <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
                   {overload.explanation}
@@ -1046,7 +1165,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
               <div style={{ marginTop: 2 }}>
                 <input
                   type="text"
-                  placeholder="📝 Notes (e.g. seat height 4, pin 5, 2s pause)..."
+                  placeholder="📝 Notes (e.g. seat height 4, incline 2%, 2s pause)..."
                   value={ex.notes || ''}
                   onChange={(e) => {
                     const updated = [...session.exercises];
@@ -1062,12 +1181,35 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                 <div className="set-table-header">
                   <span>Set</span>
                   <span>Prev</span>
-                  <span>{settings.unit}</span>
-                  <span>Reps</span>
+                  {trackingType === 'weight_reps' && (
+                    <>
+                      <span>{settings.unit}</span>
+                      <span>Reps</span>
+                    </>
+                  )}
+                  {trackingType === 'distance_time' && (
+                    <>
+                      <span>Dist ({distanceUnitLabel(settings.unit)})</span>
+                      <span>Duration</span>
+                    </>
+                  )}
+                  {trackingType === 'time_only' && (
+                    <>
+                      <span>Duration</span>
+                      <span>RPE</span>
+                    </>
+                  )}
+                  {trackingType === 'reps_only' && (
+                    <>
+                      <span>Reps</span>
+                      <span>RPE</span>
+                    </>
+                  )}
                   <span></span>
                 </div>
 
                 {ex.sets.map((set, setIdx) => {
+                  const activeTiming = liveTimingKey === `${exIdx}-${setIdx}`;
                   return (
                     <React.Fragment key={set.id || setIdx}>
                       <div
@@ -1083,74 +1225,422 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                       </div>
 
                       <div className="set-previous-text">
-                        {overload.currentWeight > 0
-                          ? `${displayWeight(overload.currentWeight)}×${overload.currentReps}`
-                          : '—'}
+                        {(() => {
+                          if (trackingType === 'weight_reps') {
+                            return overload.currentWeight > 0
+                              ? `${displayWeight(overload.currentWeight)}×${overload.currentReps}`
+                              : '—';
+                          }
+                          if (trackingType === 'distance_time') {
+                            const prevD = set.previousDistanceKm || (setIdx > 0 ? ex.sets[setIdx - 1].distanceKm : undefined);
+                            const prevS = set.previousDurationSeconds || (setIdx > 0 ? ex.sets[setIdx - 1].durationSeconds : undefined);
+                            if (prevD && prevS) {
+                              return `${displayDistance(prevD, settings.unit)}${distanceUnitLabel(settings.unit)} / ${formatDuration(prevS)}`;
+                            }
+                            if (prevD) return `${displayDistance(prevD, settings.unit)}${distanceUnitLabel(settings.unit)}`;
+                            if (prevS) return formatDuration(prevS);
+                            return '—';
+                          }
+                          if (trackingType === 'time_only') {
+                            const prevS = set.previousDurationSeconds || (setIdx > 0 ? ex.sets[setIdx - 1].durationSeconds : undefined);
+                            return prevS ? formatDuration(prevS) : '—';
+                          }
+                          if (trackingType === 'reps_only') {
+                            const prevR = set.previousReps || (setIdx > 0 ? ex.sets[setIdx - 1].reps : undefined);
+                            return prevR ? `${prevR}r` : '—';
+                          }
+                          return '—';
+                        })()}
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <button
-                          type="button"
-                          className="stepper-btn"
-                          onClick={() => {
-                            const cur = displayWeight(set.weightKg);
-                            const step = settings.unit === 'lbs' ? 5 : 2.5;
-                            const next = Math.max(0, Math.round((cur - step) * 10) / 10);
-                            handleSetChange(exIdx, setIdx, 'weightKg', toStorageWeight(next));
-                            triggerHaptic('light', settings.vibrationEnabled);
-                          }}
-                          title={`- ${settings.unit === 'lbs' ? 5 : 2.5}${settings.unit}`}
-                        >
-                          -
-                        </button>
-                        <input
-                          type="number"
-                          step="0.5"
-                          className="set-input-box"
-                          style={{ minWidth: 42, padding: '8px 2px', fontSize: '0.85rem' }}
-                          value={displayWeight(set.weightKg) || ''}
-                          placeholder={String(displayWeight(overload.targetWeight))}
-                          onChange={(e) =>
-                            handleSetChange(
-                              exIdx,
-                              setIdx,
-                              'weightKg',
-                              toStorageWeight(parseFloat(e.target.value) || 0)
-                            )
-                          }
-                        />
-                        <button
-                          type="button"
-                          className="stepper-btn"
-                          onClick={() => {
-                            const cur = displayWeight(set.weightKg);
-                            const step = settings.unit === 'lbs' ? 5 : 2.5;
-                            const next = Math.round((cur + step) * 10) / 10;
-                            handleSetChange(exIdx, setIdx, 'weightKg', toStorageWeight(next));
-                            triggerHaptic('light', settings.vibrationEnabled);
-                          }}
-                          title={`+ ${settings.unit === 'lbs' ? 5 : 2.5}${settings.unit}`}
-                        >
-                          +
-                        </button>
-                      </div>
+                      {/* Mode 1: Weight & Reps */}
+                      {trackingType === 'weight_reps' && (
+                        <>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <button
+                              type="button"
+                              className="stepper-btn"
+                              onClick={() => {
+                                const cur = displayWeight(set.weightKg);
+                                const step = settings.unit === 'lbs' ? 5 : 2.5;
+                                const next = Math.max(0, Math.round((cur - step) * 10) / 10);
+                                handleSetChange(exIdx, setIdx, 'weightKg', toStorageWeight(next));
+                                triggerHaptic('light', settings.vibrationEnabled);
+                              }}
+                              title={`- ${settings.unit === 'lbs' ? 5 : 2.5}${settings.unit}`}
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              step="0.5"
+                              className="set-input-box"
+                              style={{ minWidth: 42, padding: '8px 2px', fontSize: '0.85rem' }}
+                              value={displayWeight(set.weightKg) || ''}
+                              placeholder={String(displayWeight(overload.targetWeight))}
+                              onChange={(e) =>
+                                handleSetChange(
+                                  exIdx,
+                                  setIdx,
+                                  'weightKg',
+                                  toStorageWeight(parseFloat(e.target.value) || 0)
+                                )
+                              }
+                            />
+                            <button
+                              type="button"
+                              className="stepper-btn"
+                              onClick={() => {
+                                const cur = displayWeight(set.weightKg);
+                                const step = settings.unit === 'lbs' ? 5 : 2.5;
+                                const next = Math.round((cur + step) * 10) / 10;
+                                handleSetChange(exIdx, setIdx, 'weightKg', toStorageWeight(next));
+                                triggerHaptic('light', settings.vibrationEnabled);
+                              }}
+                              title={`+ ${settings.unit === 'lbs' ? 5 : 2.5}${settings.unit}`}
+                            >
+                              +
+                            </button>
+                          </div>
 
-                      <div>
-                        <input
-                          type="number"
-                          className="set-input-box"
-                          value={set.reps || ''}
-                          placeholder={String(overload.targetReps)}
-                          onChange={(e) =>
-                            handleSetChange(
-                              exIdx,
-                              setIdx,
-                              'reps',
-                              parseInt(e.target.value, 10) || 0
-                            )
-                          }
-                        />
-                      </div>
+                          <div>
+                            <input
+                              type="number"
+                              className="set-input-box"
+                              value={set.reps || ''}
+                              placeholder={String(overload.targetReps)}
+                              onChange={(e) =>
+                                handleSetChange(
+                                  exIdx,
+                                  setIdx,
+                                  'reps',
+                                  parseInt(e.target.value, 10) || 0
+                                )
+                              }
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      {/* Mode 2: Distance & Time Cardio */}
+                      {trackingType === 'distance_time' && (
+                        <>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <button
+                              type="button"
+                              className="stepper-btn"
+                              onClick={() => {
+                                const cur = displayDistance(set.distanceKm, settings.unit);
+                                const next = Math.max(0, Math.round((cur - 0.25) * 100) / 100);
+                                handleSetChange(exIdx, setIdx, 'distanceKm', toStorageDistance(next, settings.unit));
+                                triggerHaptic('light', settings.vibrationEnabled);
+                              }}
+                              title={`- 0.25 ${distanceUnitLabel(settings.unit)}`}
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              step="0.1"
+                              className="set-input-box"
+                              style={{ minWidth: 44, padding: '8px 2px', fontSize: '0.85rem' }}
+                              value={displayDistance(set.distanceKm, settings.unit) || ''}
+                              placeholder="1.0"
+                              onChange={(e) =>
+                                handleSetChange(
+                                  exIdx,
+                                  setIdx,
+                                  'distanceKm',
+                                  toStorageDistance(parseFloat(e.target.value) || 0, settings.unit)
+                                )
+                              }
+                            />
+                            <button
+                              type="button"
+                              className="stepper-btn"
+                              onClick={() => {
+                                const cur = displayDistance(set.distanceKm, settings.unit);
+                                const next = Math.round((cur + 0.25) * 100) / 100;
+                                handleSetChange(exIdx, setIdx, 'distanceKm', toStorageDistance(next, settings.unit));
+                                triggerHaptic('light', settings.vibrationEnabled);
+                              }}
+                              title={`+ 0.25 ${distanceUnitLabel(settings.unit)}`}
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            {activeTiming ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleSetChange(exIdx, setIdx, 'durationSeconds', liveTimingSeconds);
+                                  setLiveTimingKey(null);
+                                  setLiveTimingSeconds(0);
+                                  triggerHaptic('medium', settings.vibrationEnabled);
+                                }}
+                                style={{
+                                  background: 'rgba(255, 51, 102, 0.2)',
+                                  border: '1px solid var(--accent-crimson)',
+                                  color: 'var(--accent-crimson)',
+                                  borderRadius: 'var(--radius-md)',
+                                  padding: '5px 8px',
+                                  fontSize: '0.78rem',
+                                  fontWeight: 800,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 4,
+                                  cursor: 'pointer'
+                                }}
+                                title="Stop live interval timer"
+                              >
+                                <Square size={10} fill="var(--accent-crimson)" />
+                                <span>{formatDuration(liveTimingSeconds)}</span>
+                              </button>
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  className="stepper-btn"
+                                  onClick={() => {
+                                    const cur = set.durationSeconds || 0;
+                                    const next = Math.max(0, cur - 60);
+                                    handleSetChange(exIdx, setIdx, 'durationSeconds', next);
+                                    triggerHaptic('light', settings.vibrationEnabled);
+                                  }}
+                                  title="- 1 minute"
+                                >
+                                  -
+                                </button>
+                                <input
+                                  type="number"
+                                  className="set-input-box"
+                                  style={{ minWidth: 38, padding: '8px 2px', fontSize: '0.85rem' }}
+                                  value={set.durationSeconds ? Math.round(set.durationSeconds / 60) : ''}
+                                  placeholder="15"
+                                  title="Minutes"
+                                  onChange={(e) => {
+                                    const mins = parseFloat(e.target.value) || 0;
+                                    handleSetChange(exIdx, setIdx, 'durationSeconds', Math.round(mins * 60));
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  className="stepper-btn"
+                                  onClick={() => {
+                                    const cur = set.durationSeconds || 0;
+                                    const next = cur + 60;
+                                    handleSetChange(exIdx, setIdx, 'durationSeconds', next);
+                                    triggerHaptic('light', settings.vibrationEnabled);
+                                  }}
+                                  title="+ 1 minute"
+                                >
+                                  +
+                                </button>
+                                <button
+                                  type="button"
+                                  className="stepper-btn"
+                                  style={{
+                                    background: 'rgba(0, 245, 155, 0.15)',
+                                    color: 'var(--accent-volt)',
+                                    borderColor: 'rgba(0, 245, 155, 0.4)'
+                                  }}
+                                  onClick={() => {
+                                    setLiveTimingKey(`${exIdx}-${setIdx}`);
+                                    setLiveTimingSeconds(set.durationSeconds || 0);
+                                    triggerHaptic('light', settings.vibrationEnabled);
+                                  }}
+                                  title="Start live interval stopwatch"
+                                >
+                                  <Play size={9} fill="var(--accent-volt)" />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      {/* Mode 3: Time Only (e.g. Planks, Timed Holds) */}
+                      {trackingType === 'time_only' && (
+                        <>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            {activeTiming ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleSetChange(exIdx, setIdx, 'durationSeconds', liveTimingSeconds);
+                                  setLiveTimingKey(null);
+                                  setLiveTimingSeconds(0);
+                                  triggerHaptic('medium', settings.vibrationEnabled);
+                                }}
+                                style={{
+                                  background: 'rgba(255, 51, 102, 0.2)',
+                                  border: '1px solid var(--accent-crimson)',
+                                  color: 'var(--accent-crimson)',
+                                  borderRadius: 'var(--radius-md)',
+                                  padding: '5px 8px',
+                                  fontSize: '0.78rem',
+                                  fontWeight: 800,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 4,
+                                  cursor: 'pointer'
+                                }}
+                                title="Stop live hold timer"
+                              >
+                                <Square size={10} fill="var(--accent-crimson)" />
+                                <span>{formatDuration(liveTimingSeconds)}</span>
+                              </button>
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  className="stepper-btn"
+                                  onClick={() => {
+                                    const cur = set.durationSeconds || 0;
+                                    const next = Math.max(0, cur - 5);
+                                    handleSetChange(exIdx, setIdx, 'durationSeconds', next);
+                                    triggerHaptic('light', settings.vibrationEnabled);
+                                  }}
+                                  title="- 5 seconds"
+                                >
+                                  -
+                                </button>
+                                <input
+                                  type="number"
+                                  className="set-input-box"
+                                  style={{ minWidth: 40, padding: '8px 2px', fontSize: '0.85rem' }}
+                                  value={set.durationSeconds || ''}
+                                  placeholder="45"
+                                  title="Seconds"
+                                  onChange={(e) => {
+                                    const sec = parseInt(e.target.value, 10) || 0;
+                                    handleSetChange(exIdx, setIdx, 'durationSeconds', sec);
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  className="stepper-btn"
+                                  onClick={() => {
+                                    const cur = set.durationSeconds || 0;
+                                    const next = cur + 5;
+                                    handleSetChange(exIdx, setIdx, 'durationSeconds', next);
+                                    triggerHaptic('light', settings.vibrationEnabled);
+                                  }}
+                                  title="+ 5 seconds"
+                                >
+                                  +
+                                </button>
+                                <button
+                                  type="button"
+                                  className="stepper-btn"
+                                  style={{
+                                    background: 'rgba(0, 245, 155, 0.15)',
+                                    color: 'var(--accent-volt)',
+                                    borderColor: 'rgba(0, 245, 155, 0.4)'
+                                  }}
+                                  onClick={() => {
+                                    setLiveTimingKey(`${exIdx}-${setIdx}`);
+                                    setLiveTimingSeconds(set.durationSeconds || 0);
+                                    triggerHaptic('light', settings.vibrationEnabled);
+                                  }}
+                                  title="Start live hold stopwatch"
+                                >
+                                  <Play size={9} fill="var(--accent-volt)" />
+                                </button>
+                              </>
+                            )}
+                          </div>
+
+                          <div>
+                            <input
+                              type="number"
+                              step="0.5"
+                              className="set-input-box"
+                              value={set.rpe || ''}
+                              placeholder="8.0"
+                              title="RPE (Effort 1-10)"
+                              onChange={(e) =>
+                                handleSetChange(
+                                  exIdx,
+                                  setIdx,
+                                  'rpe',
+                                  parseFloat(e.target.value) || 0
+                                )
+                              }
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      {/* Mode 4: Reps Only (Burpees, Star Jumps) */}
+                      {trackingType === 'reps_only' && (
+                        <>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <button
+                              type="button"
+                              className="stepper-btn"
+                              onClick={() => {
+                                const cur = set.reps || 0;
+                                const next = Math.max(0, cur - 1);
+                                handleSetChange(exIdx, setIdx, 'reps', next);
+                                triggerHaptic('light', settings.vibrationEnabled);
+                              }}
+                              title="- 1 rep"
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              className="set-input-box"
+                              style={{ minWidth: 42, padding: '8px 2px', fontSize: '0.85rem' }}
+                              value={set.reps || ''}
+                              placeholder={String(overload.targetReps || 15)}
+                              onChange={(e) =>
+                                handleSetChange(
+                                  exIdx,
+                                  setIdx,
+                                  'reps',
+                                  parseInt(e.target.value, 10) || 0
+                                )
+                              }
+                            />
+                            <button
+                              type="button"
+                              className="stepper-btn"
+                              onClick={() => {
+                                const cur = set.reps || 0;
+                                const next = cur + 1;
+                                handleSetChange(exIdx, setIdx, 'reps', next);
+                                triggerHaptic('light', settings.vibrationEnabled);
+                              }}
+                              title="+ 1 rep"
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          <div>
+                            <input
+                              type="number"
+                              step="0.5"
+                              className="set-input-box"
+                              value={set.rpe || ''}
+                              placeholder="8.5"
+                              title="RPE (Effort 1-10)"
+                              onChange={(e) =>
+                                handleSetChange(
+                                  exIdx,
+                                  setIdx,
+                                  'rpe',
+                                  parseFloat(e.target.value) || 0
+                                )
+                              }
+                            />
+                          </div>
+                        </>
+                      )}
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                         <button
@@ -1162,8 +1652,8 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                       </div>
                     </div>
 
-                    {/* Smart Drop Set Auto-Calculate Chips */}
-                    {set.type === 'drop' && !set.completed && (
+                    {/* Smart Drop Set Auto-Calculate Chips (only for weightlifting) */}
+                    {trackingType === 'weight_reps' && set.type === 'drop' && !set.completed && (
                       <div className="drop-quick-calc-row">
                         <span className="drop-quick-label">⚡ Quick Drop:</span>
                         <button

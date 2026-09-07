@@ -10,6 +10,7 @@ import type {
 import { StorageService } from './db/storage';
 import { calculateMuscleRecovery, calculateProgressiveOverload } from './engine/overloadEngine';
 import { calculateSessionTotalCalories } from './engine/calorieEngine';
+import { getExerciseTrackingType } from './utils/trackingTypeUtils';
 import { EXERCISE_LIBRARY } from './data/exerciseLibrary';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
@@ -83,21 +84,29 @@ export function App() {
         workouts
       );
 
+      const trackingType = template.trackingType || getExerciseTrackingType(exMeta);
+      const isWeight = trackingType === 'weight_reps';
+      const isCardioDist = trackingType === 'distance_time';
+      const isTimed = trackingType === 'time_only';
+
       return {
         id: `we-${Date.now()}-${idx}`,
         exerciseId: exMeta?.id || template.exerciseId,
         name: exMeta?.name || template.exerciseId.replace(/^db-/, 'Dumbbell ').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
         muscleGroup: exMeta?.muscleGroup || 'Chest',
         equipment: exMeta?.equipment || 'Barbell',
+        trackingType,
         restSeconds: template.restSeconds,
         sets: Array.from({ length: template.defaultSets }).map((_, sIdx) => ({
           id: `set-${Date.now()}-${idx}-${sIdx + 1}`,
           setNumber: sIdx + 1,
-          type: sIdx === 0 ? 'working' : 'working',
-          weightKg: overload.currentWeight > 0 ? overload.targetWeight : (template.defaultWeightKg || overload.targetWeight || 20),
-          reps: overload.targetReps || template.targetRepRange[0],
-          targetWeightKg: overload.currentWeight > 0 ? overload.targetWeight : (template.defaultWeightKg || overload.targetWeight),
-          targetReps: overload.targetReps || template.targetRepRange[0],
+          type: 'working',
+          weightKg: isWeight ? (overload.currentWeight > 0 ? overload.targetWeight : (template.defaultWeightKg || overload.targetWeight || 20)) : 0,
+          reps: isCardioDist || isTimed ? 0 : (overload.targetReps || template.targetRepRange[0] || 10),
+          targetWeightKg: isWeight ? (overload.currentWeight > 0 ? overload.targetWeight : (template.defaultWeightKg || overload.targetWeight)) : 0,
+          targetReps: isCardioDist || isTimed ? 0 : (overload.targetReps || template.targetRepRange[0] || 10),
+          distanceKm: isCardioDist ? (template.defaultDistanceKm || 1.0) : undefined,
+          durationSeconds: isCardioDist ? (template.defaultDurationSeconds || 900) : isTimed ? (template.defaultDurationSeconds || 45) : undefined,
           completed: false
         }))
       };

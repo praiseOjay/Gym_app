@@ -93,6 +93,12 @@ export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
     setFeedbackSaved(true);
   };
 
+  const totalDistanceKm = useMemo(() => {
+    return session.exercises.reduce((sum, ex) => {
+      return sum + ex.sets.filter((s) => s.completed).reduce((sSum, s) => sSum + (s.distanceKm || 0), 0);
+    }, 0);
+  }, [session]);
+
   const displayVolume =
     settings.unit === 'lbs'
       ? `${kgToLbs(session.totalVolumeKg)} lbs`
@@ -157,10 +163,14 @@ export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              Volume
+              {totalDistanceKm > 0 && session.totalVolumeKg === 0 ? 'Distance' : totalDistanceKm > 0 ? 'Vol / Dist' : 'Volume'}
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: 'var(--accent-volt)' }}>
-              {displayVolume}
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: totalDistanceKm > 0 && session.totalVolumeKg > 0 ? '0.82rem' : '1rem', color: 'var(--accent-volt)' }}>
+              {totalDistanceKm > 0 && session.totalVolumeKg === 0
+                ? `${totalDistanceKm.toFixed(1)} km`
+                : totalDistanceKm > 0
+                ? `${displayVolume} · ${totalDistanceKm.toFixed(1)}k`
+                : displayVolume}
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>

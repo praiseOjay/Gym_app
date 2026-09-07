@@ -2,6 +2,13 @@ import React, { useState, useMemo } from 'react';
 import type { WorkoutSession, UserSettings } from '../types/gym';
 import { kgToLbs } from '../engine/overloadEngine';
 import {
+  getExerciseTrackingType,
+  displayDistance,
+  distanceUnitLabel,
+  formatDuration,
+  displayWeight
+} from '../utils/trackingTypeUtils';
+import {
   ChevronLeft,
   ChevronRight,
   Flame,
@@ -503,26 +510,45 @@ export const WorkoutCalendar: React.FC<WorkoutCalendarProps> = ({
                         </span>
                       )}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 2 }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <Clock size={12} />
-                        {Math.round(session.durationSeconds / 60)} min
-                      </span>
-                      <span>·</span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'var(--accent-volt)', fontWeight: 700 }}>
-                        <Dumbbell size={12} />
-                        {displayVolume(session.totalVolumeKg)}
-                      </span>
-                      {session.caloriesBurned ? (
-                        <>
-                          <span>·</span>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: '#FF7A00', fontWeight: 700 }}>
-                            <Flame size={12} color="#FF7A00" fill="#FF7A00" />
-                            {session.caloriesBurned} kcal
+                    {(() => {
+                      const sessionDistance = session.exercises.reduce((sum, ex) => {
+                        return sum + ex.sets.filter((s) => s.completed).reduce((sSum, s) => sSum + (s.distanceKm || 0), 0);
+                      }, 0);
+                      return (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                            <Clock size={12} />
+                            {Math.round(session.durationSeconds / 60)} min
                           </span>
-                        </>
-                      ) : null}
-                    </div>
+                          {session.totalVolumeKg > 0 && (
+                            <>
+                              <span>·</span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'var(--accent-volt)', fontWeight: 700 }}>
+                                <Dumbbell size={12} />
+                                {displayVolume(session.totalVolumeKg)}
+                              </span>
+                            </>
+                          )}
+                          {sessionDistance > 0 && (
+                            <>
+                              <span>·</span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'var(--accent-cyan)', fontWeight: 700 }}>
+                                {displayDistance(sessionDistance, settings.unit)} {distanceUnitLabel(settings.unit)}
+                              </span>
+                            </>
+                          )}
+                          {session.caloriesBurned ? (
+                            <>
+                              <span>·</span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: '#FF7A00', fontWeight: 700 }}>
+                                <Flame size={12} color="#FF7A00" fill="#FF7A00" />
+                                {session.caloriesBurned} kcal
+                              </span>
+                            </>
+                          ) : null}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {session.prCount > 0 && (
@@ -535,26 +561,46 @@ export const WorkoutCalendar: React.FC<WorkoutCalendarProps> = ({
 
                 {/* Exercises list */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 2 }}>
-                  {session.exercises.map((ex, exI) => (
-                    <div
-                      key={exI}
-                      style={{
-                        fontSize: '0.75rem',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        padding: '4px 6px',
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        borderRadius: 'var(--radius-sm)'
-                      }}
-                    >
-                      <span style={{ color: '#fff', fontWeight: 600 }}>
-                        {ex.name}
-                      </span>
-                      <span style={{ color: 'var(--accent-volt)', fontFamily: 'var(--font-mono)' }}>
-                        {ex.sets.filter((s) => s.completed).length} sets · {Math.max(...ex.sets.map((s) => s.weightKg))}kg max
-                      </span>
-                    </div>
-                  ))}
+                  {session.exercises.map((ex, exI) => {
+                    const tType = getExerciseTrackingType(ex, ex.trackingType);
+                    const completedSets = ex.sets.filter((s) => s.completed);
+                    const count = completedSets.length;
+                    let statSummary = '';
+                    if (tType === 'distance_time') {
+                      const totalDist = completedSets.reduce((sum, s) => sum + (s.distanceKm || 0), 0);
+                      statSummary = `${count} sets · ${displayDistance(totalDist, settings.unit)} ${distanceUnitLabel(settings.unit)}`;
+                    } else if (tType === 'time_only') {
+                      const totalSecs = completedSets.reduce((sum, s) => sum + (s.durationSeconds || 0), 0);
+                      statSummary = `${count} sets · ${formatDuration(totalSecs)}`;
+                    } else if (tType === 'reps_only') {
+                      const totalReps = completedSets.reduce((sum, s) => sum + (s.reps || 0), 0);
+                      statSummary = `${count} sets · ${totalReps} reps`;
+                    } else {
+                      const maxW = Math.max(...ex.sets.map((s) => s.weightKg), 0);
+                      statSummary = `${count} sets · ${displayWeight(maxW, settings.unit)} ${settings.unit} max`;
+                    }
+
+                    return (
+                      <div
+                        key={exI}
+                        style={{
+                          fontSize: '0.75rem',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: '4px 6px',
+                          background: 'rgba(255, 255, 255, 0.03)',
+                          borderRadius: 'var(--radius-sm)'
+                        }}
+                      >
+                        <span style={{ color: '#fff', fontWeight: 600 }}>
+                          {ex.name}
+                        </span>
+                        <span style={{ color: 'var(--accent-volt)', fontFamily: 'var(--font-mono)' }}>
+                          {statSummary}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {session.notes && (
