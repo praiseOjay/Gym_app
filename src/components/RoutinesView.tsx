@@ -42,7 +42,9 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
   const [showAddExercisePicker, setShowAddExercisePicker] = useState(false);
   const [exerciseFilterMuscle, setExerciseFilterMuscle] = useState<string>('All');
+  const [exerciseFilterEquipment, setExerciseFilterEquipment] = useState<string>('All Equipment');
   const [exerciseSearch, setExerciseSearch] = useState<string>('');
+  const [exerciseDisplayLimit, setExerciseDisplayLimit] = useState<number>(60);
 
   // Keep active selection valid
   const currentRoutine =
@@ -55,17 +57,34 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
 
   const filteredExercises = useMemo(() => {
     const q = exerciseSearch.toLowerCase().trim();
+    const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+
     return EXERCISE_LIBRARY.filter((e) => {
-      const matchMuscle = exerciseFilterMuscle === 'All' || e.muscleGroup === exerciseFilterMuscle;
+      const matchMuscle =
+        exerciseFilterMuscle === 'All' ||
+        e.muscleGroup === exerciseFilterMuscle;
       if (!matchMuscle) return false;
-      if (!q) return true;
-      return (
-        e.name.toLowerCase().includes(q) ||
-        e.equipment.toLowerCase().includes(q) ||
-        e.id.toLowerCase().includes(q)
+
+      const matchEquipment =
+        exerciseFilterEquipment === 'All Equipment' ||
+        e.equipment.toLowerCase() === exerciseFilterEquipment.toLowerCase() ||
+        (exerciseFilterEquipment === 'Machine' &&
+          (e.equipment === 'Machine' || e.name.toLowerCase().includes('lever') || e.equipment === 'Smith Machine'));
+      if (!matchEquipment) return false;
+
+      if (tokens.length === 0) return true;
+
+      return tokens.every(
+        (token) =>
+          e.name.toLowerCase().includes(token) ||
+          e.equipment.toLowerCase().includes(token) ||
+          e.muscleGroup.toLowerCase().includes(token) ||
+          (e.secondaryMuscles && e.secondaryMuscles.some((m) => m.toLowerCase().includes(token))) ||
+          e.category.toLowerCase().includes(token) ||
+          e.id.toLowerCase().includes(token)
       );
     });
-  }, [exerciseFilterMuscle, exerciseSearch]);
+  }, [exerciseFilterMuscle, exerciseFilterEquipment, exerciseSearch]);
 
   const getExerciseMeta = (id: string): Exercise | undefined => {
     if (!id) return undefined;
@@ -100,17 +119,43 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
       return;
     }
 
-    const existingIndex = routines.findIndex((r) => r.id === editingRoutine.id);
+    // Sanitize exercise templates so all numbers are properly parsed and valid
+    const sanitizedExercises = editingRoutine.exercises.map((e) => ({
+      ...e,
+      defaultSets: Math.max(1, parseInt(String(e.defaultSets), 10) || 3),
+      targetRepRange: [
+        Math.max(1, parseInt(String(e.targetRepRange[0]), 10) || 8),
+        Math.max(1, parseInt(String(e.targetRepRange[1]), 10) || 12)
+      ] as [number, number],
+      defaultWeightKg: e.defaultWeightKg !== undefined && e.defaultWeightKg !== ('' as any)
+        ? Math.max(0, parseFloat(String(e.defaultWeightKg)) || 0)
+        : 0,
+      targetRpe: e.targetRpe ? parseFloat(String(e.targetRpe)) || 8.5 : 8.5,
+      restSeconds: Math.max(0, parseInt(String(e.restSeconds), 10) || 60),
+      defaultDistanceKm: e.defaultDistanceKm !== undefined && e.defaultDistanceKm !== ('' as any)
+        ? Math.max(0, parseFloat(String(e.defaultDistanceKm)) || 0)
+        : undefined,
+      defaultDurationSeconds: e.defaultDurationSeconds !== undefined && e.defaultDurationSeconds !== ('' as any)
+        ? Math.max(0, parseInt(String(e.defaultDurationSeconds), 10) || 0)
+        : undefined
+    }));
+
+    const sanitizedRoutine: Routine = {
+      ...editingRoutine,
+      exercises: sanitizedExercises
+    };
+
+    const existingIndex = routines.findIndex((r) => r.id === sanitizedRoutine.id);
     let updated: Routine[];
     if (existingIndex >= 0) {
-      updated = routines.map((r) => (r.id === editingRoutine.id ? editingRoutine : r));
+      updated = routines.map((r) => (r.id === sanitizedRoutine.id ? sanitizedRoutine : r));
     } else {
-      updated = [...routines, editingRoutine];
-      setSelectedRoutineId(editingRoutine.id);
+      updated = [...routines, sanitizedRoutine];
+      setSelectedRoutineId(sanitizedRoutine.id);
     }
 
     onUpdateRoutines(updated);
-    preloadRoutineGifs(editingRoutine).catch(() => {});
+    preloadRoutineGifs(sanitizedRoutine).catch(() => {});
     setEditingRoutine(null);
     sounds.playSetComplete();
     triggerHaptic('success');
@@ -803,12 +848,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                           <input
                             type="number"
                             className="set-input-box"
-                            value={template.defaultSets}
+                            value={template.defaultSets !== undefined && (template.defaultSets as any) !== '' ? template.defaultSets : ''}
+                            placeholder="3"
+                            onFocus={(e) => e.target.select()}
                             onChange={(e) => {
-                              const val = parseInt(e.target.value, 10) || 1;
+                              const raw = e.target.value;
+                              const val = raw === '' ? ('' as unknown as number) : (parseInt(raw, 10) || 0);
                               const updated = [...editingRoutine.exercises];
                               updated[idx].defaultSets = val;
                               setEditingRoutine({ ...editingRoutine, exercises: updated });
+                            }}
+                            onBlur={() => {
+                              if (!template.defaultSets || (template.defaultSets as any) < 1) {
+                                const updated = [...editingRoutine.exercises];
+                                updated[idx].defaultSets = 3;
+                                setEditingRoutine({ ...editingRoutine, exercises: updated });
+                              }
                             }}
                           />
                         </div>
@@ -821,12 +876,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                                 type="number"
                                 step="0.1"
                                 className="set-input-box"
-                                value={template.defaultDistanceKm ?? 3.0}
+                                value={template.defaultDistanceKm !== undefined && (template.defaultDistanceKm as any) !== '' ? template.defaultDistanceKm : ''}
+                                placeholder="3.0"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseFloat(e.target.value) || 0;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseFloat(raw) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].defaultDistanceKm = val;
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (template.defaultDistanceKm === ('' as any) || (template.defaultDistanceKm as any) <= 0) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].defaultDistanceKm = 3.0;
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -835,12 +900,26 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                               <input
                                 type="number"
                                 className="set-input-box"
-                                value={Math.round((template.defaultDurationSeconds ?? 1200) / 60)}
+                                value={template.defaultDurationSeconds !== undefined && template.defaultDurationSeconds !== null && (template.defaultDurationSeconds as any) !== '' ? Math.round(template.defaultDurationSeconds / 60) : ''}
+                                placeholder="20"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const mins = parseInt(e.target.value, 10) || 0;
+                                  const raw = e.target.value;
                                   const updated = [...editingRoutine.exercises];
-                                  updated[idx].defaultDurationSeconds = mins * 60;
+                                  if (raw === '') {
+                                    updated[idx].defaultDurationSeconds = '' as unknown as number;
+                                  } else {
+                                    const mins = parseFloat(raw) || 0;
+                                    updated[idx].defaultDurationSeconds = Math.round(mins * 60);
+                                  }
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (!template.defaultDurationSeconds || (template.defaultDurationSeconds as any) <= 0) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].defaultDurationSeconds = 1200;
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -850,12 +929,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                                 type="number"
                                 step="15"
                                 className="set-input-box"
-                                value={template.restSeconds}
+                                value={template.restSeconds !== undefined && (template.restSeconds as any) !== '' ? template.restSeconds : ''}
+                                placeholder="60"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseInt(e.target.value, 10) || 60;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseInt(raw, 10) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].restSeconds = val;
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (template.restSeconds === ('' as any) || (template.restSeconds as any) < 0) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].restSeconds = 60;
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -868,12 +957,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                                 type="number"
                                 step="5"
                                 className="set-input-box"
-                                value={template.defaultDurationSeconds ?? 60}
+                                value={template.defaultDurationSeconds !== undefined && (template.defaultDurationSeconds as any) !== '' ? template.defaultDurationSeconds : ''}
+                                placeholder="60"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseInt(e.target.value, 10) || 30;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseInt(raw, 10) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].defaultDurationSeconds = val;
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (!template.defaultDurationSeconds || (template.defaultDurationSeconds as any) <= 0) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].defaultDurationSeconds = 60;
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -883,13 +982,24 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                                 type="number"
                                 min="1"
                                 max="10"
+                                step="0.5"
                                 className="set-input-box"
-                                value={template.targetRpe}
+                                value={template.targetRpe !== undefined && (template.targetRpe as any) !== '' ? template.targetRpe : ''}
+                                placeholder="8.5"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseInt(e.target.value, 10) || 8;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseFloat(raw) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].targetRpe = val;
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (!template.targetRpe || (template.targetRpe as any) < 1) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].targetRpe = 8.5;
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -899,12 +1009,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                                 type="number"
                                 step="15"
                                 className="set-input-box"
-                                value={template.restSeconds}
+                                value={template.restSeconds !== undefined && (template.restSeconds as any) !== '' ? template.restSeconds : ''}
+                                placeholder="60"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseInt(e.target.value, 10) || 60;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseInt(raw, 10) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].restSeconds = val;
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (template.restSeconds === ('' as any) || (template.restSeconds as any) < 0) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].restSeconds = 60;
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -916,12 +1036,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                               <input
                                 type="number"
                                 className="set-input-box"
-                                value={template.targetRepRange[0]}
+                                value={template.targetRepRange[0] !== undefined && (template.targetRepRange[0] as any) !== '' ? template.targetRepRange[0] : ''}
+                                placeholder="8"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseInt(e.target.value, 10) || 5;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseInt(raw, 10) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].targetRepRange = [val, updated[idx].targetRepRange[1]];
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (!template.targetRepRange[0] || (template.targetRepRange[0] as any) < 1) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].targetRepRange = [8, updated[idx].targetRepRange[1] || 12];
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -930,12 +1060,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                               <input
                                 type="number"
                                 className="set-input-box"
-                                value={template.targetRepRange[1]}
+                                value={template.targetRepRange[1] !== undefined && (template.targetRepRange[1] as any) !== '' ? template.targetRepRange[1] : ''}
+                                placeholder="12"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseInt(e.target.value, 10) || 12;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseInt(raw, 10) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].targetRepRange = [updated[idx].targetRepRange[0], val];
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (!template.targetRepRange[1] || (template.targetRepRange[1] as any) < 1) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].targetRepRange = [updated[idx].targetRepRange[0] || 8, 12];
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -945,12 +1085,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                                 type="number"
                                 step="15"
                                 className="set-input-box"
-                                value={template.restSeconds}
+                                value={template.restSeconds !== undefined && (template.restSeconds as any) !== '' ? template.restSeconds : ''}
+                                placeholder="60"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseInt(e.target.value, 10) || 60;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseInt(raw, 10) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].restSeconds = val;
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (template.restSeconds === ('' as any) || (template.restSeconds as any) < 0) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].restSeconds = 60;
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -962,12 +1112,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                               <input
                                 type="number"
                                 className="set-input-box"
-                                value={template.targetRepRange[0]}
+                                value={template.targetRepRange[0] !== undefined && (template.targetRepRange[0] as any) !== '' ? template.targetRepRange[0] : ''}
+                                placeholder="8"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseInt(e.target.value, 10) || 6;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseInt(raw, 10) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].targetRepRange = [val, updated[idx].targetRepRange[1]];
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (!template.targetRepRange[0] || (template.targetRepRange[0] as any) < 1) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].targetRepRange = [8, updated[idx].targetRepRange[1] || 12];
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -977,12 +1137,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                               <input
                                 type="number"
                                 className="set-input-box"
-                                value={template.targetRepRange[1]}
+                                value={template.targetRepRange[1] !== undefined && (template.targetRepRange[1] as any) !== '' ? template.targetRepRange[1] : ''}
+                                placeholder="12"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseInt(e.target.value, 10) || 12;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseInt(raw, 10) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].targetRepRange = [updated[idx].targetRepRange[0], val];
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (!template.targetRepRange[1] || (template.targetRepRange[1] as any) < 1) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].targetRepRange = [updated[idx].targetRepRange[0] || 8, 12];
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -991,13 +1161,24 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                               <span style={{ color: 'var(--text-muted)' }}>Weight (kg)</span>
                               <input
                                 type="number"
+                                step="0.5"
                                 className="set-input-box"
-                                value={template.defaultWeightKg ?? 20}
+                                value={template.defaultWeightKg !== undefined && template.defaultWeightKg !== null && (template.defaultWeightKg as any) !== '' ? template.defaultWeightKg : ''}
+                                placeholder="20"
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = parseFloat(e.target.value) || 0;
+                                  const raw = e.target.value;
+                                  const val = raw === '' ? ('' as unknown as number) : (parseFloat(raw) || 0);
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].defaultWeightKg = val;
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                }}
+                                onBlur={() => {
+                                  if (template.defaultWeightKg === ('' as any)) {
+                                    const updated = [...editingRoutine.exercises];
+                                    updated[idx].defaultWeightKg = 0;
+                                    setEditingRoutine({ ...editingRoutine, exercises: updated });
+                                  }
                                 }}
                               />
                             </div>
@@ -1099,8 +1280,8 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
             </div>
 
             {/* Muscle Filter Tabs */}
-            <div className="quick-prompts-row" style={{ marginBottom: 10 }}>
-              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Glutes', 'Biceps', 'Triceps', 'Calves', 'Forearms', 'Abs', 'Cardio'].map(
+            <div className="quick-prompts-row" style={{ marginBottom: 6 }}>
+              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Glutes', 'Biceps', 'Triceps', 'Calves', 'Forearms', 'Traps', 'Abs', 'Cardio'].map(
                 (m) => (
                   <button
                     key={m}
@@ -1108,9 +1289,14 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                     style={{
                       background: exerciseFilterMuscle === m ? 'var(--accent-volt)' : undefined,
                       color: exerciseFilterMuscle === m ? '#050D0A' : undefined,
-                      fontWeight: exerciseFilterMuscle === m ? 800 : undefined
+                      fontWeight: exerciseFilterMuscle === m ? 800 : undefined,
+                      fontSize: '0.72rem',
+                      padding: '4px 10px'
                     }}
-                    onClick={() => setExerciseFilterMuscle(m)}
+                    onClick={() => {
+                      setExerciseFilterMuscle(m);
+                      setExerciseDisplayLimit(60);
+                    }}
                   >
                     {m}
                   </button>
@@ -1118,13 +1304,46 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
               )}
             </div>
 
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 8 }}>
-              Showing {Math.min(filteredExercises.length, 60)} of {filteredExercises.length} exercises
+            {/* Equipment Filter Chips */}
+            <div className="quick-prompts-row" style={{ marginBottom: 10 }}>
+              {['All Equipment', 'Machine', 'Dumbbell', 'Barbell', 'Cable', 'Smith Machine', 'Bodyweight'].map(
+                (eq) => (
+                  <button
+                    key={eq}
+                    className="timer-chip"
+                    style={{
+                      background: exerciseFilterEquipment === eq ? 'rgba(0, 229, 255, 0.2)' : undefined,
+                      borderColor: exerciseFilterEquipment === eq ? 'var(--accent-cyan)' : undefined,
+                      color: exerciseFilterEquipment === eq ? '#fff' : 'var(--text-muted)',
+                      fontWeight: exerciseFilterEquipment === eq ? 700 : 500,
+                      fontSize: '0.7rem',
+                      padding: '3px 8px'
+                    }}
+                    onClick={() => {
+                      setExerciseFilterEquipment(eq);
+                      setExerciseDisplayLimit(60);
+                    }}
+                  >
+                    {eq}
+                  </button>
+                )
+              )}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                Showing {Math.min(filteredExercises.length, exerciseDisplayLimit)} of {filteredExercises.length} exercises
+              </div>
+              {exerciseFilterEquipment !== 'All Equipment' && (
+                <span style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontWeight: 600 }}>
+                  Filtered by {exerciseFilterEquipment}
+                </span>
+              )}
             </div>
 
             {/* Exercises List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 380, overflowY: 'auto' }}>
-              {filteredExercises.slice(0, 60).map((ex) => (
+              {filteredExercises.slice(0, exerciseDisplayLimit).map((ex) => (
                 <div
                   key={ex.id}
                   style={{
@@ -1139,19 +1358,49 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                   }}
                   onClick={() => handleAddExerciseToEditor(ex)}
                 >
-                  <div>
+                  <div style={{ flex: 1, paddingRight: 8 }}>
                     <div style={{ fontWeight: 800, fontSize: '0.92rem' }}>{ex.name}</div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-                      {ex.muscleGroup} · {ex.equipment} · {ex.targetRepRange[0]}-{ex.targetRepRange[1]} reps
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+                      <span style={{ color: 'var(--accent-volt)', fontWeight: 600 }}>{ex.muscleGroup}</span>
+                      <span>·</span>
+                      <span>{ex.equipment}</span>
+                      <span>·</span>
+                      <span>{ex.category}</span>
+                      <span>·</span>
+                      <span>{ex.targetRepRange[0]}-{ex.targetRepRange[1]} reps</span>
+                      {ex.secondaryMuscles && ex.secondaryMuscles.length > 0 && (
+                        <>
+                          <span>·</span>
+                          <span style={{ color: 'var(--text-muted)' }}>+ {ex.secondaryMuscles.join(', ')}</span>
+                        </>
+                      )}
                     </div>
                   </div>
-                  <Plus size={18} color="var(--accent-volt)" />
+                  <Plus size={18} color="var(--accent-volt)" style={{ flexShrink: 0 }} />
                 </div>
               ))}
               {filteredExercises.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '24px 12px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                   No exercises found matching "{exerciseSearch}". Try another search term or filter.
                 </div>
+              )}
+              {filteredExercises.length > exerciseDisplayLimit && (
+                <button
+                  className="btn-secondary"
+                  style={{
+                    width: '100%',
+                    padding: '9px',
+                    fontSize: '0.8rem',
+                    color: 'var(--accent-volt)',
+                    border: '1px dashed rgba(0, 245, 155, 0.3)',
+                    borderRadius: 'var(--radius-md)',
+                    marginTop: 6,
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setExerciseDisplayLimit((prev) => prev + 60)}
+                >
+                  Load More ({filteredExercises.length - exerciseDisplayLimit} remaining)
+                </button>
               )}
             </div>
           </div>

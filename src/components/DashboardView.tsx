@@ -33,6 +33,7 @@ interface DashboardViewProps {
   prs: PRRecord[];
   settings: UserSettings;
   mesocycleBlock: MesocycleBlock;
+  activeSession?: WorkoutSession | null;
   onStartRoutine: (routine: Routine) => void;
   onNavigateTab: (tab: any) => void;
   onUpdateMesocycle: (updated: MesocycleBlock) => void;
@@ -45,6 +46,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   prs,
   settings,
   mesocycleBlock,
+  activeSession,
   onStartRoutine,
   onNavigateTab,
   onUpdateMesocycle
@@ -84,6 +86,47 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
     return `${kg} kg`;
   };
+
+  // Dynamic Readiness Calculation based on active check-in, recent check-in, or biomechanical recovery
+  const readinessMetric = useMemo(() => {
+    // 1. If currently in an active workout and readiness was checked, use it directly
+    if (activeSession?.readiness) {
+      const r = activeSession.readiness;
+      const score = Math.round(r.readinessScore);
+      const label = r.status === 'optimal' ? 'Optimal' : r.status === 'moderate' ? 'Moderate' : 'Fatigued';
+      const color = r.status === 'optimal' ? 'var(--accent-volt)' : r.status === 'moderate' ? 'var(--accent-cyan)' : 'var(--accent-amber)';
+      return { score, label, color };
+    }
+
+    // 2. Check the most recent completed session in history if it happened within 24h
+    const latestWithReadiness = historySessions
+      .filter((s) => s.readiness && s.date)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+
+    if (latestWithReadiness && latestWithReadiness.readiness) {
+      const hoursAgo = (Date.now() - new Date(latestWithReadiness.date).getTime()) / (1000 * 60 * 60);
+      if (hoursAgo <= 24) {
+        const r = latestWithReadiness.readiness;
+        const score = Math.round(r.readinessScore);
+        const label = r.status === 'optimal' ? 'Optimal' : r.status === 'moderate' ? 'Moderate' : 'Fatigued';
+        const color = r.status === 'optimal' ? 'var(--accent-volt)' : r.status === 'moderate' ? 'var(--accent-cyan)' : 'var(--accent-amber)';
+        return { score, label, color };
+      }
+    }
+
+    // 3. Dynamic Biomechanical Recovery from all muscle groups
+    if (recoveryStates && recoveryStates.length > 0) {
+      const avgRecovery = Math.round(
+        recoveryStates.reduce((acc, m) => acc + m.recoveryPercentage, 0) / recoveryStates.length
+      );
+      const score = Math.max(20, Math.min(100, avgRecovery));
+      const label = score >= 85 ? 'Optimal' : score >= 65 ? 'Moderate' : 'Fatigued';
+      const color = score >= 85 ? 'var(--accent-volt)' : score >= 65 ? 'var(--accent-cyan)' : 'var(--accent-amber)';
+      return { score, label, color };
+    }
+
+    return { score: 100, label: 'Optimal', color: 'var(--accent-volt)' };
+  }, [activeSession, historySessions, recoveryStates]);
 
   const handleFetchPrimer = async () => {
     if (!nextRoutine || loadingPrimer) return;
@@ -191,8 +234,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Readiness
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: 'var(--accent-volt)' }}>
-              96% Optimal
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: readinessMetric.color }}>
+              {readinessMetric.score}% {readinessMetric.label}
             </div>
           </div>
         </div>

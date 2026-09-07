@@ -97,6 +97,7 @@ export interface WorkoutSession {
   routineName: string;
   dayTag?: string;
   date: string; // ISO date string
+  startTime?: number; // Milliseconds epoch timestamp when workout started
   durationSeconds: number;
   exercises: WorkoutExercise[];
   totalVolumeKg: number;
@@ -105,6 +106,9 @@ export interface WorkoutSession {
   mesocycleWeek?: number;
   isDeload?: boolean;
   notes?: string;
+  readiness?: WorkoutReadiness;
+  readinessChecked?: boolean;
+  restTimer?: { endsAt: number; totalSeconds: number } | null;
   aiDebrief?: {
     summary: string;
     highlights: string[];

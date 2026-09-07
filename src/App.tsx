@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type {
   WorkoutSession,
   Routine,
@@ -22,8 +22,58 @@ import { AnalyticsView } from './components/AnalyticsView';
 import { AICoachView } from './components/AICoachView';
 import { WorkoutSummaryModal } from './components/WorkoutSummaryModal';
 import { SettingsModal } from './components/SettingsModal';
+import { RestTimerFloating } from './components/RestTimerFloating';
 import { getTodayWorkoutState } from './utils/dateUtils';
 import { Dumbbell, Play, CheckCircle2 } from 'lucide-react';
+const ActiveWorkoutBanner: React.FC<{
+  session: WorkoutSession;
+  onResume: () => void;
+}> = ({ session, onResume }) => {
+  const [elapsed, setElapsed] = useState(() => {
+    const startMs = session.startTime || (session.date ? new Date(session.date).getTime() : 0);
+    return startMs ? Math.max(0, Math.floor((Date.now() - startMs) / 1000)) : session.durationSeconds || 0;
+  });
+
+  useEffect(() => {
+    const updateElapsed = () => {
+      const startMs = session.startTime || (session.date ? new Date(session.date).getTime() : 0);
+      if (startMs) {
+        setElapsed(Math.max(0, Math.floor((Date.now() - startMs) / 1000)));
+      }
+    };
+    updateElapsed();
+    const timer = setInterval(updateElapsed, 1000);
+    return () => clearInterval(timer);
+  }, [session.startTime, session.date]);
+
+  const setsLogged = session.exercises.reduce(
+    (c, e) => c + e.sets.filter((s) => s.completed).length,
+    0
+  );
+
+  const formatTimer = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  return (
+    <div className="active-session-banner" onClick={onResume}>
+      <div className="banner-left">
+        <div className="banner-pulse-dot" />
+        <div>
+          <div className="banner-title">{session.routineName}</div>
+          <div className="banner-meta">
+            {setsLogged} sets logged · ⏱️ {formatTimer(elapsed)} · Tap to resume
+          </div>
+        </div>
+      </div>
+      <button className="btn-primary" style={{ padding: '6px 14px', fontSize: '0.78rem' }}>
+        Resume
+      </button>
+    </div>
+  );
+};
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
@@ -35,6 +85,7 @@ export function App() {
   const [activeSession, setActiveSession] = useState<WorkoutSession | null>(() => {
     const raw = StorageService.getActiveWorkout();
     if (!raw) return null;
+    const startTime = raw.startTime || (raw.date ? new Date(raw.date).getTime() : Date.now());
     const sanitizedExercises = raw.exercises.map((ex) => {
       const meta = EXERCISE_LIBRARY.find(
         (e) => e.id.toLowerCase() === ex.exerciseId.toLowerCase() || e.name.toLowerCase() === ex.name.toLowerCase()
@@ -49,7 +100,7 @@ export function App() {
       }
       return ex;
     });
-    return { ...raw, exercises: sanitizedExercises };
+    return { ...raw, startTime, exercises: sanitizedExercises };
   });
   const [justCompletedSession, setJustCompletedSession] = useState<WorkoutSession | null>(null);
   const [showSettings, setShowSettings] = useState(false);
@@ -112,12 +163,14 @@ export function App() {
       };
     });
 
+    const now = Date.now();
     const newSession: WorkoutSession = {
-      id: `session-${Date.now()}`,
+      id: `session-${now}`,
       routineId: routine.id,
       routineName: routine.name,
       dayTag: routine.dayTag,
-      date: new Date().toISOString(),
+      date: new Date(now).toISOString(),
+      startTime: now,
       durationSeconds: 0,
       totalVolumeKg: 0,
       prCount: 0,
@@ -217,27 +270,10 @@ export function App() {
 
       {/* Active Workout Banner (if workout in progress and not currently on workout tab) */}
       {activeSession && currentTab !== 'workout' && (
-        <div
-          className="active-session-banner"
-          onClick={() => setCurrentTab('workout')}
-        >
-          <div className="banner-left">
-            <div className="banner-pulse-dot" />
-            <div>
-              <div className="banner-title">{activeSession.routineName}</div>
-              <div className="banner-meta">
-                {activeSession.exercises.reduce(
-                  (c, e) => c + e.sets.filter((s) => s.completed).length,
-                  0
-                )}{' '}
-                sets logged · Tap to resume
-              </div>
-            </div>
-          </div>
-          <button className="btn-primary" style={{ padding: '6px 14px', fontSize: '0.78rem' }}>
-            Resume
-          </button>
-        </div>
+        <ActiveWorkoutBanner
+          session={activeSession}
+          onResume={() => setCurrentTab('workout')}
+        />
       )}
 
       {/* Main Tab Routing */}
@@ -250,6 +286,7 @@ export function App() {
             prs={prs}
             settings={settings}
             mesocycleBlock={mesocycleBlock}
+            activeSession={activeSession}
             onStartRoutine={handleStartRoutine}
             onNavigateTab={(tab) => setCurrentTab(tab)}
             onUpdateMesocycle={handleUpdateMesocycle}
@@ -472,6 +509,27 @@ export function App() {
         onSelectTab={(tab) => setCurrentTab(tab)}
         hasActiveWorkout={activeSession !== null}
       />
+
+      {/* Global Persistent Floating Rest Timer */}
+      {activeSession?.restTimer && (
+        <RestTimerFloating
+          endsAt={activeSession.restTimer.endsAt}
+          totalSeconds={activeSession.restTimer.totalSeconds}
+          soundEnabled={settings.soundEnabled}
+          onFinish={() => {
+            handleUpdateActiveSession({ ...activeSession, restTimer: null });
+          }}
+          onCancel={() => {
+            handleUpdateActiveSession({ ...activeSession, restTimer: null });
+          }}
+          onAdjust={(newEndsAt, newTotal) => {
+            handleUpdateActiveSession({
+              ...activeSession,
+              restTimer: { endsAt: newEndsAt, totalSeconds: newTotal }
+            });
+          }}
+        />
+      )}
 
       {/* Post-Workout AI Debrief & Celebration Modal */}
       {justCompletedSession && (

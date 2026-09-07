@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import type {
   WorkoutSession,
   WorkoutExercise,
@@ -27,7 +27,6 @@ import { sounds } from '../utils/audio';
 import { triggerHaptic } from '../utils/haptics';
 import { PlateCalculatorModal } from './PlateCalculatorModal';
 import { SmartSwapModal } from './SmartSwapModal';
-import { RestTimerFloating } from './RestTimerFloating';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
 import { VoiceLoggerModal } from './VoiceLoggerModal';
 import { ReadinessCheckinModal } from './ReadinessCheckinModal';
@@ -86,12 +85,32 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   onFinishWorkout,
   onCancelWorkout
 }) => {
-  const [elapsedSeconds, setElapsedSeconds] = useState(session.durationSeconds || 0);
-  const [activeRestSeconds, setActiveRestSeconds] = useState<number | null>(null);
-  const [plateModalWeight, setPlateModalWeight] = useState<{
+  // Reliable wall-clock elapsed time calculation based on session start timestamp
+  const getTrueElapsedSeconds = useCallback(() => {
+    const startMs = session.startTime || (session.date ? new Date(session.date).getTime() : 0);
+    if (!startMs || isNaN(startMs)) {
+      return session.durationSeconds || 0;
+    }
+    const elapsed = Math.max(0, Math.floor((Date.now() - startMs) / 1000));
+    return elapsed;
+  }, [session.startTime, session.date, session.durationSeconds]);
+
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(getTrueElapsedSeconds);
+
+  // Fresh refs so timer ticks & unmount flushes always access the latest session state without tearing down intervals
+  const sessionRef = useRef(session);
+  sessionRef.current = session;
+
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
+
+  const onUpdateSessionRef = useRef(onUpdateSession);
+  onUpdateSessionRef.current = onUpdateSession;
+  const [plateModalContext, setPlateModalContext] = useState<{
     weight: number;
     exerciseIdx: number;
     setIdx: number;
+    exerciseName: string;
   } | null>(null);
   const [swapExercise, setSwapExercise] = useState<{
     exerciseIdx: number;
@@ -99,7 +118,9 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   } | null>(null);
   const [showAddExerciseModal, setShowAddExerciseModal] = useState(false);
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState<string>('All');
+  const [selectedEquipmentFilter, setSelectedEquipmentFilter] = useState<string>('All Equipment');
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState<string>('');
+  const [exerciseDisplayLimit, setExerciseDisplayLimit] = useState<number>(60);
   const [newPRNotice, setNewPRNotice] = useState<string | null>(null);
   const [supersetNotice, setSupersetNotice] = useState<string | null>(null);
   const [inspectExerciseDetails, setInspectExerciseDetails] = useState<Exercise | null>(null);
@@ -108,9 +129,17 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     setIdx: number;
   } | null>(null);
 
-  // Tactical Intelligence state
-  const [showReadinessModal, setShowReadinessModal] = useState(true);
-  const [activeReadiness, setActiveReadiness] = useState<WorkoutReadiness | null>(null);
+  // Tactical Intelligence state - only show once per active session
+  const [showReadinessModal, setShowReadinessModal] = useState<boolean>(() => {
+    if (session.readinessChecked || session.readiness) return false;
+    try {
+      if (sessionStorage.getItem(`readiness_dismissed_${session.id}`)) return false;
+    } catch {}
+    return true;
+  });
+  const [activeReadiness, setActiveReadiness] = useState<WorkoutReadiness | null>(
+    session.readiness || null
+  );
   const [autoregCue, setAutoregCue] = useState<AutoregulationCue | null>(null);
   const [voiceCoachEnabled, setVoiceCoachEnabled] = useState(false);
 
@@ -153,24 +182,47 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     (w) => w.weekNumber === mesocycleBlock.currentWeek
   );
 
-  // Live timer tick
+  // Live timer tick driven by wall clock (never drifts or resets on tab navigation)
   useEffect(() => {
+    // Sync immediately on mount
+    const initialElapsed = getTrueElapsedSeconds();
+    setElapsedSeconds(initialElapsed);
+
     const timer = setInterval(() => {
-      setElapsedSeconds((prev) => {
-        const next = prev + 1;
-        // Periodic sync to session
-        if (next % 5 === 0) {
-          onUpdateSession({
-            ...session,
-            durationSeconds: next,
-            caloriesBurned: estimateLiveSessionCalories(session.exercises, next, settings.bodyWeightKg)
-          });
-        }
-        return next;
-      });
+      const current = getTrueElapsedSeconds();
+      setElapsedSeconds(current);
+
+      // Periodic sync to session every 5s
+      if (current % 5 === 0) {
+        const curSession = sessionRef.current;
+        onUpdateSessionRef.current({
+          ...curSession,
+          durationSeconds: current,
+          caloriesBurned: estimateLiveSessionCalories(
+            curSession.exercises,
+            current,
+            settingsRef.current.bodyWeightKg
+          )
+        });
+      }
     }, 1000);
-    return () => clearInterval(timer);
-  }, [session, onUpdateSession, settings.bodyWeightKg]);
+
+    return () => {
+      clearInterval(timer);
+      // Flush latest duration on unmount
+      const finalSec = getTrueElapsedSeconds();
+      const curSession = sessionRef.current;
+      onUpdateSessionRef.current({
+        ...curSession,
+        durationSeconds: finalSec,
+        caloriesBurned: estimateLiveSessionCalories(
+          curSession.exercises,
+          finalSec,
+          settingsRef.current.bodyWeightKg
+        )
+      });
+    };
+  }, [session.startTime, session.date, getTrueElapsedSeconds]);
 
   const formatElapsed = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -292,7 +344,14 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     }
 
     if (cmd.action === 'rest' && cmd.restSeconds) {
-      setActiveRestSeconds(cmd.restSeconds);
+      const endsAt = Date.now() + cmd.restSeconds * 1000;
+      onUpdateSession({
+        ...session,
+        exercises: updated,
+        totalVolumeKg: calculateTotalVolume(updated),
+        restTimer: { endsAt, totalSeconds: cmd.restSeconds }
+      });
+      return;
     }
 
     const totalVol = calculateTotalVolume(updated);
@@ -338,6 +397,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
     let isPRFound = false;
     let prTitle = '';
+    let updatedRestTimer = session.restTimer;
 
     const hasPerformance =
       (currentSet.weightKg > 0 && currentSet.reps > 0) ||
@@ -404,7 +464,8 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
       // Trigger Rest Timer if not deferred by active superset round
       if (!deferRestTimer) {
         const restSec = currentSet.type === 'warmup' ? 45 : (updatedExercises[exIdx].restSeconds || settings.defaultRestSeconds || 90);
-        setActiveRestSeconds(restSec);
+        const endsAt = Date.now() + restSec * 1000;
+        updatedRestTimer = { endsAt, totalSeconds: restSec };
       }
     }
 
@@ -418,7 +479,8 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     onUpdateSession({
       ...session,
       exercises: updatedExercises,
-      totalVolumeKg: totalVol
+      totalVolumeKg: totalVol,
+      restTimer: updatedRestTimer
     });
 
     // Tactical Intelligence: Autoregulation evaluation after set completion
@@ -641,6 +703,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   };
 
   const handleFinish = () => {
+    const finalDuration = getTrueElapsedSeconds();
     // Count PRs
     const prsCount = session.exercises.reduce((count, ex) => {
       return count + ex.sets.filter((s) => s.isPR).length;
@@ -648,10 +711,14 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
     const completed: WorkoutSession = {
       ...session,
-      durationSeconds: elapsedSeconds,
+      durationSeconds: finalDuration,
       totalVolumeKg: calculateTotalVolume(session.exercises),
       prCount: prsCount,
-      caloriesBurned: liveCalories,
+      caloriesBurned: estimateLiveSessionCalories(
+        session.exercises,
+        finalDuration,
+        settings.bodyWeightKg
+      ),
       mesocycleWeek: mesocycleBlock?.currentWeek,
       isDeload: currentWeekConfig?.phaseName === 'Deload'
     };
@@ -667,8 +734,18 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
           onComplete={(readiness) => {
             setActiveReadiness(readiness);
             setShowReadinessModal(false);
+            try {
+              sessionStorage.setItem(`readiness_dismissed_${session.id}`, 'true');
+            } catch {}
+            onUpdateSession({ ...session, readiness, readinessChecked: true });
           }}
-          onSkip={() => setShowReadinessModal(false)}
+          onSkip={() => {
+            setShowReadinessModal(false);
+            try {
+              sessionStorage.setItem(`readiness_dismissed_${session.id}`, 'true');
+            } catch {}
+            onUpdateSession({ ...session, readinessChecked: true });
+          }}
         />
       )}
       {/* PR Flash Notification */}
@@ -1033,14 +1110,21 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                     {(displayEquipment === 'Barbell' || displayEquipment === 'Smith Machine') && (
                       <button
                         className="plate-badge-btn"
-                        onClick={() =>
-                          setPlateModalWeight({
-                            weight: ex.sets.find((s) => s.weightKg > 0)?.weightKg || 60,
+                        onClick={() => {
+                          const activeSetIdx = ex.sets.findIndex((s) => !s.completed);
+                          const targetIdx = activeSetIdx !== -1 ? activeSetIdx : 0;
+                          const targetSetWeight =
+                            ex.sets[targetIdx]?.weightKg ||
+                            ex.sets.find((s) => s.weightKg > 0)?.weightKg ||
+                            60;
+                          setPlateModalContext({
+                            weight: targetSetWeight,
                             exerciseIdx: exIdx,
-                            setIdx: 0
-                          })
-                        }
-                        title="Visual barbell plate calculator"
+                            setIdx: targetIdx,
+                            exerciseName: displayName
+                          });
+                        }}
+                        title="Visual barbell plate calculator for active set"
                       >
                         <Calculator size={11} /> Plates
                       </button>
@@ -1183,26 +1267,26 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                   <span>Prev</span>
                   {trackingType === 'weight_reps' && (
                     <>
-                      <span>{settings.unit}</span>
-                      <span>Reps</span>
+                      <span style={{ textAlign: 'center' }}>{settings.unit}</span>
+                      <span style={{ textAlign: 'center' }}>Reps</span>
                     </>
                   )}
                   {trackingType === 'distance_time' && (
                     <>
-                      <span>Dist ({distanceUnitLabel(settings.unit)})</span>
-                      <span>Duration</span>
+                      <span style={{ textAlign: 'center' }}>Dist ({distanceUnitLabel(settings.unit)})</span>
+                      <span style={{ textAlign: 'center' }}>Duration</span>
                     </>
                   )}
                   {trackingType === 'time_only' && (
                     <>
-                      <span>Duration</span>
-                      <span>RPE</span>
+                      <span style={{ textAlign: 'center' }}>Duration</span>
+                      <span style={{ textAlign: 'center' }}>RPE</span>
                     </>
                   )}
                   {trackingType === 'reps_only' && (
                     <>
-                      <span>Reps</span>
-                      <span>RPE</span>
+                      <span style={{ textAlign: 'center' }}>Reps</span>
+                      <span style={{ textAlign: 'center' }}>RPE</span>
                     </>
                   )}
                   <span></span>
@@ -1256,7 +1340,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                       {/* Mode 1: Weight & Reps */}
                       {trackingType === 'weight_reps' && (
                         <>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 0, width: '100%', justifyContent: 'center' }}>
                             <button
                               type="button"
                               className="stepper-btn"
@@ -1275,9 +1359,10 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                               type="number"
                               step="0.5"
                               className="set-input-box"
-                              style={{ minWidth: 42, padding: '8px 2px', fontSize: '0.85rem' }}
+                              style={{ minWidth: 0, flex: 1, padding: '8px 2px', fontSize: '0.88rem' }}
                               value={displayWeight(set.weightKg) || ''}
                               placeholder={String(displayWeight(overload.targetWeight))}
+                              onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleSetChange(
                                   exIdx,
@@ -1301,14 +1386,39 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                             >
                               +
                             </button>
+                            {(displayEquipment === 'Barbell' ||
+                              displayEquipment === 'Smith Machine' ||
+                              displayName.toLowerCase().includes('lever') ||
+                              displayName.toLowerCase().includes('plate') ||
+                              displayName.toLowerCase().includes('sled') ||
+                              displayName.toLowerCase().includes('hack squat') ||
+                              displayName.toLowerCase().includes('leg press')) && (
+                              <button
+                                type="button"
+                                className="plate-stepper-btn"
+                                onClick={() =>
+                                  setPlateModalContext({
+                                    weight: set.weightKg || overload.targetWeight || 60,
+                                    exerciseIdx: exIdx,
+                                    setIdx: setIdx,
+                                    exerciseName: displayName
+                                  })
+                                }
+                                title={`Calculate plates for Set ${set.setNumber}`}
+                              >
+                                <Calculator size={11} />
+                              </button>
+                            )}
                           </div>
 
-                          <div>
+                          <div style={{ minWidth: 0, width: '100%' }}>
                             <input
                               type="number"
                               className="set-input-box"
+                              style={{ minWidth: 0, width: '100%', padding: '8px 2px', fontSize: '0.88rem' }}
                               value={set.reps || ''}
                               placeholder={String(overload.targetReps)}
+                              onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleSetChange(
                                   exIdx,
@@ -1346,6 +1456,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                               style={{ minWidth: 44, padding: '8px 2px', fontSize: '0.85rem' }}
                               value={displayDistance(set.distanceKm, settings.unit) || ''}
                               placeholder="1.0"
+                              onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleSetChange(
                                   exIdx,
@@ -1420,6 +1531,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                                   value={set.durationSeconds ? Math.round(set.durationSeconds / 60) : ''}
                                   placeholder="15"
                                   title="Minutes"
+                                  onFocus={(e) => e.target.select()}
                                   onChange={(e) => {
                                     const mins = parseFloat(e.target.value) || 0;
                                     handleSetChange(exIdx, setIdx, 'durationSeconds', Math.round(mins * 60));
@@ -1514,6 +1626,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                                   value={set.durationSeconds || ''}
                                   placeholder="45"
                                   title="Seconds"
+                                  onFocus={(e) => e.target.select()}
                                   onChange={(e) => {
                                     const sec = parseInt(e.target.value, 10) || 0;
                                     handleSetChange(exIdx, setIdx, 'durationSeconds', sec);
@@ -1561,6 +1674,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                               value={set.rpe || ''}
                               placeholder="8.0"
                               title="RPE (Effort 1-10)"
+                              onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleSetChange(
                                   exIdx,
@@ -1597,6 +1711,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                               style={{ minWidth: 42, padding: '8px 2px', fontSize: '0.85rem' }}
                               value={set.reps || ''}
                               placeholder={String(overload.targetReps || 15)}
+                              onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleSetChange(
                                   exIdx,
@@ -1629,6 +1744,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                               value={set.rpe || ''}
                               placeholder="8.5"
                               title="RPE (Effort 1-10)"
+                              onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleSetChange(
                                   exIdx,
@@ -1760,33 +1876,56 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
         </button>
       </div>
 
-      {/* Floating Rest Timer */}
-      {activeRestSeconds !== null && (
-        <RestTimerFloating
-          initialSeconds={activeRestSeconds}
-          soundEnabled={settings.soundEnabled}
-          onFinish={() => setActiveRestSeconds(null)}
-          onCancel={() => setActiveRestSeconds(null)}
-        />
-      )}
-
       {/* Plate Calculator Modal */}
-      {plateModalWeight !== null && (
-        <PlateCalculatorModal
-          initialWeight={displayWeight(plateModalWeight.weight)}
-          unit={settings.unit}
-          onClose={() => setPlateModalWeight(null)}
-          onApplyWeight={(newWeight) => {
-            const kg = toStorageWeight(newWeight);
-            handleSetChange(
-              plateModalWeight.exerciseIdx,
-              plateModalWeight.setIdx,
-              'weightKg',
-              kg
-            );
-          }}
-        />
-      )}
+      {plateModalContext !== null && (() => {
+        const ex = session.exercises[plateModalContext.exerciseIdx];
+        return (
+          <PlateCalculatorModal
+            initialWeight={displayWeight(plateModalContext.weight)}
+            unit={settings.unit}
+            exerciseName={plateModalContext.exerciseName}
+            targetSetIndex={plateModalContext.setIdx}
+            sets={ex ? ex.sets.map((s) => ({ setNumber: s.setNumber, weightKg: s.weightKg, completed: s.completed })) : undefined}
+            onClose={() => setPlateModalContext(null)}
+            onApplyWeight={(newWeight, scope, targetSetIdx) => {
+              const kg = toStorageWeight(newWeight);
+              if (!ex) return;
+
+              const updatedExercises = [...session.exercises];
+              const updatedEx = { ...ex, sets: [...ex.sets] };
+
+              if (scope === 'all') {
+                updatedEx.sets = updatedEx.sets.map((s) => ({
+                  ...s,
+                  weightKg: kg,
+                  targetWeightKg: kg
+                }));
+              } else if (scope === 'all_remaining') {
+                updatedEx.sets = updatedEx.sets.map((s, idx) => {
+                  if (idx >= targetSetIdx && !s.completed) {
+                    return { ...s, weightKg: kg, targetWeightKg: kg };
+                  }
+                  return s;
+                });
+              } else {
+                // Specific target set
+                if (updatedEx.sets[targetSetIdx]) {
+                  updatedEx.sets[targetSetIdx] = {
+                    ...updatedEx.sets[targetSetIdx],
+                    weightKg: kg,
+                    targetWeightKg: kg
+                  };
+                }
+              }
+
+              updatedExercises[plateModalContext.exerciseIdx] = updatedEx;
+              const totalVol = calculateTotalVolume(updatedExercises);
+              onUpdateSession({ ...session, exercises: updatedExercises, totalVolumeKg: totalVol });
+              triggerHaptic('success', settings.vibrationEnabled);
+            }}
+          />
+        );
+      })()}
 
       {/* Smart Swap Modal */}
       {swapExercise !== null && (
@@ -1858,8 +1997,8 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
             </div>
 
             {/* Muscle Filter Tabs */}
-            <div className="quick-prompts-row" style={{ marginBottom: 10 }}>
-              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Glutes', 'Biceps', 'Triceps', 'Calves', 'Forearms', 'Abs', 'Cardio'].map(
+            <div className="quick-prompts-row" style={{ marginBottom: 6 }}>
+              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Glutes', 'Biceps', 'Triceps', 'Calves', 'Forearms', 'Traps', 'Abs', 'Cardio'].map(
                 (m) => (
                   <button
                     key={m}
@@ -1867,9 +2006,14 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                     style={{
                       background: selectedMuscleFilter === m ? 'var(--accent-volt)' : undefined,
                       color: selectedMuscleFilter === m ? '#050D0A' : undefined,
-                      fontWeight: selectedMuscleFilter === m ? 800 : undefined
+                      fontWeight: selectedMuscleFilter === m ? 800 : undefined,
+                      fontSize: '0.72rem',
+                      padding: '4px 10px'
                     }}
-                    onClick={() => setSelectedMuscleFilter(m)}
+                    onClick={() => {
+                      setSelectedMuscleFilter(m);
+                      setExerciseDisplayLimit(60);
+                    }}
                   >
                     {m}
                   </button>
@@ -1877,28 +2021,78 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
               )}
             </div>
 
-            {/* Filtered Exercise List with Slicing */}
+            {/* Equipment Filter Chips */}
+            <div className="quick-prompts-row" style={{ marginBottom: 10 }}>
+              {['All Equipment', 'Machine', 'Dumbbell', 'Barbell', 'Cable', 'Smith Machine', 'Bodyweight'].map(
+                (eq) => (
+                  <button
+                    key={eq}
+                    className="timer-chip"
+                    style={{
+                      background: selectedEquipmentFilter === eq ? 'rgba(0, 229, 255, 0.2)' : undefined,
+                      borderColor: selectedEquipmentFilter === eq ? 'var(--accent-cyan)' : undefined,
+                      color: selectedEquipmentFilter === eq ? '#fff' : 'var(--text-muted)',
+                      fontWeight: selectedEquipmentFilter === eq ? 700 : 500,
+                      fontSize: '0.7rem',
+                      padding: '3px 8px'
+                    }}
+                    onClick={() => {
+                      setSelectedEquipmentFilter(eq);
+                      setExerciseDisplayLimit(60);
+                    }}
+                  >
+                    {eq}
+                  </button>
+                )
+              )}
+            </div>
+
+            {/* Filtered Exercise List with Dynamic Pagination */}
             {(() => {
               const q = exerciseSearchQuery.toLowerCase().trim();
+              const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+
               const filtered = EXERCISE_LIBRARY.filter((e) => {
-                const matchMuscle = selectedMuscleFilter === 'All' || e.muscleGroup === selectedMuscleFilter;
+                const matchMuscle =
+                  selectedMuscleFilter === 'All' ||
+                  e.muscleGroup === selectedMuscleFilter;
                 if (!matchMuscle) return false;
-                if (!q) return true;
-                return (
-                  e.name.toLowerCase().includes(q) ||
-                  e.equipment.toLowerCase().includes(q) ||
-                  e.id.toLowerCase().includes(q)
+
+                const matchEquipment =
+                  selectedEquipmentFilter === 'All Equipment' ||
+                  e.equipment.toLowerCase() === selectedEquipmentFilter.toLowerCase() ||
+                  (selectedEquipmentFilter === 'Machine' &&
+                    (e.equipment === 'Machine' || e.name.toLowerCase().includes('lever') || e.equipment === 'Smith Machine'));
+                if (!matchEquipment) return false;
+
+                if (tokens.length === 0) return true;
+
+                return tokens.every(
+                  (token) =>
+                    e.name.toLowerCase().includes(token) ||
+                    e.equipment.toLowerCase().includes(token) ||
+                    e.muscleGroup.toLowerCase().includes(token) ||
+                    (e.secondaryMuscles && e.secondaryMuscles.some((m) => m.toLowerCase().includes(token))) ||
+                    e.category.toLowerCase().includes(token) ||
+                    e.id.toLowerCase().includes(token)
                 );
               });
 
               return (
                 <>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 8 }}>
-                    Showing {Math.min(filtered.length, 60)} of {filtered.length} exercises
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      Showing {Math.min(filtered.length, exerciseDisplayLimit)} of {filtered.length} exercises
+                    </div>
+                    {selectedEquipmentFilter !== 'All Equipment' && (
+                      <span style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontWeight: 600 }}>
+                        Filtered by {selectedEquipmentFilter}
+                      </span>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto' }}>
-                    {filtered.slice(0, 60).map((ex) => (
+                    {filtered.slice(0, exerciseDisplayLimit).map((ex) => (
                       <div
                         key={ex.id}
                         style={{
@@ -1913,19 +2107,47 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                         }}
                         onClick={() => handleAddExerciseToWorkout(ex)}
                       >
-                        <div>
+                        <div style={{ flex: 1, paddingRight: 8 }}>
                           <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{ex.name}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                            {ex.muscleGroup} · {ex.equipment} · {ex.targetRepRange[0]}-{ex.targetRepRange[1]} reps
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+                            <span style={{ color: 'var(--accent-volt)', fontWeight: 600 }}>{ex.muscleGroup}</span>
+                            <span>·</span>
+                            <span>{ex.equipment}</span>
+                            <span>·</span>
+                            <span>{ex.category}</span>
+                            {ex.secondaryMuscles && ex.secondaryMuscles.length > 0 && (
+                              <>
+                                <span>·</span>
+                                <span style={{ color: 'var(--text-muted)' }}>+ {ex.secondaryMuscles.join(', ')}</span>
+                              </>
+                            )}
                           </div>
                         </div>
-                        <Plus size={20} color="var(--accent-volt)" />
+                        <Plus size={20} color="var(--accent-volt)" style={{ flexShrink: 0 }} />
                       </div>
                     ))}
                     {filtered.length === 0 && (
                       <div style={{ textAlign: 'center', padding: '24px 12px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                         No exercises found matching "{exerciseSearchQuery}". Try another search term or filter.
                       </div>
+                    )}
+                    {filtered.length > exerciseDisplayLimit && (
+                      <button
+                        className="btn-secondary"
+                        style={{
+                          width: '100%',
+                          padding: '9px',
+                          fontSize: '0.8rem',
+                          color: 'var(--accent-volt)',
+                          border: '1px dashed rgba(0, 245, 155, 0.3)',
+                          borderRadius: 'var(--radius-md)',
+                          marginTop: 6,
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setExerciseDisplayLimit((prev) => prev + 60)}
+                      >
+                        Load More ({filtered.length - exerciseDisplayLimit} remaining)
+                      </button>
                     )}
                   </div>
                 </>

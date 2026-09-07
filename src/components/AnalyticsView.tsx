@@ -56,8 +56,11 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   const [inspectedSession, setInspectedSession] = useState<WorkoutSession | null>(null);
 
   // 1RM Calculator State
-  const [calcWeight, setCalcWeight] = useState<number>(100);
-  const [calcReps, setCalcReps] = useState<number>(8);
+  const [calcWeight, setCalcWeight] = useState<number | string>(100);
+  const [calcReps, setCalcReps] = useState<number | string>(8);
+
+  const numericCalcWeight = typeof calcWeight === 'number' ? calcWeight : parseFloat(calcWeight) || 0;
+  const numericCalcReps = typeof calcReps === 'number' ? calcReps : parseInt(calcReps, 10) || 1;
 
   // Bodyweight Weigh-In State
   const [bodyWeightLogs, setBodyWeightLogs] = useState<BodyWeightEntry[]>(
@@ -83,12 +86,12 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
 
   // Real-time 1RM & Rep Max calculations
   const repMaxTable = useMemo(() => {
-    return calculateRepMaxTable(calcWeight, calcReps);
-  }, [calcWeight, calcReps]);
+    return calculateRepMaxTable(numericCalcWeight, numericCalcReps);
+  }, [numericCalcWeight, numericCalcReps]);
 
   const estimated1RM = useMemo(() => {
-    return calculate1RM(calcWeight, calcReps);
-  }, [calcWeight, calcReps]);
+    return calculate1RM(numericCalcWeight, numericCalcReps);
+  }, [numericCalcWeight, numericCalcReps]);
 
   const handleLogWeighIn = () => {
     const val = parseFloat(inputWeight);
@@ -440,10 +443,18 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                 </label>
                 <input
                   type="number"
+                  step="0.5"
                   className="set-input-box"
                   style={{ marginTop: 4 }}
-                  value={calcWeight || ''}
-                  onChange={(e) => setCalcWeight(parseFloat(e.target.value) || 0)}
+                  value={calcWeight}
+                  placeholder="100"
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => setCalcWeight(e.target.value)}
+                  onBlur={() => {
+                    if (calcWeight === '' || Number(calcWeight) < 0) {
+                      setCalcWeight(100);
+                    }
+                  }}
                 />
               </div>
 
@@ -453,10 +464,19 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                 </label>
                 <input
                   type="number"
+                  min="1"
+                  max="30"
                   className="set-input-box"
                   style={{ marginTop: 4 }}
-                  value={calcReps || ''}
-                  onChange={(e) => setCalcReps(parseInt(e.target.value, 10) || 1)}
+                  value={calcReps}
+                  placeholder="8"
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => setCalcReps(e.target.value)}
+                  onBlur={() => {
+                    if (calcReps === '' || Number(calcReps) < 1) {
+                      setCalcReps(8);
+                    }
+                  }}
                 />
               </div>
             </div>

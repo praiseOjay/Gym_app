@@ -4,62 +4,100 @@ import { sounds } from '../utils/audio';
 import { VoiceCoach } from '../services/voiceCoach';
 
 interface RestTimerFloatingProps {
-  initialSeconds: number;
+  initialSeconds?: number;
+  endsAt?: number;
+  totalSeconds?: number;
   onFinish: () => void;
   onCancel: () => void;
+  onAdjust?: (newEndsAt: number, newTotalSeconds: number) => void;
   soundEnabled: boolean;
 }
 
 export const RestTimerFloating: React.FC<RestTimerFloatingProps> = ({
-  initialSeconds,
+  initialSeconds = 90,
+  endsAt,
+  totalSeconds,
   onFinish,
   onCancel,
+  onAdjust,
   soundEnabled
 }) => {
-  const [timeLeft, setTimeLeft] = useState(initialSeconds);
-  const [totalSeconds, setTotalSeconds] = useState(initialSeconds);
+  const [targetEndsAt, setTargetEndsAt] = useState<number>(() => {
+    return endsAt || Date.now() + initialSeconds * 1000;
+  });
+  const [totalSec, setTotalSec] = useState<number>(() => {
+    return totalSeconds || initialSeconds;
+  });
+
+  const getRemaining = (end: number) => Math.max(0, Math.ceil((end - Date.now()) / 1000));
+  const [timeLeft, setTimeLeft] = useState<number>(() => getRemaining(targetEndsAt));
+
+  const hasFired15Ref = React.useRef(false);
+  const firedBeepsRef = React.useRef<Set<number>>(new Set());
+  const hasFinishedRef = React.useRef(false);
+
+  // Sync when parent props change
+  useEffect(() => {
+    if (endsAt) {
+      setTargetEndsAt(endsAt);
+      setTimeLeft(getRemaining(endsAt));
+    }
+    if (totalSeconds) {
+      setTotalSec(totalSeconds);
+    }
+  }, [endsAt, totalSeconds]);
 
   useEffect(() => {
-    setTimeLeft(initialSeconds);
-    setTotalSeconds(initialSeconds);
-  }, [initialSeconds]);
+    const checkTimer = () => {
+      const remaining = getRemaining(targetEndsAt);
+      setTimeLeft(remaining);
 
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      if (soundEnabled) {
-        sounds.playTimerComplete();
+      if (remaining <= 0) {
+        if (!hasFinishedRef.current) {
+          hasFinishedRef.current = true;
+          if (soundEnabled) {
+            sounds.playTimerComplete();
+          }
+          VoiceCoach.announceRestComplete();
+          onFinish();
+        }
+        return;
       }
-      VoiceCoach.announceRestComplete();
-      onFinish();
-      return;
-    }
 
-    // Voice cue at 15 seconds remaining
-    if (timeLeft === 15) {
-      VoiceCoach.announceRestApproaching(15);
-    }
+      // Voice cue at 15 seconds remaining
+      if (remaining === 15 && !hasFired15Ref.current) {
+        hasFired15Ref.current = true;
+        VoiceCoach.announceRestApproaching(15);
+      }
 
-    // Warning beeps at 3, 2, 1
-    if (soundEnabled && timeLeft <= 3 && timeLeft > 0) {
-      sounds.playWarningBeep();
-    }
+      // Warning beeps at 3, 2, 1
+      if (soundEnabled && remaining <= 3 && remaining > 0 && !firedBeepsRef.current.has(remaining)) {
+        firedBeepsRef.current.add(remaining);
+        sounds.playWarningBeep();
+      }
+    };
 
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
+    checkTimer();
+    const interval = setInterval(checkTimer, 500);
 
     return () => clearInterval(interval);
-  }, [timeLeft, soundEnabled, onFinish]);
+  }, [targetEndsAt, soundEnabled, onFinish]);
 
   const addTime = (secs: number) => {
-    setTimeLeft((prev) => Math.max(5, prev + secs));
-    setTotalSeconds((prev) => Math.max(prev, prev + secs));
+    const newEndsAt = Math.max(Date.now() + 5000, targetEndsAt + secs * 1000);
+    const newTotal = Math.max(5, totalSec + secs);
+    setTargetEndsAt(newEndsAt);
+    setTotalSec(newTotal);
+    setTimeLeft(getRemaining(newEndsAt));
+    if (onAdjust) {
+      onAdjust(newEndsAt, newTotal);
+    }
   };
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
   const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  const progressPercent = Math.min(100, Math.max(0, (timeLeft / totalSeconds) * 100));
+  const progressPercent = Math.min(100, Math.max(0, (timeLeft / totalSec) * 100));
 
   return (
     <div className="floating-rest-timer">

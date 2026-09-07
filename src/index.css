@@ -664,8 +664,9 @@ body {
 
 .set-table-header {
   display: grid;
-  grid-template-columns: 32px 1fr 94px 54px 38px;
+  grid-template-columns: 30px minmax(46px, 1fr) minmax(118px, 1.4fr) minmax(48px, 0.8fr) 38px;
   gap: 6px;
+  align-items: center;
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--text-muted);
@@ -675,7 +676,7 @@ body {
 
 .set-row {
   display: grid;
-  grid-template-columns: 32px 1fr 94px 54px 38px;
+  grid-template-columns: 30px minmax(46px, 1fr) minmax(118px, 1.4fr) minmax(48px, 0.8fr) 38px;
   gap: 6px;
   align-items: center;
   background: var(--bg-surface);
@@ -689,7 +690,7 @@ body {
 @media (max-width: 440px) {
   .set-table-header,
   .set-row {
-    grid-template-columns: 28px 1fr 88px 46px 36px;
+    grid-template-columns: 26px minmax(42px, 1fr) minmax(112px, 1.4fr) minmax(44px, 0.8fr) 34px;
     gap: 4px;
     padding: 6px 4px;
   }
@@ -698,9 +699,9 @@ body {
 @media (max-width: 375px) {
   .set-table-header,
   .set-row {
-    grid-template-columns: 24px 1fr 82px 42px 34px;
+    grid-template-columns: 24px minmax(38px, 1fr) minmax(106px, 1.4fr) minmax(40px, 0.8fr) 32px;
     gap: 3px;
-    padding: 5px 2px;
+    padding: 5px 3px;
   }
 }
 
@@ -806,12 +807,60 @@ body {
   user-select: none;
   transition: all 0.12s ease;
   flex-shrink: 0;
+  padding: 0;
 }
 
 .stepper-btn:hover, .stepper-btn:active {
   background: rgba(0, 245, 155, 0.2);
   color: var(--accent-volt);
   border-color: var(--accent-volt);
+}
+
+.plate-stepper-btn {
+  background: rgba(0, 245, 155, 0.1);
+  border: 1px solid rgba(0, 245, 155, 0.35);
+  color: var(--accent-volt);
+  width: 22px;
+  height: 36px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.plate-stepper-btn:hover,
+.plate-stepper-btn:active {
+  background: rgba(0, 245, 155, 0.25);
+  border-color: var(--accent-volt);
+  color: #fff;
+}
+
+@media (max-width: 440px) {
+  .stepper-btn {
+    width: 18px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+  .plate-stepper-btn {
+    width: 20px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 375px) {
+  .stepper-btn {
+    width: 16px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+  .plate-stepper-btn {
+    width: 18px;
+    height: 30px;
+  }
 }
 
 .plate-badge-btn {

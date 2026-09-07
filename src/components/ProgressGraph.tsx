@@ -63,6 +63,11 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
     return Array.from(map.values()).sort((a, b) => b.count - a.count);
   }, [historySessions]);
 
+  // Full library sorted alphabetically for discovery and unlogged exercises
+  const sortedLibraryExercises = useMemo(() => {
+    return [...EXERCISE_LIBRARY].sort((a, b) => a.name.localeCompare(b.name));
+  }, []);
+
   // If no exercise selected yet and no logged exercises, fallback to popular library exercise
   const currentExerciseId = selectedExerciseId || (loggedExercises[0]?.id ?? 'sled-hack-squat');
 
@@ -532,15 +537,28 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
               }}
             >
               {loggedExercises.length > 0 ? (
-                loggedExercises.map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {e.name} ({e.count} workouts)
-                  </option>
-                ))
+                <>
+                  <optgroup label="Logged in Workouts">
+                    {loggedExercises.map((e) => (
+                      <option key={e.id} value={e.id}>
+                        {e.name} ({e.count} {e.count === 1 ? 'workout' : 'workouts'})
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="All Exercises">
+                    {sortedLibraryExercises
+                      .filter((e) => !loggedExercises.some((le) => le.id === e.id))
+                      .map((e) => (
+                        <option key={e.id} value={e.id}>
+                          {e.name} ({e.muscleGroup})
+                        </option>
+                      ))}
+                  </optgroup>
+                </>
               ) : (
-                EXERCISE_LIBRARY.slice(0, 15).map((e) => (
+                sortedLibraryExercises.map((e) => (
                   <option key={e.id} value={e.id}>
-                    {e.name} ({e.equipment})
+                    {e.name} ({e.muscleGroup})
                   </option>
                 ))
               )}

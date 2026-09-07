@@ -1,21 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { X, Plus, Minus } from 'lucide-react';
 import { calculateBarbellPlates } from '../engine/overloadEngine';
 
 interface PlateCalculatorModalProps {
   initialWeight: number;
   unit: 'kg' | 'lbs';
+  exerciseName?: string;
+  targetSetIndex?: number;
+  sets?: { setNumber: number; weightKg: number; completed: boolean }[];
   onClose: () => void;
-  onApplyWeight?: (weight: number) => void;
+  onApplyWeight?: (
+    weight: number,
+    scope: 'current' | 'all_remaining' | 'all',
+    targetSetIndex: number
+  ) => void;
 }
 
 export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
   initialWeight,
   unit,
+  exerciseName,
+  targetSetIndex = 0,
+  sets,
   onClose,
   onApplyWeight
 }) => {
-  const [barWeight, setBarWeight] = useState(unit === 'kg' ? 20 : 45);
+  const [activeSetIdx, setActiveSetIdx] = useState<number>(targetSetIndex);
+
+  const isLeverOrPlateLoaded = useMemo(() => {
+    if (!exerciseName) return false;
+    const lower = exerciseName.toLowerCase();
+    return (
+      lower.includes('lever') ||
+      lower.includes('plate') ||
+      lower.includes('sled') ||
+      lower.includes('hack squat') ||
+      lower.includes('leg press')
+    );
+  }, [exerciseName]);
+
+  const [barWeight, setBarWeight] = useState(() => {
+    if (isLeverOrPlateLoaded) return 0;
+    return unit === 'kg' ? 20 : 45;
+  });
   const [weight, setWeight] = useState(initialWeight || (unit === 'kg' ? 60 : 135));
   const plateCalc = calculateBarbellPlates(weight, unit, barWeight);
 
@@ -23,18 +50,38 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
     setWeight((prev) => Math.max(barWeight, Math.round((prev + delta) * 10) / 10));
   };
 
+  const handleSelectSet = (idx: number) => {
+    setActiveSetIdx(idx);
+    if (sets && sets[idx]) {
+      const setRawKg = sets[idx].weightKg;
+      const converted = unit === 'lbs' ? Math.round(setRawKg * 2.20462 * 10) / 10 : setRawKg;
+      if (converted > 0) {
+        setWeight(converted);
+      }
+    }
+  };
+
+  const handleApply = (scope: 'current' | 'all_remaining' | 'all') => {
+    if (onApplyWeight) {
+      onApplyWeight(weight, scope, activeSetIdx);
+    }
+    onClose();
+  };
+
   const barPresets = unit === 'kg'
     ? [
         { label: 'Olympic 20kg', wt: 20 },
         { label: "Women's 15kg", wt: 15 },
         { label: 'EZ Curl 10kg', wt: 10 },
-        { label: 'Smith 15kg', wt: 15 }
+        { label: 'Smith 15kg', wt: 15 },
+        { label: 'Plates Only 0kg', wt: 0 }
       ]
     : [
         { label: 'Olympic 45lb', wt: 45 },
         { label: "Women's 35lb", wt: 35 },
         { label: 'EZ Curl 25lb', wt: 25 },
-        { label: 'Smith 30lb', wt: 30 }
+        { label: 'Smith 30lb', wt: 30 },
+        { label: 'Plates Only 0lb', wt: 0 }
       ];
 
   return (
@@ -42,11 +89,15 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
       <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="modal-handle" />
 
+        {/* Modal Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Barbell Plate Calculator</h3>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Barbell & Plate Calculator</h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              Visual plate rack loading ({barWeight} {unit} bar)
+              {exerciseName ? `${exerciseName} · ` : ''}
+              {barWeight === 0
+                ? `Visual plate rack loading (Plates Only / Lever)`
+                : `Visual plate rack loading (${barWeight} ${unit} bar)`}
             </p>
           </div>
           <button
@@ -63,8 +114,40 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
           </button>
         </div>
 
+        {/* Target Set Selector Pills */}
+        {sets && sets.length > 0 && (
+          <div style={{ marginTop: 10, marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', flexShrink: 0 }}>
+                Target Set:
+              </span>
+              {sets.map((s, idx) => {
+                const isSelected = activeSetIdx === idx;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    className="quick-prompt-chip"
+                    style={{
+                      background: isSelected ? 'var(--accent-volt)' : undefined,
+                      color: isSelected ? '#050D0A' : undefined,
+                      fontWeight: isSelected ? 800 : undefined,
+                      padding: '3px 10px',
+                      fontSize: '0.74rem',
+                      flexShrink: 0
+                    }}
+                    onClick={() => handleSelectSet(idx)}
+                  >
+                    Set {s.setNumber} {s.completed ? '✓' : ''}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Bar Type Presets */}
-        <div className="quick-prompts-row" style={{ marginTop: 8, marginBottom: 10 }}>
+        <div className="quick-prompts-row" style={{ marginTop: 6, marginBottom: 10 }}>
           {barPresets.map((b) => (
             <button
               key={b.label}
@@ -148,7 +231,7 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
         </div>
 
         {/* Visual Barbell Loading Representation */}
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', marginTop: 12 }}>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
             Load Per Side: <strong style={{ color: '#fff' }}>{plateCalc.weightPerSide} {unit}</strong>
           </div>
@@ -161,7 +244,7 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
             {/* Rendered plates from inside to outside */}
             {plateCalc.platesPerSide.length === 0 ? (
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', padding: '0 20px' }}>
-                Empty Barbell ({barWeight}{unit})
+                {barWeight === 0 ? `No Plates Loaded (0 ${unit})` : `Empty Barbell (${barWeight}${unit})`}
               </span>
             ) : (
               plateCalc.platesPerSide.map((p, idx) => {
@@ -199,7 +282,7 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
         </div>
 
         {/* Detailed Breakdown List */}
-        <div style={{ background: 'var(--bg-card)', padding: '14px', borderRadius: 'var(--radius-lg)' }}>
+        <div style={{ background: 'var(--bg-card)', padding: '14px', borderRadius: 'var(--radius-lg)', marginTop: 12 }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>
             Plates Needed (Each Side):
           </div>
@@ -243,16 +326,38 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
           )}
         </div>
 
+        {/* Multi-Scope Apply Buttons */}
         {onApplyWeight && (
-          <button
-            className="btn-primary"
-            onClick={() => {
-              onApplyWeight(weight);
-              onClose();
-            }}
-          >
-            Apply {weight} {unit} to Current Set
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
+            <button
+              className="btn-primary"
+              onClick={() => handleApply('current')}
+            >
+              Apply {weight} {unit} to Set {activeSetIdx + 1}
+            </button>
+            {sets && sets.length > 1 && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  style={{ fontSize: '0.74rem', padding: '8px 4px', color: 'var(--accent-cyan)' }}
+                  onClick={() => handleApply('all_remaining')}
+                  title={`Apply to Set ${activeSetIdx + 1} and subsequent uncompleted sets`}
+                >
+                  Apply to Remaining Sets
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  style={{ fontSize: '0.74rem', padding: '8px 4px', color: 'var(--text-secondary)' }}
+                  onClick={() => handleApply('all')}
+                  title="Apply this weight across all sets of this exercise"
+                >
+                  Apply to All Sets
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

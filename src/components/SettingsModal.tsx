@@ -448,6 +448,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 step="0.1"
                 className="settings-input"
                 value={displayCurrentWeight}
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => handleCurrentWeightChange(e.target.value)}
                 placeholder={localSettings.unit === 'kg' ? '80' : '176'}
               />
@@ -463,6 +464,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 step="0.1"
                 className="settings-input"
                 value={displayTargetWeight}
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => handleTargetWeightChange(e.target.value)}
                 placeholder={localSettings.unit === 'kg' ? '85' : '187'}
               />
@@ -477,6 +479,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="number"
                 className="settings-input"
                 value={localSettings.heightCm || ''}
+                onFocus={(e) => e.target.select()}
                 onChange={(e) =>
                   setLocalSettings({ ...localSettings, heightCm: parseFloat(e.target.value) || undefined })
                 }
@@ -493,6 +496,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="number"
                 className="settings-input"
                 value={localSettings.age || ''}
+                onFocus={(e) => e.target.select()}
                 onChange={(e) =>
                   setLocalSettings({ ...localSettings, age: parseInt(e.target.value, 10) || undefined })
                 }
