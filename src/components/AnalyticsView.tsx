@@ -33,8 +33,10 @@ import {
   Scale,
   Plus,
   BookOpen,
-  Trash2
+  Trash2,
+  FileSpreadsheet
 } from 'lucide-react';
+import { WorkoutImportModal } from './WorkoutImportModal';
 
 interface AnalyticsViewProps {
   historySessions: WorkoutSession[];
@@ -54,6 +56,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
   const [inspectedSession, setInspectedSession] = useState<WorkoutSession | null>(null);
+  const [showImportModal, setShowImportModal] = useState<boolean>(false);
 
   // 1RM Calculator State
   const [calcWeight, setCalcWeight] = useState<number | string>(100);
@@ -680,9 +683,33 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             <Calendar size={18} color="var(--text-primary)" />
             Session History Log
           </h3>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-            {historySessions.length} Completed
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{
+                padding: '4px 10px',
+                fontSize: '0.72rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                borderRadius: 'var(--radius-md)',
+                borderColor: 'rgba(0, 245, 155, 0.35)',
+                background: 'rgba(0, 245, 155, 0.08)'
+              }}
+              onClick={() => {
+                triggerHaptic('light');
+                setShowImportModal(true);
+              }}
+              title="Import workouts from Strong, Hevy, FitNotes, CSV or JSON"
+            >
+              <FileSpreadsheet size={13} color="var(--accent-volt)" />
+              Import Logs
+            </button>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+              {historySessions.length} Completed
+            </span>
+          </div>
         </div>
 
         {historySessions.length === 0 ? (
@@ -818,6 +845,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           session={inspectedSession}
           settings={settings}
           onClose={() => setInspectedSession(null)}
+        />
+      )}
+
+      {/* Workout Logs Importer Modal */}
+      {showImportModal && (
+        <WorkoutImportModal
+          onClose={() => setShowImportModal(false)}
         />
       )}
     </div>

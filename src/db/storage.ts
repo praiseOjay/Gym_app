@@ -12,6 +12,11 @@ import type {
 import { PRESET_ROUTINES } from '../data/presetRoutines';
 import { IndexedDBService, STORES } from './indexedDb';
 import { createDefaultMesocycle } from '../engine/mesocycleEngine';
+import {
+  parseWorkoutLogs,
+  computePRsFromSessions,
+  type WorkoutImportResult
+} from '../services/workoutImportService';
 
 const STORAGE_KEYS = {
   WORKOUTS: 'overload_workouts_v3',
@@ -86,6 +91,71 @@ export const StorageService = {
     const all = this.getWorkouts().filter((w) => w.id !== id);
     this.saveWorkouts(all);
     return all;
+  },
+
+  importWorkoutLogs(
+    rawContent: string,
+    mode: 'merge' | 'replace' = 'merge'
+  ): WorkoutImportResult {
+    const parsed = parseWorkoutLogs(rawContent);
+    if (!parsed.success || parsed.sessions.length === 0) {
+      return parsed;
+    }
+
+    let finalWorkouts: WorkoutSession[];
+    let importedCount = 0;
+
+    if (mode === 'replace') {
+      finalWorkouts = parsed.sessions;
+      importedCount = finalWorkouts.length;
+    } else {
+      const existing = this.getWorkouts();
+      const existingSignatures = new Set(
+        existing.map((s) => {
+          const datePart = (s.date || '').split('T')[0];
+          const totalSets = s.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+          return `${datePart}_${(s.routineName || '').toLowerCase().trim()}_${totalSets}`;
+        })
+      );
+
+      const newSessions: WorkoutSession[] = [];
+      for (const s of parsed.sessions) {
+        const datePart = (s.date || '').split('T')[0];
+        const totalSets = s.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+        const sig = `${datePart}_${(s.routineName || '').toLowerCase().trim()}_${totalSets}`;
+        if (!existingSignatures.has(sig)) {
+          newSessions.push(s);
+          existingSignatures.add(sig);
+        }
+      }
+
+      finalWorkouts = [...newSessions, ...existing];
+      importedCount = newSessions.length;
+    }
+
+    // Sort descending by date
+    finalWorkouts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    this.saveWorkouts(finalWorkouts);
+
+    // Automatically recalculate PRs across all workout sessions
+    const recomputedPRs = computePRsFromSessions(finalWorkouts);
+    this.savePRs(recomputedPRs);
+
+    return {
+      ...parsed,
+      sessionsImported: importedCount,
+      prsUpdated: recomputedPRs.length,
+      sessions: finalWorkouts,
+      message: `Successfully imported ${importedCount} session${importedCount === 1 ? '' : 's'} (${parsed.setsImported} sets). ${recomputedPRs.length} Personal Records recalibrated.`
+    };
+  },
+
+  recalculatePRsFromWorkouts(workouts?: WorkoutSession[]): PRRecord[] {
+    const target = workouts || this.getWorkouts();
+    const prs = computePRsFromSessions(target);
+    this.savePRs(prs);
+    return prs;
   },
 
   getRoutines(): Routine[] {

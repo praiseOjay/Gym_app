@@ -25,6 +25,7 @@ import {
   Clipboard,
   FileText
 } from 'lucide-react';
+import { WorkoutImportModal } from './WorkoutImportModal';
 
 interface SettingsModalProps {
   settings: UserSettings;
@@ -45,6 +46,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [exportStatus, setExportStatus] = useState<string | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showPasteModal, setShowPasteModal] = useState(false);
+  const [showWorkoutImportModal, setShowWorkoutImportModal] = useState(false);
   const [pastedJsonText, setPastedJsonText] = useState('');
   const [pasteError, setPasteError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,11 +87,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             encoding: Encoding.UTF8
           });
 
+          // Do NOT pass 'text' when sharing a file, as Capacitor Android will force
+          // intent.setType("text/plain"), causing Android to name it 'transfer doc.txt'.
+          // Passing 'files' allows Capacitor to look up the exact MIME type (text/csv or application/json)
           await Share.share({
             title: fileName,
-            text: `Overload AI: ${fileName}`,
-            url: fileResult.uri,
-            dialogTitle: `Export ${fileName}`
+            files: [fileResult.uri],
+            dialogTitle: `Save or Share ${fileName}`
           });
 
           setExportStatus(`✓ Exported ${fileName} via Android Share!`);
@@ -208,6 +212,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     const dateStr = new Date().toISOString().split('T')[0];
     await exportFile(csv, `overload-ai-workouts-${dateStr}.csv`, 'text/csv');
     triggerHaptic('success');
+  };
+
+  const handleCopyCSV = async () => {
+    triggerHaptic('medium');
+    try {
+      const csv = StorageService.exportWorkoutsCSV();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(csv);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = csv;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      triggerHaptic('success');
+      setExportStatus('✓ Workout logs CSV copied to clipboard!');
+      setTimeout(() => setExportStatus(null), 4000);
+    } catch (err: any) {
+      setExportStatus(`⚠️ Could not copy: ${err.message}`);
+      setTimeout(() => setExportStatus(null), 4000);
+    }
   };
 
   const processBackupString = (content: string): boolean => {
@@ -758,15 +787,56 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </button>
             </div>
 
-            <button
-              type="button"
-              className="btn-secondary"
-              style={{ width: '100%', padding: '10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-              onClick={handleExportCSV}
-              title="Download CSV spreadsheet of all workout sets"
-            >
-              <FileSpreadsheet size={14} color="var(--accent-volt)" /> Export Workout Logs (CSV)
-            </button>
+            <div style={{ margin: '4px 0 2px' }}>
+              <button
+                type="button"
+                className="btn-primary"
+                style={{
+                  width: '100%',
+                  padding: '11px',
+                  fontSize: '0.82rem',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  background: 'linear-gradient(135deg, rgba(0, 245, 155, 0.25) 0%, rgba(0, 229, 255, 0.18) 100%)',
+                  border: '1px solid rgba(0, 245, 155, 0.45)',
+                  color: '#fff',
+                  borderRadius: 'var(--radius-md)'
+                }}
+                onClick={() => {
+                  triggerHaptic('light');
+                  setShowWorkoutImportModal(true);
+                }}
+                title="Import workouts from Strong, Hevy, FitNotes, CSV or JSON"
+              >
+                <FileSpreadsheet size={16} color="var(--accent-volt)" />
+                Import Workout Logs (CSV / JSON)
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{ padding: '10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                onClick={handleExportCSV}
+                title="Download CSV spreadsheet of all workout sets"
+              >
+                <FileSpreadsheet size={14} color="var(--accent-volt)" /> Export Logs (CSV)
+              </button>
+
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{ padding: '10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                onClick={handleCopyCSV}
+                title="Copy entire CSV spreadsheet directly to clipboard"
+              >
+                <Copy size={14} /> Copy CSV Text
+              </button>
+            </div>
           </div>
         </div>
 
@@ -898,6 +968,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {showWorkoutImportModal && (
+        <WorkoutImportModal
+          onClose={() => setShowWorkoutImportModal(false)}
+        />
       )}
     </div>
   );
