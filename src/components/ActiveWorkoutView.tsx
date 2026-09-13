@@ -46,7 +46,6 @@ import {
   Info,
   Mic,
   Layers,
-  Search,
   Zap,
   Volume2,
   VolumeX,
@@ -59,6 +58,7 @@ import {
 import confetti from 'canvas-confetti';
 import { SwipeableModalSheet } from './SwipeableModalSheet';
 import { useDraggableList } from '../hooks/useDraggableList';
+import { ExerciseFilterBar } from './ExerciseFilterBar';
 import {
   getExerciseTrackingType,
   displayDistance,
@@ -133,6 +133,40 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     exerciseIdx: number;
     setIdx: number;
   } | null>(null);
+
+  const filteredExercisesForWorkout = useMemo(() => {
+    const q = exerciseSearchQuery.toLowerCase().trim();
+    const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+
+    return EXERCISE_LIBRARY.filter((e) => {
+      const matchMuscle =
+        selectedMuscleFilter === 'All' ||
+        (selectedMuscleFilter === 'Legs' && ['Quads', 'Hamstrings', 'Glutes', 'Calves'].includes(e.muscleGroup)) ||
+        (selectedMuscleFilter === 'Arms' && ['Biceps', 'Triceps', 'Forearms'].includes(e.muscleGroup)) ||
+        (selectedMuscleFilter === 'Core' && e.muscleGroup === 'Abs') ||
+        e.muscleGroup === selectedMuscleFilter;
+      if (!matchMuscle) return false;
+
+      const matchEquipment =
+        selectedEquipmentFilter === 'All Equipment' ||
+        e.equipment.toLowerCase() === selectedEquipmentFilter.toLowerCase() ||
+        (selectedEquipmentFilter === 'Machine' &&
+          (e.equipment === 'Machine' || e.name.toLowerCase().includes('lever') || e.equipment === 'Smith Machine'));
+      if (!matchEquipment) return false;
+
+      if (tokens.length === 0) return true;
+
+      return tokens.every(
+        (token) =>
+          e.name.toLowerCase().includes(token) ||
+          e.equipment.toLowerCase().includes(token) ||
+          e.muscleGroup.toLowerCase().includes(token) ||
+          (e.secondaryMuscles && e.secondaryMuscles.some((m) => m.toLowerCase().includes(token))) ||
+          e.category.toLowerCase().includes(token) ||
+          e.id.toLowerCase().includes(token)
+      );
+    });
+  }, [selectedMuscleFilter, selectedEquipmentFilter, exerciseSearchQuery]);
 
   // Tactical Intelligence state - only show once per active session
   const [showReadinessModal, setShowReadinessModal] = useState<boolean>(() => {
@@ -1998,286 +2032,164 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
             </button>
           </div>
 
-            {/* Search Input */}
-            <div style={{ position: 'relative', marginBottom: 10 }}>
-              <Search
-                size={16}
-                color="var(--text-muted)"
-                style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
-              />
-              <input
-                type="text"
-                placeholder="Search 1,300+ exercises by name or equipment..."
-                value={exerciseSearchQuery}
-                onChange={(e) => setExerciseSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  background: 'var(--bg-input)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '9px 12px 9px 36px',
-                  color: '#fff',
-                  fontSize: '0.85rem',
-                  outline: 'none'
-                }}
-              />
-              {exerciseSearchQuery && (
-                <button
-                  onClick={() => setExerciseSearchQuery('')}
+            {/* Unified Tactile Filter Bar */}
+            <ExerciseFilterBar
+              searchQuery={exerciseSearchQuery}
+              onSearchChange={setExerciseSearchQuery}
+              selectedMuscle={selectedMuscleFilter}
+              onSelectMuscle={(m) => {
+                setSelectedMuscleFilter(m);
+                setExerciseDisplayLimit(60);
+              }}
+              selectedEquipment={selectedEquipmentFilter}
+              onSelectEquipment={(eq) => {
+                setSelectedEquipmentFilter(eq);
+                setExerciseDisplayLimit(60);
+              }}
+              totalResults={EXERCISE_LIBRARY.length}
+              filteredCount={filteredExercisesForWorkout.length}
+              onReset={() => setExerciseDisplayLimit(60)}
+            />
+
+            {/* Preview Guide Banner */}
+            <div
+              style={{
+                background: 'rgba(0, 229, 255, 0.08)',
+                border: '1px solid rgba(0, 229, 255, 0.22)',
+                borderRadius: 'var(--radius-md)',
+                padding: '7px 12px',
+                marginBottom: 8,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: '0.74rem',
+                color: 'var(--text-secondary)'
+              }}
+            >
+              <Eye size={14} color="var(--accent-cyan)" style={{ flexShrink: 0 }} />
+              <span>
+                Tap any exercise or <strong style={{ color: 'var(--accent-cyan)' }}>Preview</strong> to inspect animated form, biomechanics & cues before adding.
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto' }}>
+              {filteredExercisesForWorkout.slice(0, exerciseDisplayLimit).map((ex) => (
+                <div
+                  key={ex.id}
                   style={{
-                    position: 'absolute',
-                    right: 10,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--text-muted)',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
                     cursor: 'pointer',
-                    padding: 2
+                    transition: 'background 0.15s ease, border-color 0.15s ease'
+                  }}
+                  onClick={() => {
+                    triggerHaptic('light', settings.vibrationEnabled);
+                    setPreviewExerciseForWorkout(ex);
                   }}
                 >
-                  <X size={14} />
+                  <div style={{ flex: 1, minWidth: 0, paddingRight: 4 }}>
+                    <div style={{ fontWeight: 800, fontSize: '0.94rem', color: '#fff' }}>{ex.name}</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+                      <span style={{ color: 'var(--accent-volt)', fontWeight: 700 }}>{ex.muscleGroup}</span>
+                      <span>·</span>
+                      <span>{ex.equipment}</span>
+                      <span>·</span>
+                      <span>{ex.category}</span>
+                      {ex.secondaryMuscles && ex.secondaryMuscles.length > 0 && (
+                        <>
+                          <span>·</span>
+                          <span style={{ color: 'var(--text-muted)' }}>+ {ex.secondaryMuscles.join(', ')}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions: Preview & Quick Add */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerHaptic('light', settings.vibrationEnabled);
+                        setPreviewExerciseForWorkout(ex);
+                      }}
+                      style={{
+                        background: 'rgba(0, 229, 255, 0.1)',
+                        border: '1px solid rgba(0, 229, 255, 0.3)',
+                        color: 'var(--accent-cyan)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '6px 10px',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        cursor: 'pointer'
+                      }}
+                      title="Preview exercise motion, biomechanics & form cues"
+                    >
+                      <Eye size={13} />
+                      <span>Preview</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerHaptic('success', settings.vibrationEnabled);
+                        handleAddExerciseToWorkout(ex);
+                      }}
+                      style={{
+                        background: 'rgba(0, 245, 155, 0.15)',
+                        border: '1px solid rgba(0, 245, 155, 0.35)',
+                        color: 'var(--accent-volt)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '6px 11px',
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        cursor: 'pointer'
+                      }}
+                      title="Quick add to workout"
+                    >
+                      <Plus size={14} />
+                      <span>Add</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {filteredExercisesForWorkout.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '24px 12px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  No exercises found matching "{exerciseSearchQuery}". Try another search term or filter.
+                </div>
+              )}
+              {filteredExercisesForWorkout.length > exerciseDisplayLimit && (
+                <button
+                  className="btn-secondary"
+                  style={{
+                    width: '100%',
+                    padding: '9px',
+                    fontSize: '0.8rem',
+                    color: 'var(--accent-volt)',
+                    border: '1px dashed rgba(0, 245, 155, 0.3)',
+                    borderRadius: 'var(--radius-md)',
+                    marginTop: 6,
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setExerciseDisplayLimit((prev) => prev + 60)}
+                >
+                  Load More ({filteredExercisesForWorkout.length - exerciseDisplayLimit} remaining)
                 </button>
               )}
             </div>
-
-            {/* Muscle Filter Tabs */}
-            <div className="quick-prompts-row" style={{ marginBottom: 6 }}>
-              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Glutes', 'Biceps', 'Triceps', 'Calves', 'Forearms', 'Traps', 'Abs', 'Cardio'].map(
-                (m) => (
-                  <button
-                    key={m}
-                    className="quick-prompt-chip"
-                    style={{
-                      background: selectedMuscleFilter === m ? 'var(--accent-volt)' : undefined,
-                      color: selectedMuscleFilter === m ? '#050D0A' : undefined,
-                      fontWeight: selectedMuscleFilter === m ? 800 : undefined,
-                      fontSize: '0.72rem',
-                      padding: '4px 10px'
-                    }}
-                    onClick={() => {
-                      setSelectedMuscleFilter(m);
-                      setExerciseDisplayLimit(60);
-                    }}
-                  >
-                    {m}
-                  </button>
-                )
-              )}
-            </div>
-
-            {/* Equipment Filter Chips */}
-            <div className="quick-prompts-row" style={{ marginBottom: 10 }}>
-              {['All Equipment', 'Machine', 'Dumbbell', 'Barbell', 'Cable', 'Smith Machine', 'Bodyweight'].map(
-                (eq) => (
-                  <button
-                    key={eq}
-                    className="timer-chip"
-                    style={{
-                      background: selectedEquipmentFilter === eq ? 'rgba(0, 229, 255, 0.2)' : undefined,
-                      borderColor: selectedEquipmentFilter === eq ? 'var(--accent-cyan)' : undefined,
-                      color: selectedEquipmentFilter === eq ? '#fff' : 'var(--text-muted)',
-                      fontWeight: selectedEquipmentFilter === eq ? 700 : 500,
-                      fontSize: '0.7rem',
-                      padding: '3px 8px'
-                    }}
-                    onClick={() => {
-                      setSelectedEquipmentFilter(eq);
-                      setExerciseDisplayLimit(60);
-                    }}
-                  >
-                    {eq}
-                  </button>
-                )
-              )}
-            </div>
-
-            {/* Filtered Exercise List with Dynamic Pagination */}
-            {(() => {
-              const q = exerciseSearchQuery.toLowerCase().trim();
-              const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
-
-              const filtered = EXERCISE_LIBRARY.filter((e) => {
-                const matchMuscle =
-                  selectedMuscleFilter === 'All' ||
-                  e.muscleGroup === selectedMuscleFilter;
-                if (!matchMuscle) return false;
-
-                const matchEquipment =
-                  selectedEquipmentFilter === 'All Equipment' ||
-                  e.equipment.toLowerCase() === selectedEquipmentFilter.toLowerCase() ||
-                  (selectedEquipmentFilter === 'Machine' &&
-                    (e.equipment === 'Machine' || e.name.toLowerCase().includes('lever') || e.equipment === 'Smith Machine'));
-                if (!matchEquipment) return false;
-
-                if (tokens.length === 0) return true;
-
-                return tokens.every(
-                  (token) =>
-                    e.name.toLowerCase().includes(token) ||
-                    e.equipment.toLowerCase().includes(token) ||
-                    e.muscleGroup.toLowerCase().includes(token) ||
-                    (e.secondaryMuscles && e.secondaryMuscles.some((m) => m.toLowerCase().includes(token))) ||
-                    e.category.toLowerCase().includes(token) ||
-                    e.id.toLowerCase().includes(token)
-                );
-              });
-
-              return (
-                <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      Showing {Math.min(filtered.length, exerciseDisplayLimit)} of {filtered.length} exercises
-                    </div>
-                    {selectedEquipmentFilter !== 'All Equipment' && (
-                      <span style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontWeight: 600 }}>
-                        Filtered by {selectedEquipmentFilter}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Preview Guide Banner */}
-                  <div
-                    style={{
-                      background: 'rgba(0, 229, 255, 0.08)',
-                      border: '1px solid rgba(0, 229, 255, 0.22)',
-                      borderRadius: 'var(--radius-md)',
-                      padding: '7px 12px',
-                      marginBottom: 8,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      fontSize: '0.74rem',
-                      color: 'var(--text-secondary)'
-                    }}
-                  >
-                    <Eye size={14} color="var(--accent-cyan)" style={{ flexShrink: 0 }} />
-                    <span>
-                      Tap any exercise or <strong style={{ color: 'var(--accent-cyan)' }}>Preview</strong> to inspect animated form, biomechanics & cues before adding.
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto' }}>
-                    {filtered.slice(0, exerciseDisplayLimit).map((ex) => (
-                      <div
-                        key={ex.id}
-                        style={{
-                          background: 'var(--bg-card)',
-                          border: '1px solid var(--border-subtle)',
-                          borderRadius: 'var(--radius-md)',
-                          padding: '10px 12px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: 8,
-                          cursor: 'pointer',
-                          transition: 'background 0.15s ease, border-color 0.15s ease'
-                        }}
-                        onClick={() => {
-                          triggerHaptic('light', settings.vibrationEnabled);
-                          setPreviewExerciseForWorkout(ex);
-                        }}
-                      >
-                        <div style={{ flex: 1, minWidth: 0, paddingRight: 4 }}>
-                          <div style={{ fontWeight: 800, fontSize: '0.94rem', color: '#fff' }}>{ex.name}</div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: 2 }}>
-                            <span style={{ color: 'var(--accent-volt)', fontWeight: 700 }}>{ex.muscleGroup}</span>
-                            <span>·</span>
-                            <span>{ex.equipment}</span>
-                            <span>·</span>
-                            <span>{ex.category}</span>
-                            {ex.secondaryMuscles && ex.secondaryMuscles.length > 0 && (
-                              <>
-                                <span>·</span>
-                                <span style={{ color: 'var(--text-muted)' }}>+ {ex.secondaryMuscles.join(', ')}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Actions: Preview & Quick Add */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              triggerHaptic('light', settings.vibrationEnabled);
-                              setPreviewExerciseForWorkout(ex);
-                            }}
-                            style={{
-                              background: 'rgba(0, 229, 255, 0.1)',
-                              border: '1px solid rgba(0, 229, 255, 0.3)',
-                              color: 'var(--accent-cyan)',
-                              borderRadius: 'var(--radius-md)',
-                              padding: '6px 10px',
-                              fontSize: '0.72rem',
-                              fontWeight: 700,
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 4,
-                              cursor: 'pointer'
-                            }}
-                            title="Preview exercise motion, biomechanics & form cues"
-                          >
-                            <Eye size={13} />
-                            <span>Preview</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              triggerHaptic('success', settings.vibrationEnabled);
-                              handleAddExerciseToWorkout(ex);
-                            }}
-                            style={{
-                              background: 'rgba(0, 245, 155, 0.15)',
-                              border: '1px solid rgba(0, 245, 155, 0.35)',
-                              color: 'var(--accent-volt)',
-                              borderRadius: 'var(--radius-md)',
-                              padding: '6px 11px',
-                              fontSize: '0.72rem',
-                              fontWeight: 800,
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 4,
-                              cursor: 'pointer'
-                            }}
-                            title="Quick add to workout"
-                          >
-                            <Plus size={14} />
-                            <span>Add</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                    {filtered.length === 0 && (
-                      <div style={{ textAlign: 'center', padding: '24px 12px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                        No exercises found matching "{exerciseSearchQuery}". Try another search term or filter.
-                      </div>
-                    )}
-                    {filtered.length > exerciseDisplayLimit && (
-                      <button
-                        className="btn-secondary"
-                        style={{
-                          width: '100%',
-                          padding: '9px',
-                          fontSize: '0.8rem',
-                          color: 'var(--accent-volt)',
-                          border: '1px dashed rgba(0, 245, 155, 0.3)',
-                          borderRadius: 'var(--radius-md)',
-                          marginTop: 6,
-                          cursor: 'pointer'
-                        }}
-                        onClick={() => setExerciseDisplayLimit((prev) => prev + 60)}
-                      >
-                        Load More ({filtered.length - exerciseDisplayLimit} remaining)
-                      </button>
-                    )}
-                  </div>
-                </>
-              );
-            })()}
         </SwipeableModalSheet>
       )}
 

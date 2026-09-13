@@ -20,12 +20,12 @@ import {
   ArrowUp,
   ArrowDown,
   Save,
-  Search,
   GripVertical,
   Eye
 } from 'lucide-react';
 import { SwipeableModalSheet } from './SwipeableModalSheet';
 import { useDraggableList } from '../hooks/useDraggableList';
+import { ExerciseFilterBar } from './ExerciseFilterBar';
 
 interface RoutinesViewProps {
   routines: Routine[];
@@ -86,6 +86,9 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
     return EXERCISE_LIBRARY.filter((e) => {
       const matchMuscle =
         exerciseFilterMuscle === 'All' ||
+        (exerciseFilterMuscle === 'Legs' && ['Quads', 'Hamstrings', 'Glutes', 'Calves'].includes(e.muscleGroup)) ||
+        (exerciseFilterMuscle === 'Arms' && ['Biceps', 'Triceps', 'Forearms'].includes(e.muscleGroup)) ||
+        (exerciseFilterMuscle === 'Core' && e.muscleGroup === 'Abs') ||
         e.muscleGroup === exerciseFilterMuscle;
       if (!matchMuscle) return false;
 
@@ -1275,110 +1278,24 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
               </button>
             </div>
 
-            {/* Search Input */}
-            <div style={{ position: 'relative', marginBottom: 10 }}>
-              <Search
-                size={16}
-                color="var(--text-muted)"
-                style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
-              />
-              <input
-                type="text"
-                placeholder="Search 1,300+ exercises by name or equipment..."
-                value={exerciseSearch}
-                onChange={(e) => setExerciseSearch(e.target.value)}
-                style={{
-                  width: '100%',
-                  background: 'var(--bg-input)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '9px 12px 9px 36px',
-                  color: '#fff',
-                  fontSize: '0.85rem',
-                  outline: 'none'
-                }}
-              />
-              {exerciseSearch && (
-                <button
-                  onClick={() => setExerciseSearch('')}
-                  style={{
-                    position: 'absolute',
-                    right: 10,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--text-muted)',
-                    cursor: 'pointer',
-                    padding: 2
-                  }}
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-
-            {/* Muscle Filter Tabs */}
-            <div className="quick-prompts-row" style={{ marginBottom: 6 }}>
-              {['All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Glutes', 'Biceps', 'Triceps', 'Calves', 'Forearms', 'Traps', 'Abs', 'Cardio'].map(
-                (m) => (
-                  <button
-                    key={m}
-                    className="quick-prompt-chip"
-                    style={{
-                      background: exerciseFilterMuscle === m ? 'var(--accent-volt)' : undefined,
-                      color: exerciseFilterMuscle === m ? '#050D0A' : undefined,
-                      fontWeight: exerciseFilterMuscle === m ? 800 : undefined,
-                      fontSize: '0.72rem',
-                      padding: '4px 10px'
-                    }}
-                    onClick={() => {
-                      setExerciseFilterMuscle(m);
-                      setExerciseDisplayLimit(60);
-                    }}
-                  >
-                    {m}
-                  </button>
-                )
-              )}
-            </div>
-
-            {/* Equipment Filter Chips */}
-            <div className="quick-prompts-row" style={{ marginBottom: 10 }}>
-              {['All Equipment', 'Machine', 'Dumbbell', 'Barbell', 'Cable', 'Smith Machine', 'Bodyweight'].map(
-                (eq) => (
-                  <button
-                    key={eq}
-                    className="timer-chip"
-                    style={{
-                      background: exerciseFilterEquipment === eq ? 'rgba(0, 229, 255, 0.2)' : undefined,
-                      borderColor: exerciseFilterEquipment === eq ? 'var(--accent-cyan)' : undefined,
-                      color: exerciseFilterEquipment === eq ? '#fff' : 'var(--text-muted)',
-                      fontWeight: exerciseFilterEquipment === eq ? 700 : 500,
-                      fontSize: '0.7rem',
-                      padding: '3px 8px'
-                    }}
-                    onClick={() => {
-                      setExerciseFilterEquipment(eq);
-                      setExerciseDisplayLimit(60);
-                    }}
-                  >
-                    {eq}
-                  </button>
-                )
-              )}
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Showing {Math.min(filteredExercises.length, exerciseDisplayLimit)} of {filteredExercises.length} exercises
-              </div>
-              {exerciseFilterEquipment !== 'All Equipment' && (
-                <span style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontWeight: 600 }}>
-                  Filtered by {exerciseFilterEquipment}
-                </span>
-              )}
-            </div>
+            {/* Unified Tactile Filter Bar */}
+            <ExerciseFilterBar
+              searchQuery={exerciseSearch}
+              onSearchChange={setExerciseSearch}
+              selectedMuscle={exerciseFilterMuscle}
+              onSelectMuscle={(m) => {
+                setExerciseFilterMuscle(m);
+                setExerciseDisplayLimit(60);
+              }}
+              selectedEquipment={exerciseFilterEquipment}
+              onSelectEquipment={(eq) => {
+                setExerciseFilterEquipment(eq);
+                setExerciseDisplayLimit(60);
+              }}
+              totalResults={EXERCISE_LIBRARY.length}
+              filteredCount={filteredExercises.length}
+              onReset={() => setExerciseDisplayLimit(60)}
+            />
 
             {/* Preview Guide Banner */}
             <div

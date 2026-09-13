@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { X, Sparkles, RefreshCw, CheckCircle2, ArrowRight, Search, SlidersHorizontal } from 'lucide-react';
+import { X, Sparkles, RefreshCw, CheckCircle2, ArrowRight, SlidersHorizontal } from 'lucide-react';
 import type { Exercise } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import { getSmartExerciseSwap } from '../services/geminiService';
 import { SwipeableModalSheet } from './SwipeableModalSheet';
+import { ExerciseFilterBar } from './ExerciseFilterBar';
 
 interface SmartSwapModalProps {
   exercise: Exercise;
@@ -11,33 +12,6 @@ interface SmartSwapModalProps {
   onClose: () => void;
   onSelectAlternative: (newExerciseName: string, equipment: string) => void;
 }
-
-const MUSCLE_FILTER_OPTIONS = [
-  'All',
-  'Chest',
-  'Back',
-  'Shoulders',
-  'Quads',
-  'Hamstrings',
-  'Glutes',
-  'Biceps',
-  'Triceps',
-  'Calves',
-  'Forearms',
-  'Traps',
-  'Abs',
-  'Cardio'
-];
-
-const EQUIPMENT_FILTER_OPTIONS = [
-  'All Equipment',
-  'Machine',
-  'Dumbbell',
-  'Barbell',
-  'Cable',
-  'Smith Machine',
-  'Bodyweight'
-];
 
 export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
   exercise,
@@ -103,10 +77,13 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
         return false;
       }
 
-      // Match muscle group
+      // Match muscle group (supports macro categories)
       const matchMuscle =
         swapMuscleFilter === 'All' ||
-        e.muscleGroup === swapMuscleFilter;
+        e.muscleGroup === swapMuscleFilter ||
+        (swapMuscleFilter === 'Legs' && ['Quads', 'Hamstrings', 'Glutes', 'Calves'].includes(e.muscleGroup)) ||
+        (swapMuscleFilter === 'Arms' && ['Biceps', 'Triceps', 'Forearms'].includes(e.muscleGroup)) ||
+        (swapMuscleFilter === 'Core' && ['Abs'].includes(e.muscleGroup));
       if (!matchMuscle) return false;
 
       // Match equipment
@@ -340,98 +317,23 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
             </span>
           </div>
 
-          {/* Search Input */}
-          <div style={{ position: 'relative', marginBottom: 8 }}>
-            <Search
-              size={15}
-              color="var(--text-muted)"
-              style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
-            />
-            <input
-              id="swap-library-search-input"
-              type="text"
-              placeholder="Search swap movements (e.g. lever, incline, press, machine)..."
-              value={swapSearchQuery}
-              onChange={(e) => setSwapSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                background: 'var(--bg-input)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-md)',
-                padding: '9px 12px 9px 34px',
-                color: '#fff',
-                fontSize: '0.82rem',
-                outline: 'none'
-              }}
-            />
-            {swapSearchQuery && (
-              <button
-                onClick={() => setSwapSearchQuery('')}
-                style={{
-                  position: 'absolute',
-                  right: 10,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  padding: 2
-                }}
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
-
-          {/* Muscle Group Filter Tabs */}
-          <div className="quick-prompts-row" style={{ marginBottom: 6 }}>
-            {MUSCLE_FILTER_OPTIONS.map((m) => {
-              const isSelected = swapMuscleFilter === m;
-              const isCurrentMuscle = m === resolvedExercise.muscleGroup;
-              return (
-                <button
-                  key={m}
-                  className="quick-prompt-chip"
-                  style={{
-                    background: isSelected ? 'var(--accent-volt)' : undefined,
-                    color: isSelected ? '#050D0A' : isCurrentMuscle ? 'var(--accent-volt)' : undefined,
-                    borderColor: isCurrentMuscle && !isSelected ? 'rgba(0, 245, 155, 0.4)' : undefined,
-                    fontWeight: isSelected ? 800 : undefined,
-                    fontSize: '0.72rem',
-                    padding: '4px 10px'
-                  }}
-                  onClick={() => setSwapMuscleFilter(m)}
-                >
-                  {m} {isCurrentMuscle ? '★' : ''}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Equipment Filter Chips */}
-          <div className="quick-prompts-row" style={{ marginBottom: 10 }}>
-            {EQUIPMENT_FILTER_OPTIONS.map((eq) => {
-              const isSelected = swapEquipmentFilter === eq;
-              return (
-                <button
-                  key={eq}
-                  className="timer-chip"
-                  style={{
-                    background: isSelected ? 'rgba(0, 229, 255, 0.2)' : undefined,
-                    borderColor: isSelected ? 'var(--accent-cyan)' : undefined,
-                    color: isSelected ? '#fff' : 'var(--text-muted)',
-                    fontWeight: isSelected ? 700 : 500,
-                    fontSize: '0.7rem',
-                    padding: '3px 8px'
-                  }}
-                  onClick={() => setSwapEquipmentFilter(eq)}
-                >
-                  {eq}
-                </button>
-              );
-            })}
-          </div>
+          {/* Enhanced Exercise Filter Bar */}
+          <ExerciseFilterBar
+            searchQuery={swapSearchQuery}
+            onSearchChange={setSwapSearchQuery}
+            selectedMuscle={swapMuscleFilter}
+            onSelectMuscle={setSwapMuscleFilter}
+            selectedEquipment={swapEquipmentFilter}
+            onSelectEquipment={setSwapEquipmentFilter}
+            totalResults={EXERCISE_LIBRARY.length}
+            filteredCount={filteredAlternatives.length}
+            placeholder="Search swap movements (e.g. lever, incline)..."
+            onReset={() => {
+              setSwapSearchQuery('');
+              setSwapMuscleFilter('All');
+              setSwapEquipmentFilter('All Equipment');
+            }}
+          />
 
           {/* Exercise List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 300, overflowY: 'auto' }}>

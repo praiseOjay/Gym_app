@@ -21,6 +21,7 @@ export function useSwipeToDismiss({
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const handleRef = useRef<HTMLDivElement | null>(null);
 
+  const startXRef = useRef(0);
   const startYRef = useRef(0);
   const currentYRef = useRef(0);
   const startTimeRef = useRef(0);
@@ -41,12 +42,22 @@ export function useSwipeToDismiss({
       target.classList.contains('modal-handle') ||
       target.closest('.modal-handle') !== null;
 
+    // If touch started in an element explicitly marked data-no-swipe, or input/textarea/select, don't initiate sheet dismiss
+    const inNoSwipeZone =
+      target.closest('[data-no-swipe="true"]') !== null ||
+      target.closest('input, textarea, select') !== null;
+
+    if (!onHandle && inNoSwipeZone) {
+      return;
+    }
+
     // If not on handle, allow swipe-down only if content is scrolled to top
     if (!onHandle && sheet.scrollTop > 5) {
       return;
     }
 
     startedOnHandleRef.current = onHandle;
+    startXRef.current = touch.clientX;
     startYRef.current = touch.clientY;
     currentYRef.current = touch.clientY;
     startTimeRef.current = Date.now();
@@ -56,27 +67,41 @@ export function useSwipeToDismiss({
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (!isTrackingRef.current || !enabled || isClosing) return;
     const touch = e.touches[0];
-    const rawDelta = touch.clientY - startYRef.current;
+    const deltaX = Math.abs(touch.clientX - startXRef.current);
+    const rawDeltaY = touch.clientY - startYRef.current;
 
-    const sheet = sheetRef.current;
-    // If we started inside content and user scrolls up, let default scroll happen
-    if (!startedOnHandleRef.current && sheet && sheet.scrollTop > 0 && rawDelta < 0) {
+    // If not dragging by the handle and horizontal motion dominates, abort dismiss tracking (user is swiping tabs/carousels)
+    if (!startedOnHandleRef.current && deltaX > Math.abs(rawDeltaY)) {
       isTrackingRef.current = false;
       setTranslateY(0);
       setIsDragging(false);
       return;
     }
 
-    if (rawDelta > 0) {
+    const sheet = sheetRef.current;
+    // If we started inside content and user scrolls up, let default scroll happen
+    if (!startedOnHandleRef.current && sheet && sheet.scrollTop > 0 && rawDeltaY < 0) {
+      isTrackingRef.current = false;
+      setTranslateY(0);
+      setIsDragging(false);
+      return;
+    }
+
+    if (rawDeltaY > 0) {
+      // Require clear downward intent before locking touch into dismiss mode
+      if (!startedOnHandleRef.current && (rawDeltaY < 6 || rawDeltaY < deltaX * 1.2)) {
+        return;
+      }
+
       // Swiping down: apply pull resistance
-      e.cancelable && e.preventDefault();
-      const delta = rawDelta * resistance;
+      if (e.cancelable) e.preventDefault();
+      const delta = rawDeltaY * resistance;
       setTranslateY(delta);
       setIsDragging(true);
       currentYRef.current = touch.clientY;
     } else {
       // Pulling up: slight dampening rubber band
-      const delta = Math.max(-20, rawDelta * 0.15);
+      const delta = Math.max(-20, rawDeltaY * 0.15);
       setTranslateY(delta);
     }
   }, [enabled, isClosing, resistance]);
