@@ -3,6 +3,7 @@ import { X, Sparkles, RefreshCw, CheckCircle2, ArrowRight, Search, SlidersHorizo
 import type { Exercise } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import { getSmartExerciseSwap } from '../services/geminiService';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
 
 interface SmartSwapModalProps {
   exercise: Exercise;
@@ -132,15 +133,8 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
   }, [resolvedExercise, swapSearchQuery, swapMuscleFilter, swapEquipmentFilter]);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal-sheet"
-        style={{ maxHeight: '90vh', overflowY: 'auto' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-handle" />
-
-        {/* Header */}
+    <SwipeableModalSheet onClose={onClose} maxHeight="90vh">
+      {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div
@@ -517,7 +511,6 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
             )}
           </div>
         </div>
-      </div>
-    </div>
+    </SwipeableModalSheet>
   );
 };

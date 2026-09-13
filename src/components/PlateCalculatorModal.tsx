@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { X, Plus, Minus } from 'lucide-react';
 import { calculateBarbellPlates } from '../engine/overloadEngine';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
 
 interface PlateCalculatorModalProps {
   initialWeight: number;
@@ -85,11 +86,8 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
       ];
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-handle" />
-
-        {/* Modal Header */}
+    <SwipeableModalSheet onClose={onClose}>
+      {/* Modal Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Barbell & Plate Calculator</h3>
@@ -359,7 +357,6 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
             )}
           </div>
         )}
-      </div>
-    </div>
+    </SwipeableModalSheet>
   );
 };

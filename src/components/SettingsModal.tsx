@@ -26,6 +26,7 @@ import {
   FileText
 } from 'lucide-react';
 import { WorkoutImportModal } from './WorkoutImportModal';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
 
 interface SettingsModalProps {
   settings: UserSettings;
@@ -379,10 +380,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       : null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-handle" />
-
+    <>
+      <SwipeableModalSheet onClose={onClose}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Preferences & AI</h3>
@@ -875,22 +874,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <RotateCcw size={14} /> Reset Demo History
           </button>
         </div>
-      </div>
+      </SwipeableModalSheet>
 
       {/* Paste JSON Modal Dialog */}
       {showPasteModal && (
-        <div
-          className="modal-overlay"
-          style={{ zIndex: 9999 }}
-          onClick={() => setShowPasteModal(false)}
+        <SwipeableModalSheet
+          onClose={() => setShowPasteModal(false)}
+          overlayStyle={{ zIndex: 9999 }}
+          maxHeight="85vh"
         >
-          <div
-            className="modal-sheet"
-            style={{ maxHeight: '85vh', overflowY: 'auto' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-handle" />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Database size={18} color="var(--accent-volt)" />
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>
@@ -966,8 +959,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 Restore Backup Data
               </button>
             </div>
-          </div>
-        </div>
+        </SwipeableModalSheet>
       )}
 
       {showWorkoutImportModal && (
@@ -975,6 +967,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           onClose={() => setShowWorkoutImportModal(false)}
         />
       )}
-    </div>
+    </>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { WorkoutReadiness } from '../types/gym';
 import { Zap, Moon, Activity, ArrowRight } from 'lucide-react';
 import { triggerHaptic } from '../utils/haptics';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
 
 interface ReadinessCheckinModalProps {
   onComplete: (readiness: WorkoutReadiness) => void;
@@ -73,11 +74,12 @@ export const ReadinessCheckinModal: React.FC<ReadinessCheckinModalProps> = ({
   }[status];
 
   return (
-    <div className="modal-overlay" style={{ zIndex: 10000 }}>
-      <div className="modal-sheet" style={{ maxWidth: 480 }}>
-        <div className="modal-handle" />
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+    <SwipeableModalSheet
+      onClose={onSkip}
+      overlayStyle={{ zIndex: 10000 }}
+      style={{ maxWidth: 480 }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <div>
             <div style={{ fontSize: '0.72rem', color: 'var(--accent-volt)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
               ⚡ 15-Second Tactical Calibration
@@ -258,7 +260,6 @@ export const ReadinessCheckinModal: React.FC<ReadinessCheckinModalProps> = ({
           <span>Apply Calibration & Start Workout</span>
           <ArrowRight size={17} />
         </button>
-      </div>
-    </div>
+    </SwipeableModalSheet>
   );
 };

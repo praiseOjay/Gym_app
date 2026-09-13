@@ -14,6 +14,7 @@ import type { ParsedVoiceCommand } from '../services/voiceLogger';
 import { triggerHaptic } from '../utils/haptics';
 import { kgToLbs } from '../engine/overloadEngine';
 import { displayDistance, distanceUnitLabel, formatDuration } from '../utils/trackingTypeUtils';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
 
 interface VoiceLoggerModalProps {
   isOpen: boolean;
@@ -120,19 +121,16 @@ export const VoiceLoggerModal: React.FC<VoiceLoggerModalProps> = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1200 }}>
-      <div
-        className="modal-sheet"
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          borderTop: '2px solid var(--accent-volt)',
-          background: 'linear-gradient(180deg, #10161E 0%, #070B10 100%)',
-          maxWidth: 480
-        }}
-      >
-        <div className="modal-handle" />
-
-        {/* Header */}
+    <SwipeableModalSheet
+      onClose={onClose}
+      overlayStyle={{ zIndex: 1200 }}
+      style={{
+        borderTop: '2px solid var(--accent-volt)',
+        background: 'linear-gradient(180deg, #10161E 0%, #070B10 100%)',
+        maxWidth: 480
+      }}
+    >
+      {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div
@@ -372,7 +370,6 @@ export const VoiceLoggerModal: React.FC<VoiceLoggerModalProps> = ({
             <Check size={18} fill="#050D0A" /> Apply to Set #{activeSetNumber}
           </button>
         </div>
-      </div>
-    </div>
+    </SwipeableModalSheet>
   );
 };

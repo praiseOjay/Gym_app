@@ -17,6 +17,7 @@ import {
   Zap,
   ShieldAlert
 } from 'lucide-react';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
 
 interface MesocycleCardProps {
   mesocycleBlock: MesocycleBlock;
@@ -468,117 +469,116 @@ export const MesocycleCard: React.FC<MesocycleCardProps> = ({
 
       {/* Mesocycle Configuration Modal */}
       {showConfigModal && (
-        <div className="modal-overlay" onClick={() => setShowConfigModal(false)}>
-          <div className="modal-sheet" onClick={(e) => e.stopPropagation()} style={{ maxHeight: '85vh', overflowY: 'auto' }}>
-            <div className="modal-handle" />
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff' }}>
-                  Configure Mesocycle Block
-                </h3>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2 }}>
-                  Select an evidence-based periodization structure for your goals.
-                </p>
-              </div>
-              <button
-                className="icon-ctrl-btn"
-                onClick={() => setShowConfigModal(false)}
-              >
-                <X size={18} />
-              </button>
+        <SwipeableModalSheet
+          onClose={() => setShowConfigModal(false)}
+          maxHeight="85vh"
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff' }}>
+                Configure Mesocycle Block
+              </h3>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+                Select an evidence-based periodization structure for your goals.
+              </p>
             </div>
+            <button
+              className="icon-ctrl-btn"
+              onClick={() => setShowConfigModal(false)}
+            >
+              <X size={18} />
+            </button>
+          </div>
 
-            {/* Template Selector Cards */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-              {Object.entries(MESOCYCLE_TEMPLATES).map(([key, template]) => {
-                const isSelected = selectedTemplateKey === key;
-                return (
-                  <div
-                    key={key}
-                    onClick={() => setSelectedTemplateKey(key)}
-                    style={{
-                      background: isSelected ? 'rgba(0, 245, 155, 0.1)' : 'var(--bg-card)',
-                      border: isSelected ? '1.5px solid var(--accent-volt)' : '1px solid var(--border-subtle)',
-                      borderRadius: 'var(--radius-lg)',
-                      padding: '14px',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                      <strong style={{ fontSize: '0.95rem', color: '#fff' }}>
-                        {template.name}
-                      </strong>
-                      <span
+          {/* Template Selector Cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+            {Object.entries(MESOCYCLE_TEMPLATES).map(([key, template]) => {
+              const isSelected = selectedTemplateKey === key;
+              return (
+                <div
+                  key={key}
+                  onClick={() => setSelectedTemplateKey(key)}
+                  style={{
+                    background: isSelected ? 'rgba(0, 245, 155, 0.1)' : 'var(--bg-card)',
+                    border: isSelected ? '1.5px solid var(--accent-volt)' : '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '14px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <strong style={{ fontSize: '0.95rem', color: '#fff' }}>
+                      {template.name}
+                    </strong>
+                    <span
+                      style={{
+                        fontSize: '0.7rem',
+                        background: isSelected ? 'var(--accent-volt)' : 'rgba(255, 255, 255, 0.08)',
+                        color: isSelected ? '#050D0A' : 'var(--text-secondary)',
+                        fontWeight: 800,
+                        padding: '2px 8px',
+                        borderRadius: 'var(--radius-full)'
+                      }}
+                    >
+                      {template.totalWeeks} Weeks · {template.focus}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+                    {template.weeks.map((w) => (
+                      <div
+                        key={w.weekNumber}
                         style={{
-                          fontSize: '0.7rem',
-                          background: isSelected ? 'var(--accent-volt)' : 'rgba(255, 255, 255, 0.08)',
-                          color: isSelected ? '#050D0A' : 'var(--text-secondary)',
-                          fontWeight: 800,
-                          padding: '2px 8px',
-                          borderRadius: 'var(--radius-full)'
+                          flex: 1,
+                          background: 'var(--bg-surface)',
+                          borderRadius: 'var(--radius-xs)',
+                          padding: '4px 2px',
+                          textAlign: 'center',
+                          fontSize: '0.62rem',
+                          color: w.phaseName === 'Deload' ? '#C084FC' : 'var(--text-secondary)'
                         }}
                       >
-                        {template.totalWeeks} Weeks · {template.focus}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
-                      {template.weeks.map((w) => (
-                        <div
-                          key={w.weekNumber}
-                          style={{
-                            flex: 1,
-                            background: 'var(--bg-surface)',
-                            borderRadius: 'var(--radius-xs)',
-                            padding: '4px 2px',
-                            textAlign: 'center',
-                            fontSize: '0.62rem',
-                            color: w.phaseName === 'Deload' ? '#C084FC' : 'var(--text-secondary)'
-                          }}
-                        >
-                          W{w.weekNumber}: {w.targetRir}RIR
-                        </div>
-                      ))}
-                    </div>
+                        W{w.weekNumber}: {w.targetRir}RIR
+                      </div>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-
-            {/* Actions */}
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'space-between', borderTop: '1px solid var(--border-subtle)', paddingTop: 14 }}>
-              <button
-                onClick={handleResetCurrentCycle}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid var(--border-subtle)',
-                  color: 'var(--text-secondary)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '9px 14px',
-                  fontSize: '0.8rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6
-                }}
-              >
-                <RotateCcw size={14} />
-                <span>Reset to Week 1</span>
-              </button>
-
-              <button
-                className="btn-primary"
-                onClick={() => handleApplyNewTemplate(selectedTemplateKey)}
-                style={{ padding: '9px 18px', fontSize: '0.82rem' }}
-              >
-                Apply Selected Block
-              </button>
-            </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
+
+          {/* Actions */}
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'space-between', borderTop: '1px solid var(--border-subtle)', paddingTop: 14 }}>
+            <button
+              onClick={handleResetCurrentCycle}
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid var(--border-subtle)',
+                color: 'var(--text-secondary)',
+                borderRadius: 'var(--radius-md)',
+                padding: '9px 14px',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+            >
+              <RotateCcw size={14} />
+              <span>Reset to Week 1</span>
+            </button>
+
+            <button
+              className="btn-primary"
+              onClick={() => handleApplyNewTemplate(selectedTemplateKey)}
+              style={{ padding: '9px 18px', fontSize: '0.82rem' }}
+            >
+              Apply Selected Block
+            </button>
+          </div>
+        </SwipeableModalSheet>
       )}
     </>
   );

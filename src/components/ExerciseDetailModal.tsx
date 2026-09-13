@@ -1,7 +1,9 @@
 import React from 'react';
 import type { Exercise, MuscleGroup } from '../types/gym';
-import { X, Play, Target, Sparkles, CheckCircle2 } from 'lucide-react';
+import { X, Play, Target, Sparkles, CheckCircle2, Plus, Eye } from 'lucide-react';
 import { ExerciseMotionPlayer } from './ExerciseMotionPlayer';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
+import { triggerHaptic } from '../utils/haptics';
 
 interface ExerciseDetailModalProps {
   exercise: Exercise | {
@@ -18,11 +20,17 @@ interface ExerciseDetailModalProps {
     tips?: string[];
   };
   onClose: () => void;
+  onAddExercise?: (exercise: Exercise) => void;
+  actionLabel?: string;
+  overlayZIndex?: number;
 }
 
 export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
   exercise,
-  onClose
+  onClose,
+  onAddExercise,
+  actionLabel,
+  overlayZIndex
 }) => {
   const muscle = exercise.muscleGroup;
   const isBackMuscle = ['Back', 'Hamstrings', 'Glutes', 'Calves', 'Triceps'].includes(muscle);
@@ -131,18 +139,35 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
   )}`;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal-sheet"
-        style={{ maxHeight: '92vh', overflowY: 'auto' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-handle" />
-
-        {/* Modal Header */}
+    <SwipeableModalSheet
+      onClose={onClose}
+      maxHeight="92vh"
+      overlayStyle={overlayZIndex ? { zIndex: overlayZIndex } : undefined}
+    >
+      {/* Modal Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4, alignItems: 'center' }}>
+              {onAddExercise && (
+                <span
+                  style={{
+                    fontSize: '0.68rem',
+                    fontWeight: 800,
+                    color: 'var(--accent-cyan)',
+                    background: 'rgba(0, 229, 255, 0.15)',
+                    border: '1px solid rgba(0, 229, 255, 0.35)',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-full)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    letterSpacing: '0.4px'
+                  }}
+                >
+                  <Eye size={12} />
+                  PREVIEW MODE
+                </span>
+              )}
               <span
                 style={{
                   fontSize: '0.7rem',
@@ -378,15 +403,48 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
           </div>
         )}
 
-        {/* Action Button */}
-        <button
-          className="btn-primary"
-          style={{ width: '100%', marginTop: 6 }}
-          onClick={onClose}
-        >
-          Got It, Let's Train
-        </button>
-      </div>
-    </div>
+        {/* Action Buttons */}
+        {onAddExercise ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 10, marginTop: 8 }}>
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ padding: '12px', fontSize: '0.84rem' }}
+              onClick={onClose}
+            >
+              Back to List
+            </button>
+            <button
+              type="button"
+              className="btn-primary"
+              style={{
+                padding: '12px',
+                fontSize: '0.88rem',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8
+              }}
+              onClick={() => {
+                triggerHaptic('success');
+                onAddExercise(exercise as Exercise);
+                onClose();
+              }}
+            >
+              <Plus size={18} />
+              <span>{actionLabel || 'Add to Routine'}</span>
+            </button>
+          </div>
+        ) : (
+          <button
+            className="btn-primary"
+            style={{ width: '100%', marginTop: 6 }}
+            onClick={onClose}
+          >
+            Got It, Let's Train
+          </button>
+        )}
+    </SwipeableModalSheet>
   );
 };

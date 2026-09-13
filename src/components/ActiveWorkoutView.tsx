@@ -52,9 +52,13 @@ import {
   VolumeX,
   AlertTriangle,
   Play,
-  Square
+  Square,
+  GripVertical,
+  Eye
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
+import { useDraggableList } from '../hooks/useDraggableList';
 import {
   getExerciseTrackingType,
   displayDistance,
@@ -117,6 +121,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     exercise: Exercise;
   } | null>(null);
   const [showAddExerciseModal, setShowAddExerciseModal] = useState(false);
+  const [previewExerciseForWorkout, setPreviewExerciseForWorkout] = useState<Exercise | null>(null);
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState<string>('All');
   const [selectedEquipmentFilter, setSelectedEquipmentFilter] = useState<string>('All Equipment');
   const [exerciseSearchQuery, setExerciseSearchQuery] = useState<string>('');
@@ -181,6 +186,25 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   const currentWeekConfig = mesocycleBlock?.weeks.find(
     (w) => w.weekNumber === mesocycleBlock.currentWeek
   );
+
+  const {
+    handleTouchStart: handleTouchStartActiveEx,
+    handleTouchMove: handleTouchMoveActiveEx,
+    handleTouchEnd: handleTouchEndActiveEx,
+    handleDragStart: handleDragStartActiveEx,
+    handleDragOver: handleDragOverActiveEx,
+    handleDrop: handleDropActiveEx,
+    handleDragEnd: handleDragEndActiveEx,
+    getItemDragProps: getActiveExDragProps
+  } = useDraggableList({
+    vibrationEnabled: settings.vibrationEnabled,
+    onReorder: (from, to) => {
+      const updated = [...session.exercises];
+      const [moved] = updated.splice(from, 1);
+      updated.splice(to, 0, moved);
+      onUpdateSession({ ...session, exercises: updated });
+    }
+  });
 
   // Live timer tick driven by wall clock (never drifts or resets on tab navigation)
   useEffect(() => {
@@ -662,6 +686,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
     const updated = [...session.exercises, newWorkoutEx];
     onUpdateSession({ ...session, exercises: updated });
+    setPreviewExerciseForWorkout(null);
     setShowAddExerciseModal(false);
   };
 
@@ -1043,14 +1068,37 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
           const trackingType = ex.trackingType || getExerciseTrackingType(exMeta || ex);
           const supersetLabel = getSupersetLabel(ex.supersetGroupId, ex.supersetOrder);
 
+          const dragProps = getActiveExDragProps(exIdx);
+
           return (
             <div
               key={ex.id || exIdx}
-              className={`workout-exercise-card ${ex.supersetGroupId ? 'in-superset' : ''}`}
+              {...dragProps}
+              onDragOver={(e) => handleDragOverActiveEx(exIdx, e)}
+              onDrop={(e) => handleDropActiveEx(exIdx, e)}
+              className={`workout-exercise-card ${ex.supersetGroupId ? 'in-superset' : ''} ${dragProps.className}`}
+              style={{
+                transition: 'box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease'
+              }}
             >
               <div className="exercise-card-header">
                 <div className="exercise-title-group">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                    <button
+                      type="button"
+                      className="drag-handle-btn"
+                      draggable
+                      onDragStart={(e) => handleDragStartActiveEx(exIdx, e)}
+                      onDragEnd={handleDragEndActiveEx}
+                      onTouchStart={(e) => handleTouchStartActiveEx(exIdx, e)}
+                      onTouchMove={handleTouchMoveActiveEx}
+                      onTouchEnd={handleTouchEndActiveEx}
+                      title="Drag to rearrange exercise"
+                      style={{ cursor: 'grab', touchAction: 'none', marginTop: 2 }}
+                    >
+                      <GripVertical size={16} />
+                    </button>
+
                     <div className="exercise-card-controls" style={{ flexShrink: 0, marginTop: 2 }}>
                       <button
                         className="icon-ctrl-btn"
@@ -1939,19 +1987,16 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
       {/* Add Exercise Modal */}
       {showAddExerciseModal && (
-        <div className="modal-overlay" onClick={() => setShowAddExerciseModal(false)}>
-          <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-handle" />
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Add Exercise</h3>
-              <button
-                onClick={() => setShowAddExerciseModal(false)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
-              >
-                <X size={22} />
-              </button>
-            </div>
+        <SwipeableModalSheet onClose={() => setShowAddExerciseModal(false)} maxHeight="90vh">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Add Exercise</h3>
+            <button
+              onClick={() => setShowAddExerciseModal(false)}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+            >
+              <X size={22} />
+            </button>
+          </div>
 
             {/* Search Input */}
             <div style={{ position: 'relative', marginBottom: 10 }}>
@@ -2091,6 +2136,27 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                     )}
                   </div>
 
+                  {/* Preview Guide Banner */}
+                  <div
+                    style={{
+                      background: 'rgba(0, 229, 255, 0.08)',
+                      border: '1px solid rgba(0, 229, 255, 0.22)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '7px 12px',
+                      marginBottom: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      fontSize: '0.74rem',
+                      color: 'var(--text-secondary)'
+                    }}
+                  >
+                    <Eye size={14} color="var(--accent-cyan)" style={{ flexShrink: 0 }} />
+                    <span>
+                      Tap any exercise or <strong style={{ color: 'var(--accent-cyan)' }}>Preview</strong> to inspect animated form, biomechanics & cues before adding.
+                    </span>
+                  </div>
+
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto' }}>
                     {filtered.slice(0, exerciseDisplayLimit).map((ex) => (
                       <div
@@ -2099,18 +2165,23 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                           background: 'var(--bg-card)',
                           border: '1px solid var(--border-subtle)',
                           borderRadius: 'var(--radius-md)',
-                          padding: '12px 14px',
+                          padding: '10px 12px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          cursor: 'pointer'
+                          gap: 8,
+                          cursor: 'pointer',
+                          transition: 'background 0.15s ease, border-color 0.15s ease'
                         }}
-                        onClick={() => handleAddExerciseToWorkout(ex)}
+                        onClick={() => {
+                          triggerHaptic('light', settings.vibrationEnabled);
+                          setPreviewExerciseForWorkout(ex);
+                        }}
                       >
-                        <div style={{ flex: 1, paddingRight: 8 }}>
-                          <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{ex.name}</div>
+                        <div style={{ flex: 1, minWidth: 0, paddingRight: 4 }}>
+                          <div style={{ fontWeight: 800, fontSize: '0.94rem', color: '#fff' }}>{ex.name}</div>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: 2 }}>
-                            <span style={{ color: 'var(--accent-volt)', fontWeight: 600 }}>{ex.muscleGroup}</span>
+                            <span style={{ color: 'var(--accent-volt)', fontWeight: 700 }}>{ex.muscleGroup}</span>
                             <span>·</span>
                             <span>{ex.equipment}</span>
                             <span>·</span>
@@ -2123,7 +2194,61 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                             )}
                           </div>
                         </div>
-                        <Plus size={20} color="var(--accent-volt)" style={{ flexShrink: 0 }} />
+
+                        {/* Actions: Preview & Quick Add */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              triggerHaptic('light', settings.vibrationEnabled);
+                              setPreviewExerciseForWorkout(ex);
+                            }}
+                            style={{
+                              background: 'rgba(0, 229, 255, 0.1)',
+                              border: '1px solid rgba(0, 229, 255, 0.3)',
+                              color: 'var(--accent-cyan)',
+                              borderRadius: 'var(--radius-md)',
+                              padding: '6px 10px',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              cursor: 'pointer'
+                            }}
+                            title="Preview exercise motion, biomechanics & form cues"
+                          >
+                            <Eye size={13} />
+                            <span>Preview</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              triggerHaptic('success', settings.vibrationEnabled);
+                              handleAddExerciseToWorkout(ex);
+                            }}
+                            style={{
+                              background: 'rgba(0, 245, 155, 0.15)',
+                              border: '1px solid rgba(0, 245, 155, 0.35)',
+                              color: 'var(--accent-volt)',
+                              borderRadius: 'var(--radius-md)',
+                              padding: '6px 11px',
+                              fontSize: '0.72rem',
+                              fontWeight: 800,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              cursor: 'pointer'
+                            }}
+                            title="Quick add to workout"
+                          >
+                            <Plus size={14} />
+                            <span>Add</span>
+                          </button>
+                        </div>
                       </div>
                     ))}
                     {filtered.length === 0 && (
@@ -2153,8 +2278,20 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                 </>
               );
             })()}
-          </div>
-        </div>
+        </SwipeableModalSheet>
+      )}
+
+      {/* Exercise Preview Modal Before Adding to Workout */}
+      {previewExerciseForWorkout && (
+        <ExerciseDetailModal
+          exercise={previewExerciseForWorkout}
+          onClose={() => setPreviewExerciseForWorkout(null)}
+          onAddExercise={(exercise) => {
+            handleAddExerciseToWorkout(exercise);
+          }}
+          actionLabel="Add to Workout"
+          overlayZIndex={120}
+        />
       )}
 
       {/* Exercise Detail & Visual Demo Modal */}

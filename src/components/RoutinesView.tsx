@@ -20,8 +20,12 @@ import {
   ArrowUp,
   ArrowDown,
   Save,
-  Search
+  Search,
+  GripVertical,
+  Eye
 } from 'lucide-react';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
+import { useDraggableList } from '../hooks/useDraggableList';
 
 interface RoutinesViewProps {
   routines: Routine[];
@@ -41,10 +45,30 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
   const [inspectExercise, setInspectExercise] = useState<Exercise | null>(null);
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
   const [showAddExercisePicker, setShowAddExercisePicker] = useState(false);
+  const [previewExerciseForRoutine, setPreviewExerciseForRoutine] = useState<Exercise | null>(null);
   const [exerciseFilterMuscle, setExerciseFilterMuscle] = useState<string>('All');
   const [exerciseFilterEquipment, setExerciseFilterEquipment] = useState<string>('All Equipment');
   const [exerciseSearch, setExerciseSearch] = useState<string>('');
   const [exerciseDisplayLimit, setExerciseDisplayLimit] = useState<number>(60);
+
+  const {
+    handleTouchStart: handleTouchStartRoutineEx,
+    handleTouchMove: handleTouchMoveRoutineEx,
+    handleTouchEnd: handleTouchEndRoutineEx,
+    handleDragStart: handleDragStartRoutineEx,
+    handleDragOver: handleDragOverRoutineEx,
+    handleDrop: handleDropRoutineEx,
+    handleDragEnd: handleDragEndRoutineEx,
+    getItemDragProps: getRoutineExDragProps
+  } = useDraggableList({
+    onReorder: (from, to) => {
+      if (!editingRoutine) return;
+      const updated = [...editingRoutine.exercises];
+      const [moved] = updated.splice(from, 1);
+      updated.splice(to, 0, moved);
+      setEditingRoutine({ ...editingRoutine, exercises: updated });
+    }
+  });
 
   // Keep active selection valid
   const currentRoutine =
@@ -207,6 +231,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
       ...editingRoutine,
       exercises: [...editingRoutine.exercises, template]
     });
+    setPreviewExerciseForRoutine(null);
     setShowAddExercisePicker(false);
   };
 
@@ -687,11 +712,8 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
 
       {/* VISUAL ROUTINE EDITOR MODAL */}
       {editingRoutine && (
-        <div className="modal-overlay" onClick={() => setEditingRoutine(null)}>
-          <div className="modal-sheet" style={{ maxHeight: '92vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
-            <div className="modal-handle" />
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <SwipeableModalSheet onClose={() => setEditingRoutine(null)} maxHeight="92vh">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>
                   {routines.some((r) => r.id === editingRoutine.id) ? 'Edit Routine' : 'Create Routine'}
@@ -792,9 +814,13 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                 {editingRoutine.exercises.map((template, idx) => {
                   const meta = getExerciseMeta(template.exerciseId);
                   const trackingType = getExerciseTrackingType(meta, template.trackingType);
+                  const dragProps = getRoutineExDragProps(idx);
                   return (
                     <div
                       key={idx}
+                      {...dragProps}
+                      onDragOver={(e) => handleDragOverRoutineEx(idx, e)}
+                      onDrop={(e) => handleDropRoutineEx(idx, e)}
                       style={{
                         background: 'var(--bg-card)',
                         border: '1px solid var(--border-subtle)',
@@ -802,16 +828,32 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                         padding: '10px 12px',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: 8
+                        gap: 8,
+                        transition: 'box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease'
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <button
+                            type="button"
+                            className="drag-handle-btn"
+                            draggable
+                            onDragStart={(e) => handleDragStartRoutineEx(idx, e)}
+                            onDragEnd={handleDragEndRoutineEx}
+                            onTouchStart={(e) => handleTouchStartRoutineEx(idx, e)}
+                            onTouchMove={handleTouchMoveRoutineEx}
+                            onTouchEnd={handleTouchEndRoutineEx}
+                            title="Drag to rearrange exercise"
+                            style={{ cursor: 'grab', touchAction: 'none' }}
+                          >
+                            <GripVertical size={16} />
+                          </button>
                           <div className="exercise-card-controls">
                             <button
                               className="icon-ctrl-btn"
                               disabled={idx === 0}
                               onClick={() => handleMoveEditorExercise(idx, 'up')}
+                              title="Move Up"
                             >
                               <ArrowUp size={12} />
                             </button>
@@ -819,6 +861,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                               className="icon-ctrl-btn"
                               disabled={idx === editingRoutine.exercises.length - 1}
                               onClick={() => handleMoveEditorExercise(idx, 'down')}
+                              title="Move Down"
                             >
                               <ArrowDown size={12} />
                             </button>
@@ -1216,17 +1259,13 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                 Save Routine Changes
               </button>
             </div>
-          </div>
-        </div>
+        </SwipeableModalSheet>
       )}
 
       {/* EXERCISE PICKER MODAL */}
       {showAddExercisePicker && (
-        <div className="modal-overlay" onClick={() => setShowAddExercisePicker(false)}>
-          <div className="modal-sheet" style={{ maxHeight: '85vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
-            <div className="modal-handle" />
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <SwipeableModalSheet onClose={() => setShowAddExercisePicker(false)} maxHeight="85vh">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 800 }}>Choose Exercise</h3>
               <button
                 onClick={() => setShowAddExercisePicker(false)}
@@ -1341,6 +1380,27 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
               )}
             </div>
 
+            {/* Preview Guide Banner */}
+            <div
+              style={{
+                background: 'rgba(0, 229, 255, 0.08)',
+                border: '1px solid rgba(0, 229, 255, 0.22)',
+                borderRadius: 'var(--radius-md)',
+                padding: '7px 12px',
+                marginBottom: 8,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: '0.74rem',
+                color: 'var(--text-secondary)'
+              }}
+            >
+              <Eye size={14} color="var(--accent-cyan)" style={{ flexShrink: 0 }} />
+              <span>
+                Tap any exercise or <strong style={{ color: 'var(--accent-cyan)' }}>Preview</strong> to inspect animated form, biomechanics & cues before adding.
+              </span>
+            </div>
+
             {/* Exercises List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 380, overflowY: 'auto' }}>
               {filteredExercises.slice(0, exerciseDisplayLimit).map((ex) => (
@@ -1350,18 +1410,23 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                     background: 'var(--bg-card)',
                     border: '1px solid var(--border-subtle)',
                     borderRadius: 'var(--radius-md)',
-                    padding: '10px 14px',
+                    padding: '10px 12px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    cursor: 'pointer'
+                    gap: 8,
+                    cursor: 'pointer',
+                    transition: 'background 0.15s ease, border-color 0.15s ease'
                   }}
-                  onClick={() => handleAddExerciseToEditor(ex)}
+                  onClick={() => {
+                    triggerHaptic('light');
+                    setPreviewExerciseForRoutine(ex);
+                  }}
                 >
-                  <div style={{ flex: 1, paddingRight: 8 }}>
-                    <div style={{ fontWeight: 800, fontSize: '0.92rem' }}>{ex.name}</div>
+                  <div style={{ flex: 1, minWidth: 0, paddingRight: 4 }}>
+                    <div style={{ fontWeight: 800, fontSize: '0.92rem', color: '#fff' }}>{ex.name}</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 2 }}>
-                      <span style={{ color: 'var(--accent-volt)', fontWeight: 600 }}>{ex.muscleGroup}</span>
+                      <span style={{ color: 'var(--accent-volt)', fontWeight: 700 }}>{ex.muscleGroup}</span>
                       <span>·</span>
                       <span>{ex.equipment}</span>
                       <span>·</span>
@@ -1376,7 +1441,61 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                       )}
                     </div>
                   </div>
-                  <Plus size={18} color="var(--accent-volt)" style={{ flexShrink: 0 }} />
+
+                  {/* Actions: Preview & Quick Add */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerHaptic('light');
+                        setPreviewExerciseForRoutine(ex);
+                      }}
+                      style={{
+                        background: 'rgba(0, 229, 255, 0.1)',
+                        border: '1px solid rgba(0, 229, 255, 0.3)',
+                        color: 'var(--accent-cyan)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '6px 10px',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        cursor: 'pointer'
+                      }}
+                      title="Preview exercise video, biomechanics & form cues"
+                    >
+                      <Eye size={13} />
+                      <span>Preview</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerHaptic('success');
+                        handleAddExerciseToEditor(ex);
+                      }}
+                      style={{
+                        background: 'rgba(0, 245, 155, 0.15)',
+                        border: '1px solid rgba(0, 245, 155, 0.35)',
+                        color: 'var(--accent-volt)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '6px 11px',
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        cursor: 'pointer'
+                      }}
+                      title="Quick add to routine"
+                    >
+                      <Plus size={14} />
+                      <span>Add</span>
+                    </button>
+                  </div>
                 </div>
               ))}
               {filteredExercises.length === 0 && (
@@ -1403,8 +1522,20 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                 </button>
               )}
             </div>
-          </div>
-        </div>
+        </SwipeableModalSheet>
+      )}
+
+      {/* Exercise Preview Modal Before Adding to Routine */}
+      {previewExerciseForRoutine && (
+        <ExerciseDetailModal
+          exercise={previewExerciseForRoutine}
+          onClose={() => setPreviewExerciseForRoutine(null)}
+          onAddExercise={(exercise) => {
+            handleAddExerciseToEditor(exercise);
+          }}
+          actionLabel="Add to Routine"
+          overlayZIndex={120}
+        />
       )}
 
       {/* Exercise Detail Modal with Biomechanical Visual Demo */}

@@ -25,6 +25,7 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
 
 interface DashboardViewProps {
   routines: Routine[];
@@ -604,11 +605,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       {/* AI Pre-Workout Tactical Primer Modal */}
       {primerData && nextRoutine && (
-        <div className="modal-overlay" onClick={() => setPrimerData(null)}>
-          <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-handle" />
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+        <SwipeableModalSheet onClose={() => setPrimerData(null)}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
               <div>
                 <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--accent-volt)', textTransform: 'uppercase' }}>
                   Pre-Workout Tactical Brief
@@ -658,8 +656,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <CheckCircle2 size={18} />
               Start Workout with Cues
             </button>
-          </div>
-        </div>
+        </SwipeableModalSheet>
       )}
     </div>
   );

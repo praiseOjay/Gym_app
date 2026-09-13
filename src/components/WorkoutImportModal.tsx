@@ -13,6 +13,7 @@ import {
   Sparkles,
   ArrowRight
 } from 'lucide-react';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
 
 interface WorkoutImportModalProps {
   onClose: () => void;
@@ -133,38 +134,19 @@ export const WorkoutImportModal: React.FC<WorkoutImportModalProps> = ({
   };
 
   return (
-    <div
-      className="modal-overlay"
+    <SwipeableModalSheet
+      onClose={onClose}
+      overlayStyle={{ zIndex: 9999 }}
       style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(5, 7, 12, 0.85)',
-        backdropFilter: 'blur(8px)',
-        zIndex: 9999,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '16px'
+        maxWidth: 560,
+        maxHeight: '90vh',
+        background: 'var(--bg-card, #12141a)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        padding: 0,
+        overflow: 'hidden'
       }}
-      onClick={onClose}
     >
-      <div
-        className="modal-container"
-        style={{
-          background: 'var(--bg-card, #12141a)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: 'var(--radius-lg, 16px)',
-          width: '100%',
-          maxWidth: '560px',
-          maxHeight: '90vh',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.75)'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Hidden native file input with broad mobile-friendly MIME support */}
+      {/* Hidden native file input with broad mobile-friendly MIME support */}
         <input
           type="file"
           ref={fileInputRef}
@@ -683,7 +665,6 @@ export const WorkoutImportModal: React.FC<WorkoutImportModalProps> = ({
             )}
           </button>
         </div>
-      </div>
-    </div>
+    </SwipeableModalSheet>
   );
 };

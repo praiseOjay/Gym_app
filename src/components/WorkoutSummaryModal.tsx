@@ -15,6 +15,7 @@ import {
   Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { SwipeableModalSheet } from './SwipeableModalSheet';
 
 interface WorkoutSummaryModalProps {
   session: WorkoutSession;
@@ -112,11 +113,8 @@ export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
   const mesoWeekConfig = mesocycleBlock?.weeks.find((w) => w.weekNumber === mesoWeekNumber);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-handle" />
-
-        <div style={{ textAlign: 'center', padding: '10px 0' }}>
+    <SwipeableModalSheet onClose={onClose}>
+      <div style={{ textAlign: 'center', padding: '10px 0' }}>
           <div
             style={{
               width: 56,
@@ -476,7 +474,6 @@ export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
           <CheckCircle2 size={18} />
           Save Workout to Log
         </button>
-      </div>
-    </div>
+    </SwipeableModalSheet>
   );
 };

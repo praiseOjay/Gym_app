@@ -1091,14 +1091,63 @@ body {
   width: 44px;
   height: 5px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   align-self: center;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   flex-shrink: 0;
+  cursor: grab;
+  touch-action: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.modal-handle:hover,
+.modal-handle:active {
+  background: rgba(255, 255, 255, 0.45);
+  transform: scaleX(1.15);
 }
 
 .modal-sheet > * {
   flex-shrink: 0;
+}
+
+/* Drag and Drop Exercise Styles */
+.drag-handle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: grab;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.drag-handle-btn:hover,
+.drag-handle-btn:active {
+  color: var(--accent-volt);
+  background: rgba(0, 245, 155, 0.12);
+  cursor: grabbing;
+}
+
+.exercise-card-dragging {
+  opacity: 0.88;
+  transform: scale(1.02);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 0 2px var(--accent-volt) !important;
+  z-index: 50 !important;
+  cursor: grabbing !important;
+}
+
+.exercise-drop-indicator-top {
+  border-top: 2px solid var(--accent-volt) !important;
+}
+
+.exercise-drop-indicator-bottom {
+  border-bottom: 2px solid var(--accent-volt) !important;
 }
 
 /* Dedicated Form Input Styles for Modals & Settings */
