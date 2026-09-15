@@ -113,8 +113,11 @@ export function App() {
 
   // Save active workout whenever it updates
   const handleUpdateActiveSession = (updated: WorkoutSession) => {
-    setActiveSession(updated);
-    StorageService.saveActiveWorkout(updated);
+    setActiveSession((prev) => {
+      if (!prev) return null;
+      StorageService.saveActiveWorkout(updated);
+      return updated;
+    });
   };
 
   const handleUpdateMesocycle = (updated: MesocycleBlock) => {
@@ -187,8 +190,8 @@ export function App() {
     // Caloric expenditure & mesocycle periodization tagging
     const cals = calculateSessionTotalCalories(completed, settings.bodyWeightKg);
     completed.caloriesBurned = cals.totalCalories;
-    completed.mesocycleWeek = mesocycleBlock.currentWeek;
-    const currentWeekPhase = mesocycleBlock.weeks.find((w) => w.weekNumber === mesocycleBlock.currentWeek);
+    completed.mesocycleWeek = mesocycleBlock?.currentWeek;
+    const currentWeekPhase = mesocycleBlock?.weeks?.find((w) => w.weekNumber === mesocycleBlock?.currentWeek);
     completed.isDeload = currentWeekPhase?.phaseName === 'Deload';
 
     StorageService.addWorkout(completed);
@@ -222,15 +225,13 @@ export function App() {
   };
 
   const handleCancelWorkout = () => {
-    if (window.confirm('Are you sure you want to discard this active workout?')) {
-      setActiveSession(null);
-      StorageService.saveActiveWorkout(null);
-      setCurrentTab('dashboard');
-    }
+    StorageService.saveActiveWorkout(null);
+    setActiveSession(null);
+    setCurrentTab('dashboard');
   };
 
-  const handleDeleteWorkout = (id: string) => {
-    const updated = StorageService.deleteWorkout(id);
+  const handleDeleteWorkout = (id: string, index?: number) => {
+    const updated = StorageService.deleteWorkout(id, index);
     setWorkouts(updated);
   };
 
@@ -440,7 +441,7 @@ export function App() {
                       No Routines Configured
                     </h3>
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 16 }}>
-                      You have a fresh slate. Build a custom routine using any of the 1,300+ WorkoutX exercises!
+                      You have a fresh slate. Build a custom routine using any of the 1,500+ exercises!
                     </p>
                     <button
                       className="btn-primary"

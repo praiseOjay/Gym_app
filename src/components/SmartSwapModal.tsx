@@ -5,6 +5,7 @@ import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import { getSmartExerciseSwap } from '../services/geminiService';
 import { SwipeableModalSheet } from './SwipeableModalSheet';
 import { ExerciseFilterBar } from './ExerciseFilterBar';
+import { filterExerciseLibrary } from '../utils/exerciseFilterUtils';
 
 interface SmartSwapModalProps {
   exercise: Exercise;
@@ -65,47 +66,11 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
 
   // Available library alternatives with full tokenized search, category filtering & secondary muscle support
   const filteredAlternatives = useMemo(() => {
-    const q = swapSearchQuery.toLowerCase().trim();
-    const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
-
-    return EXERCISE_LIBRARY.filter((e) => {
-      // Exclude current exercise from alternatives
-      if (
-        e.id.toLowerCase() === resolvedExercise.id.toLowerCase() ||
-        e.name.toLowerCase() === resolvedExercise.name.toLowerCase()
-      ) {
-        return false;
-      }
-
-      // Match muscle group (supports macro categories)
-      const matchMuscle =
-        swapMuscleFilter === 'All' ||
-        e.muscleGroup === swapMuscleFilter ||
-        (swapMuscleFilter === 'Legs' && ['Quads', 'Hamstrings', 'Glutes', 'Calves'].includes(e.muscleGroup)) ||
-        (swapMuscleFilter === 'Arms' && ['Biceps', 'Triceps', 'Forearms'].includes(e.muscleGroup)) ||
-        (swapMuscleFilter === 'Core' && ['Abs'].includes(e.muscleGroup));
-      if (!matchMuscle) return false;
-
-      // Match equipment
-      const matchEquipment =
-        swapEquipmentFilter === 'All Equipment' ||
-        e.equipment.toLowerCase() === swapEquipmentFilter.toLowerCase() ||
-        (swapEquipmentFilter === 'Machine' &&
-          (e.equipment === 'Machine' || e.name.toLowerCase().includes('lever') || e.equipment === 'Smith Machine'));
-      if (!matchEquipment) return false;
-
-      if (tokens.length === 0) return true;
-
-      // Tokenized search across name, equipment, muscleGroup, secondaryMuscles, and category
-      return tokens.every(
-        (token) =>
-          e.name.toLowerCase().includes(token) ||
-          e.equipment.toLowerCase().includes(token) ||
-          e.muscleGroup.toLowerCase().includes(token) ||
-          (e.secondaryMuscles && e.secondaryMuscles.some((m) => m.toLowerCase().includes(token))) ||
-          e.category.toLowerCase().includes(token) ||
-          e.id.toLowerCase().includes(token)
-      );
+    return filterExerciseLibrary(EXERCISE_LIBRARY, {
+      searchQuery: swapSearchQuery,
+      selectedMuscle: swapMuscleFilter,
+      selectedEquipment: swapEquipmentFilter,
+      excludeId: resolvedExercise.id
     });
   }, [resolvedExercise, swapSearchQuery, swapMuscleFilter, swapEquipmentFilter]);
 
@@ -336,7 +301,15 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
           />
 
           {/* Exercise List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 300, overflowY: 'auto' }}>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 300, overflowY: 'auto' }}
+            onScroll={(e) => {
+              const t = e.currentTarget;
+              if (t.scrollHeight - t.scrollTop - t.clientHeight < 120) {
+                setSwapDisplayLimit((prev) => Math.min(prev + 40, filteredAlternatives.length));
+              }
+            }}
+          >
             {filteredAlternatives.slice(0, swapDisplayLimit).map((alt) => (
               <div
                 key={alt.id}

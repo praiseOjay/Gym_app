@@ -59,6 +59,7 @@ import confetti from 'canvas-confetti';
 import { SwipeableModalSheet } from './SwipeableModalSheet';
 import { useDraggableList } from '../hooks/useDraggableList';
 import { ExerciseFilterBar } from './ExerciseFilterBar';
+import { filterExerciseLibrary } from '../utils/exerciseFilterUtils';
 import {
   getExerciseTrackingType,
   displayDistance,
@@ -110,6 +111,9 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
   const onUpdateSessionRef = useRef(onUpdateSession);
   onUpdateSessionRef.current = onUpdateSession;
+
+  // Prevents unmount timer flush from resurrecting the active session when completing or discarding
+  const isEndingRef = useRef(false);
   const [plateModalContext, setPlateModalContext] = useState<{
     weight: number;
     exerciseIdx: number;
@@ -135,38 +139,20 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   } | null>(null);
 
   const filteredExercisesForWorkout = useMemo(() => {
-    const q = exerciseSearchQuery.toLowerCase().trim();
-    const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
-
-    return EXERCISE_LIBRARY.filter((e) => {
-      const matchMuscle =
-        selectedMuscleFilter === 'All' ||
-        (selectedMuscleFilter === 'Legs' && ['Quads', 'Hamstrings', 'Glutes', 'Calves'].includes(e.muscleGroup)) ||
-        (selectedMuscleFilter === 'Arms' && ['Biceps', 'Triceps', 'Forearms'].includes(e.muscleGroup)) ||
-        (selectedMuscleFilter === 'Core' && e.muscleGroup === 'Abs') ||
-        e.muscleGroup === selectedMuscleFilter;
-      if (!matchMuscle) return false;
-
-      const matchEquipment =
-        selectedEquipmentFilter === 'All Equipment' ||
-        e.equipment.toLowerCase() === selectedEquipmentFilter.toLowerCase() ||
-        (selectedEquipmentFilter === 'Machine' &&
-          (e.equipment === 'Machine' || e.name.toLowerCase().includes('lever') || e.equipment === 'Smith Machine'));
-      if (!matchEquipment) return false;
-
-      if (tokens.length === 0) return true;
-
-      return tokens.every(
-        (token) =>
-          e.name.toLowerCase().includes(token) ||
-          e.equipment.toLowerCase().includes(token) ||
-          e.muscleGroup.toLowerCase().includes(token) ||
-          (e.secondaryMuscles && e.secondaryMuscles.some((m) => m.toLowerCase().includes(token))) ||
-          e.category.toLowerCase().includes(token) ||
-          e.id.toLowerCase().includes(token)
-      );
+    return filterExerciseLibrary(EXERCISE_LIBRARY, {
+      searchQuery: exerciseSearchQuery,
+      selectedMuscle: selectedMuscleFilter,
+      selectedEquipment: selectedEquipmentFilter
     });
   }, [selectedMuscleFilter, selectedEquipmentFilter, exerciseSearchQuery]);
+
+  const handleOpenAddExerciseModal = () => {
+    setSelectedMuscleFilter('All');
+    setSelectedEquipmentFilter('All Equipment');
+    setExerciseSearchQuery('');
+    setExerciseDisplayLimit(60);
+    setShowAddExerciseModal(true);
+  };
 
   // Tactical Intelligence state - only show once per active session
   const [showReadinessModal, setShowReadinessModal] = useState<boolean>(() => {
@@ -267,7 +253,8 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
     return () => {
       clearInterval(timer);
-      // Flush latest duration on unmount
+      if (isEndingRef.current) return;
+      // Flush latest duration on unmount (only when switching tabs during an active session)
       const finalSec = getTrueElapsedSeconds();
       const curSession = sessionRef.current;
       onUpdateSessionRef.current({
@@ -762,6 +749,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   };
 
   const handleFinish = () => {
+    isEndingRef.current = true;
     const finalDuration = getTrueElapsedSeconds();
     // Count PRs
     const prsCount = session.exercises.reduce((count, ex) => {
@@ -783,6 +771,13 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     };
 
     onFinishWorkout(completed);
+  };
+
+  const handleDiscard = () => {
+    if (window.confirm('Are you sure you want to discard this active workout?')) {
+      isEndingRef.current = true;
+      onCancelWorkout();
+    }
   };
 
   return (
@@ -1933,7 +1928,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
       <button
         className="btn-secondary"
         style={{ width: '100%' }}
-        onClick={() => setShowAddExerciseModal(true)}
+        onClick={handleOpenAddExerciseModal}
       >
         <Plus size={18} />
         Add Exercise to Workout
@@ -1944,7 +1939,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
         <button
           className="btn-secondary"
           style={{ flex: 1, color: 'var(--accent-crimson)', borderColor: 'rgba(255, 51, 102, 0.3)' }}
-          onClick={onCancelWorkout}
+          onClick={handleDiscard}
         >
           Discard
         </button>
@@ -2072,7 +2067,15 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
               </span>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto' }}>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto' }}
+              onScroll={(e) => {
+                const t = e.currentTarget;
+                if (t.scrollHeight - t.scrollTop - t.clientHeight < 120) {
+                  setExerciseDisplayLimit((prev) => Math.min(prev + 60, filteredExercisesForWorkout.length));
+                }
+              }}
+            >
               {filteredExercisesForWorkout.slice(0, exerciseDisplayLimit).map((ex) => (
                 <div
                   key={ex.id}

@@ -26,6 +26,7 @@ import {
 import { SwipeableModalSheet } from './SwipeableModalSheet';
 import { useDraggableList } from '../hooks/useDraggableList';
 import { ExerciseFilterBar } from './ExerciseFilterBar';
+import { filterExerciseLibrary } from '../utils/exerciseFilterUtils';
 
 interface RoutinesViewProps {
   routines: Routine[];
@@ -80,38 +81,20 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
   }, [currentRoutine]);
 
   const filteredExercises = useMemo(() => {
-    const q = exerciseSearch.toLowerCase().trim();
-    const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
-
-    return EXERCISE_LIBRARY.filter((e) => {
-      const matchMuscle =
-        exerciseFilterMuscle === 'All' ||
-        (exerciseFilterMuscle === 'Legs' && ['Quads', 'Hamstrings', 'Glutes', 'Calves'].includes(e.muscleGroup)) ||
-        (exerciseFilterMuscle === 'Arms' && ['Biceps', 'Triceps', 'Forearms'].includes(e.muscleGroup)) ||
-        (exerciseFilterMuscle === 'Core' && e.muscleGroup === 'Abs') ||
-        e.muscleGroup === exerciseFilterMuscle;
-      if (!matchMuscle) return false;
-
-      const matchEquipment =
-        exerciseFilterEquipment === 'All Equipment' ||
-        e.equipment.toLowerCase() === exerciseFilterEquipment.toLowerCase() ||
-        (exerciseFilterEquipment === 'Machine' &&
-          (e.equipment === 'Machine' || e.name.toLowerCase().includes('lever') || e.equipment === 'Smith Machine'));
-      if (!matchEquipment) return false;
-
-      if (tokens.length === 0) return true;
-
-      return tokens.every(
-        (token) =>
-          e.name.toLowerCase().includes(token) ||
-          e.equipment.toLowerCase().includes(token) ||
-          e.muscleGroup.toLowerCase().includes(token) ||
-          (e.secondaryMuscles && e.secondaryMuscles.some((m) => m.toLowerCase().includes(token))) ||
-          e.category.toLowerCase().includes(token) ||
-          e.id.toLowerCase().includes(token)
-      );
+    return filterExerciseLibrary(EXERCISE_LIBRARY, {
+      searchQuery: exerciseSearch,
+      selectedMuscle: exerciseFilterMuscle,
+      selectedEquipment: exerciseFilterEquipment
     });
   }, [exerciseFilterMuscle, exerciseFilterEquipment, exerciseSearch]);
+
+  const handleOpenAddExercisePicker = () => {
+    setExerciseFilterMuscle('All');
+    setExerciseFilterEquipment('All Equipment');
+    setExerciseSearch('');
+    setExerciseDisplayLimit(60);
+    setShowAddExercisePicker(true);
+  };
 
   const getExerciseMeta = (id: string): Exercise | undefined => {
     if (!id) return undefined;
@@ -343,7 +326,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
             Fresh App Ready
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', maxWidth: 420, margin: '0 auto 20px', lineHeight: 1.5 }}>
-            No routines in your split yet. You have full access to all 1,300+ WorkoutX exercises with accurate animated GIFs. Build your custom training routine!
+            No routines in your split yet. You have full access to all 1,500+ exercises with accurate animated demonstrations. Build your custom training routine!
           </p>
           <button
             className="btn-primary"
@@ -807,7 +790,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                 <button
                   className="btn-secondary"
                   style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 4 }}
-                  onClick={() => setShowAddExercisePicker(true)}
+                  onClick={handleOpenAddExercisePicker}
                 >
                   <Plus size={14} /> Add Exercise
                 </button>
@@ -1319,7 +1302,15 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
             </div>
 
             {/* Exercises List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 380, overflowY: 'auto' }}>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 380, overflowY: 'auto' }}
+              onScroll={(e) => {
+                const t = e.currentTarget;
+                if (t.scrollHeight - t.scrollTop - t.clientHeight < 120) {
+                  setExerciseDisplayLimit((prev) => Math.min(prev + 60, filteredExercises.length));
+                }
+              }}
+            >
               {filteredExercises.slice(0, exerciseDisplayLimit).map((ex) => (
                 <div
                   key={ex.id}

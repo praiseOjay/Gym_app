@@ -4,7 +4,7 @@
 import { getExerciseVisual } from '../data/exerciseVisualMap';
 import type { Routine } from '../types/gym';
 
-const MEDIA_CACHE_NAME = 'overload-ai-media-v2';
+const MEDIA_CACHE_NAME = 'overload-ai-media-v3';
 
 /**
  * Preloads and caches a single exercise GIF for offline availability

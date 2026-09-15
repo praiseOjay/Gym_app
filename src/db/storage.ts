@@ -63,7 +63,27 @@ export const StorageService = {
         this.saveWorkouts(initial);
         return initial;
       }
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (!Array.isArray(parsed)) return [];
+      let needsResave = false;
+      const workouts: WorkoutSession[] = parsed.map((s, idx) => {
+        if (!s || typeof s !== 'object') return s;
+        if (!s.id || typeof s.id !== 'string' || s.id.trim() === '') {
+          needsResave = true;
+          const timestamp = s.date ? new Date(s.date).getTime() : Date.now();
+          return {
+            ...s,
+            id: `session-${isNaN(timestamp) ? Date.now() : timestamp}-${idx}-${Math.random().toString(36).substring(2, 7)}`
+          };
+        }
+        return s;
+      });
+      if (needsResave) {
+        try {
+          localStorage.setItem(STORAGE_KEYS.WORKOUTS, JSON.stringify(workouts));
+        } catch {}
+      }
+      return workouts;
     } catch (e) {
       console.error('Failed reading workouts:', e);
       return [];
@@ -82,15 +102,30 @@ export const StorageService = {
   },
 
   addWorkout(session: WorkoutSession): void {
+    if (!session.id) {
+      session.id = `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    }
     const all = this.getWorkouts();
     all.unshift(session);
     this.saveWorkouts(all);
   },
 
-  deleteWorkout(id: string): WorkoutSession[] {
-    const all = this.getWorkouts().filter((w) => w.id !== id);
-    this.saveWorkouts(all);
-    return all;
+  deleteWorkout(id: string, fallbackIndex?: number): WorkoutSession[] {
+    const all = this.getWorkouts();
+    let targetIndex = -1;
+    if (id && typeof id === 'string') {
+      targetIndex = all.findIndex((w) => w.id === id);
+    }
+    if (targetIndex === -1 && fallbackIndex !== undefined && fallbackIndex >= 0 && fallbackIndex < all.length) {
+      targetIndex = fallbackIndex;
+    }
+    if (targetIndex === -1) {
+      console.warn(`deleteWorkout: No workout found matching id "${id}" or index ${fallbackIndex}. No workouts deleted.`);
+      return all;
+    }
+    const updated = all.filter((_, idx) => idx !== targetIndex);
+    this.saveWorkouts(updated);
+    return updated;
   },
 
   importWorkoutLogs(

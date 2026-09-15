@@ -415,7 +415,7 @@ CURRENT WEEKLY ROUTINE TEMPLATES:
 ${routinesSummary}
 
 APP CAPABILITIES THAT YOU OWN & CAN GUIDE THE ATHLETE ON:
-- 🧬 3D Anatomical Demonstration GIFs & Biomechanical Vector Player for all 1,300+ WorkoutX exercises (including strength, hypertrophy, and cardio).
+- 🧬 3D Anatomical Demonstration GIFs & Biomechanical Vector Player for all 1,500+ exercises (including strength, hypertrophy, and cardio).
 - ⚡ Supersets & Giant Sets: 1-tap antagonist pairing (e.g. Biceps + Triceps) with deferred rest.
 - 🎯 Smart Drop-Sets: Instant -20% and -25% load calculation chips for metabolic fatigue.
 - 🏋️ Barbell Plate Calculator: Exact 20kg/15kg Olympic plate visualizer per side.

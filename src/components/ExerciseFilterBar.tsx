@@ -33,19 +33,22 @@ export const MACRO_MUSCLE_OPTIONS = [
 ] as const;
 
 export const DETAILED_MUSCLE_GROUPS = [
-  { group: 'Upper Body', items: ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Forearms', 'Traps'] },
+  { group: 'Upper Body', items: ['Chest', 'Upper Chest', 'Back', 'Shoulders', 'Rear Delts', 'Traps', 'Biceps', 'Triceps', 'Forearms'] },
   { group: 'Lower Body', items: ['Quads', 'Hamstrings', 'Glutes', 'Calves'] },
-  { group: 'Core & Cardio', items: ['Abs', 'Cardio'] }
+  { group: 'Core & Cardio', items: ['Abs', 'Core', 'Cardio'] }
 ];
 
 export const EQUIPMENT_OPTIONS = [
   'All Equipment',
   'Barbell',
   'Dumbbell',
-  'Machine',
   'Cable',
+  'Machine',
   'Smith Machine',
-  'Bodyweight'
+  'Bodyweight',
+  'Kettlebell',
+  'Cardio Machine',
+  'Bands & Other'
 ];
 
 export const ExerciseFilterBar: React.FC<ExerciseFilterBarProps> = ({
@@ -118,7 +121,7 @@ export const ExerciseFilterBar: React.FC<ExerciseFilterBarProps> = ({
         />
         <input
           type="text"
-          placeholder={placeholder || "Search 1,300+ exercises by name or equipment..."}
+          placeholder={placeholder || "Search 1,500+ exercises by name or equipment..."}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           style={{

@@ -42,7 +42,7 @@ interface AnalyticsViewProps {
   historySessions: WorkoutSession[];
   prs: PRRecord[];
   settings: UserSettings;
-  onDeleteSession?: (id: string) => void;
+  onDeleteSession?: (id: string, index?: number) => void;
 }
 
 type TabType = 'overview' | 'muscleVolume' | 'graphs' | 'calendar' | 'prs' | 'tools';
@@ -718,11 +718,11 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           </p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {historySessions.map((s) => {
+            {historySessions.map((s, sIdx) => {
               const isExpanded = expandedSessionId === s.id;
               return (
                 <div
-                  key={s.id}
+                  key={s.id || `session-${sIdx}`}
                   style={{
                     background: 'var(--bg-surface)',
                     border: '1px solid var(--border-subtle)',
@@ -819,7 +819,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               if (window.confirm(`Delete workout log for "${s.routineName}" on ${new Date(s.date).toLocaleDateString()}?`)) {
-                                onDeleteSession(s.id);
+                                onDeleteSession(s.id, sIdx);
                                 triggerHaptic('medium');
                               }
                             }}
