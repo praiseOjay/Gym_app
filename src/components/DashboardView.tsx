@@ -9,7 +9,7 @@ import type {
 } from '../types/gym';
 import { MuscleRecoveryHeatmap } from './MuscleRecoveryHeatmap';
 import { MesocycleCard } from './MesocycleCard';
-import { kgToLbs, calculateMuscleWeeklySets } from '../engine/overloadEngine';
+import { formatWeight, formatHeight, calculateMuscleWeeklySets } from '../engine/overloadEngine';
 import { getPreWorkoutPrimer } from '../services/geminiService';
 import { triggerHaptic } from '../utils/haptics';
 import { getTodayWorkoutState } from '../utils/dateUtils';
@@ -84,8 +84,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   }, [recentSessions]);
 
   const displayVolume = (kg: number) => {
-    if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
-    return `${kg} kg`;
+    return formatWeight(kg, settings.unit, 2);
   };
 
   // Dynamic Readiness Calculation based on active check-in, recent check-in, or biomechanical recovery
@@ -259,13 +258,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ color: 'var(--accent-volt)', fontWeight: 800 }}>⚖️ Weight:</span>
               <span style={{ color: '#fff', fontWeight: 700 }}>
-                {settings.unit === 'lbs' ? kgToLbs(settings.bodyWeightKg) : settings.bodyWeightKg} {settings.unit}
+                {settings.bodyWeightKg !== undefined ? formatWeight(settings.bodyWeightKg, settings.unit, 2) : ''}
               </span>
-              {settings.targetWeightKg && (
+              {settings.targetWeightKg !== undefined && (
                 <>
                   <span style={{ color: 'var(--text-muted)' }}>→</span>
                   <span style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>
-                    Target: {settings.unit === 'lbs' ? kgToLbs(settings.targetWeightKg) : settings.targetWeightKg} {settings.unit}
+                    Target: {formatWeight(settings.targetWeightKg, settings.unit, 2)}
                   </span>
                 </>
               )}
@@ -273,7 +272,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
             {settings.age && settings.heightCm && (
               <span style={{ color: 'var(--text-secondary)' }}>
-                {settings.age}y · {settings.heightCm}cm
+                {settings.age}y · {formatHeight(settings.heightCm, settings.unit, 2)}
               </span>
             )}
           </div>

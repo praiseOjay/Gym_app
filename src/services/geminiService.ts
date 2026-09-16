@@ -1,36 +1,11 @@
 import type { WorkoutSession, UserSettings, Exercise, Routine, MuscleRecoveryState } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 
-const DEFAULT_API_KEY =
-  (typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_GEMINI_API_KEY) ||
-  'AIzaSyAfyy7j_3Vc9eJ4ds7RxOOmvHzUnjskosQ';
-
-interface GeminiResponse {
-  candidates?: {
-    content?: {
-      parts?: { text?: string }[];
-    };
-  }[];
-  error?: {
-    message?: string;
-  };
-}
-
-export interface GeminiCallOptions {
-  apiKey?: string;
-  responseMimeType?: string;
-  maxOutputTokens?: number;
-  temperature?: number;
-}
-
-const ACTIVE_MODELS = [
-  'gemini-3.5-flash-lite',
-  'gemini-3.6-flash',
-  'gemini-flash-latest'
-];
+import { aiProxyService, type GeminiCallOptions } from './aiProxyService';
+export type { GeminiCallOptions };
 
 /**
- * Resilient multi-model call to Google Gemini API
+ * Resilient call to AI engine routed through secure proxy with developer fallback
  */
 async function callGemini(
   prompt: string,
@@ -38,59 +13,7 @@ async function callGemini(
 ): Promise<string> {
   const opts: GeminiCallOptions =
     typeof options === 'string' ? { apiKey: options } : options || {};
-  const key = opts.apiKey || DEFAULT_API_KEY;
-  if (!key) {
-    throw new Error('No Gemini API key provided');
-  }
-
-  const generationConfig: Record<string, any> = {
-    temperature: opts.temperature ?? 0.7,
-    topP: 0.95,
-    maxOutputTokens: opts.maxOutputTokens ?? 2500
-  };
-
-  if (opts.responseMimeType) {
-    generationConfig.responseMimeType = opts.responseMimeType;
-  }
-
-  let lastError: string = 'Unknown error';
-
-  for (const model of ACTIVE_MODELS) {
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }]
-            }
-          ],
-          generationConfig
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errMsg = (errorData as GeminiResponse)?.error?.message || response.statusText;
-        lastError = `Model ${model} (${response.status}): ${errMsg}`;
-        console.warn(lastError);
-        continue;
-      }
-
-      const data: GeminiResponse = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) {
-        return text;
-      }
-    } catch (err: any) {
-      lastError = `Model ${model} exception: ${err.message}`;
-      console.warn(lastError);
-    }
-  }
-
-  throw new Error(`All Gemini models failed. Last error: ${lastError}`);
+  return aiProxyService.callAI(prompt, opts);
 }
 
 /**

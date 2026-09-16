@@ -25,9 +25,12 @@ import {
   Flame,
   ArrowRight,
   Activity,
-  Dumbbell
+  Dumbbell,
+  Crown
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { subscriptionService } from '../services/subscriptionService';
+import { PaywallModal } from './PaywallModal';
 
 interface AICoachViewProps {
   settings: UserSettings;
@@ -180,7 +183,18 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
   ]);
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isPro, setIsPro] = useState(() => subscriptionService.isPro());
+  const [aiQuota, setAiQuota] = useState(() => subscriptionService.getDailyAICoachUsage());
+  const [showPaywall, setShowPaywall] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const unsubscribe = subscriptionService.subscribe((state) => {
+      setIsPro(state.isPro);
+      setAiQuota(subscriptionService.getDailyAICoachUsage());
+    });
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -206,6 +220,12 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
     const text = textToSend || inputText;
     if (!text.trim() || loading) return;
 
+    // Check Pro or Free daily quota
+    if (!subscriptionService.canUseAICoach()) {
+      setShowPaywall(true);
+      return;
+    }
+
     const newHistory: ChatMessage[] = [...messages, { role: 'user', text }];
     setMessages(newHistory);
     setInputText('');
@@ -227,6 +247,9 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
           recoveryStates
         }
       );
+
+      subscriptionService.recordAICoachUsage();
+      setAiQuota(subscriptionService.getDailyAICoachUsage());
 
       setMessages([
         ...newHistory,
@@ -527,8 +550,59 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
             AI Hypertrophy Scientist · Split Engineering & Live Workout Tuning
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {activeSession ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {isPro ? (
+            <span
+              style={{
+                background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(0, 245, 155, 0.15))',
+                border: '1px solid rgba(255, 215, 0, 0.45)',
+                color: '#ffd700',
+                fontSize: '0.7rem',
+                fontWeight: 800,
+                padding: '4px 9px',
+                borderRadius: 'var(--radius-full)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                letterSpacing: '0.03em'
+              }}
+            >
+              <Crown size={12} color="#ffd700" /> PRO UNLIMITED
+            </span>
+          ) : (
+            <button
+              onClick={() => setShowPaywall(true)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: 'var(--text-secondary)',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '4px 9px',
+                borderRadius: 'var(--radius-full)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                cursor: 'pointer'
+              }}
+              title="Upgrade to Overload Pro for unlimited AI queries"
+            >
+              <span>{aiQuota.remaining}/{aiQuota.max} Left Today</span>
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #00F59B, #00E5FF)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontWeight: 900,
+                  fontSize: '0.68rem'
+                }}
+              >
+                PRO ✨
+              </span>
+            </button>
+          )}
+
+          {activeSession && (
             <span
               style={{
                 background: 'rgba(0, 245, 155, 0.15)',
@@ -543,21 +617,7 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
                 gap: 5
               }}
             >
-              <Zap size={11} fill="var(--accent-volt)" /> Live Session Active
-            </span>
-          ) : (
-            <span
-              style={{
-                background: 'rgba(0, 229, 255, 0.15)',
-                border: '1px solid var(--accent-cyan)',
-                color: 'var(--accent-cyan)',
-                fontSize: '0.7rem',
-                fontWeight: 800,
-                padding: '3px 8px',
-                borderRadius: 'var(--radius-full)'
-              }}
-            >
-              Ready
+              <Zap size={11} fill="var(--accent-volt)" /> Live
             </span>
           )}
         </div>
@@ -987,6 +1047,16 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
           <Send size={18} fill="#050D0A" />
         </button>
       </div>
+
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        reason="ai_coach"
+        onSuccess={() => {
+          setIsPro(true);
+          setAiQuota(subscriptionService.getDailyAICoachUsage());
+        }}
+      />
     </div>
   );
 };

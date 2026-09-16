@@ -43,7 +43,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   bodyWeightKg: 80,
   heightCm: 180,
   age: 24,
-  targetWeightKg: 85
+  targetWeightKg: 85,
+  preferredCurrency: 'auto'
 };
 
 function getInitialSampleWorkouts(): WorkoutSession[] {

@@ -72,13 +72,13 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
   const currentExerciseId = selectedExerciseId || (loggedExercises[0]?.id ?? 'sled-hack-squat');
 
   const displayWeight = useCallback((kg: number) => {
-    if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
-    return `${kg} kg`;
+    if (settings.unit === 'lbs') return `${kgToLbs(kg).toFixed(2)} lbs`;
+    return `${(Math.round(kg * 100) / 100).toFixed(2)} kg`;
   }, [settings.unit]);
 
   const displayVolume = useCallback((kg: number) => {
-    if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
-    return `${kg} kg`;
+    if (settings.unit === 'lbs') return `${kgToLbs(kg).toFixed(2)} lbs`;
+    return `${(Math.round(kg * 100) / 100).toFixed(2)} kg`;
   }, [settings.unit]);
 
   // Filter sessions by timeframe safely
@@ -98,7 +98,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
   const rawPoints = useMemo(() => {
     if (mode === 'volume') {
       return filteredSessions.map((s, idx) => {
-        const val = settings.unit === 'lbs' ? kgToLbs(s.totalVolumeKg) : s.totalVolumeKg;
+        const val = settings.unit === 'lbs' ? kgToLbs(s.totalVolumeKg) : Math.round(s.totalVolumeKg * 100) / 100;
         const d = new Date(s.date);
         return {
           id: s.id || `session-${idx}`,
@@ -184,7 +184,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
               });
             } else {
               const topSet = completedSets.reduce((max, curr) => (curr.weightKg > max.weightKg ? curr : max), completedSets[0]);
-              const val = settings.unit === 'lbs' ? kgToLbs(topSet.weightKg) : topSet.weightKg;
+              const val = settings.unit === 'lbs' ? kgToLbs(topSet.weightKg) : Math.round(topSet.weightKg * 100) / 100;
               const hasPR = completedSets.some((st) => st.isPR) || prs.some((p) => p.exerciseId === currentExerciseId && Math.abs(p.value - topSet.weightKg) < 0.5);
               points.push({
                 id: `${s.id}-${matchEx.id}`,
@@ -192,7 +192,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({
                 displayDate,
                 value: val,
                 displayValue: displayWeight(topSet.weightKg),
-                label: `${topSet.weightKg}kg × ${topSet.reps} reps`,
+                label: `${displayWeight(topSet.weightKg)} × ${topSet.reps} reps`,
                 isPR: hasPR,
                 subLabel: `${completedSets.length} sets completed`
               });

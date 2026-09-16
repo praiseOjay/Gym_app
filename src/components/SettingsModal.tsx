@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { UserSettings } from '../types/gym';
-import { kgToLbs, lbsToKg } from '../engine/overloadEngine';
+import { kgToLbs, lbsToKg, cmToFeet, feetToCm } from '../engine/overloadEngine';
 import { StorageService } from '../db/storage';
 import { triggerHaptic } from '../utils/haptics';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
@@ -8,7 +8,6 @@ import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
 import {
   X,
-  Key,
   Volume2,
   Scale,
   Clock,
@@ -23,10 +22,21 @@ import {
   Smartphone,
   Copy,
   Clipboard,
-  FileText
+  FileText,
+  Crown,
+  Sparkles,
+  Globe,
+  Bot,
+  ShieldCheck,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { WorkoutImportModal } from './WorkoutImportModal';
 import { SwipeableModalSheet } from './SwipeableModalSheet';
+import { subscriptionService } from '../services/subscriptionService';
+import { currencyService, SUPPORTED_CURRENCIES } from '../services/currencyService';
+import { aiProxyService } from '../services/aiProxyService';
+import { PaywallModal } from './PaywallModal';
 
 interface SettingsModalProps {
   settings: UserSettings;
@@ -50,7 +60,51 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [showWorkoutImportModal, setShowWorkoutImportModal] = useState(false);
   const [pastedJsonText, setPastedJsonText] = useState('');
   const [pasteError, setPasteError] = useState<string | null>(null);
+  const [subState, setSubState] = useState(() => subscriptionService.getState());
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [showDevAIOptions, setShowDevAIOptions] = useState(false);
+  const [customProxyUrl, setCustomProxyUrl] = useState(() => aiProxyService.getProxyUrl());
+  const [aiStatus, setAiStatus] = useState(() => aiProxyService.getStatus());
+  const [showLegalModal, setShowLegalModal] = useState<'privacy' | 'terms' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const unsubSub = subscriptionService.subscribe((s) => setSubState(s));
+    const unsubAI = aiProxyService.subscribe(() => setAiStatus(aiProxyService.getStatus()));
+    return () => {
+      unsubSub();
+      unsubAI();
+    };
+  }, []);
+
+  const handleRestorePurchases = async () => {
+    setIsRestoring(true);
+    setRestoreMsg(null);
+    triggerHaptic('medium');
+    try {
+      const res = await subscriptionService.restorePurchases();
+      if (res.isPro) {
+        triggerHaptic('success');
+      } else {
+        triggerHaptic('warning');
+      }
+      setRestoreMsg(res.message);
+      setTimeout(() => setRestoreMsg(null), 4000);
+    } catch (err: any) {
+      setRestoreMsg(`Restore failed: ${err.message}`);
+      setTimeout(() => setRestoreMsg(null), 4000);
+    } finally {
+      setIsRestoring(false);
+    }
+  };
+
+  const handleToggleDevPro = () => {
+    triggerHaptic('light');
+    const next = subscriptionService.toggleDevPro();
+    setSubState(next);
+  };
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -320,6 +374,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleSave = () => {
+    aiProxyService.setCustomKey(localSettings.geminiApiKey || '');
+    aiProxyService.setProxyUrl(customProxyUrl);
     onSave(localSettings);
     setSavedAlert(true);
     setTimeout(() => {
@@ -328,16 +384,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }, 800);
   };
 
-  // Convert weights for display based on selected unit
+  // Convert weights and height for display based on selected unit (rounded to 2 decimal places)
   const displayCurrentWeight =
     localSettings.unit === 'lbs'
-      ? localSettings.bodyWeightKg ? kgToLbs(localSettings.bodyWeightKg) : ''
-      : localSettings.bodyWeightKg ?? '';
+      ? localSettings.bodyWeightKg !== undefined ? kgToLbs(localSettings.bodyWeightKg) : ''
+      : localSettings.bodyWeightKg !== undefined ? Math.round(localSettings.bodyWeightKg * 100) / 100 : '';
 
   const displayTargetWeight =
     localSettings.unit === 'lbs'
-      ? localSettings.targetWeightKg ? kgToLbs(localSettings.targetWeightKg) : ''
-      : localSettings.targetWeightKg ?? '';
+      ? localSettings.targetWeightKg !== undefined ? kgToLbs(localSettings.targetWeightKg) : ''
+      : localSettings.targetWeightKg !== undefined ? Math.round(localSettings.targetWeightKg * 100) / 100 : '';
+
+  const displayHeight =
+    localSettings.unit === 'lbs'
+      ? localSettings.heightCm !== undefined ? cmToFeet(localSettings.heightCm) : ''
+      : localSettings.heightCm !== undefined ? Math.round(localSettings.heightCm * 100) / 100 : '';
 
   const handleCurrentWeightChange = (valStr: string) => {
     const val = parseFloat(valStr);
@@ -346,7 +407,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       return;
     }
     const kg = localSettings.unit === 'lbs' ? lbsToKg(val) : val;
-    setLocalSettings({ ...localSettings, bodyWeightKg: Math.round(kg * 10) / 10 });
+    setLocalSettings({ ...localSettings, bodyWeightKg: Math.round(kg * 100) / 100 });
   };
 
   const handleTargetWeightChange = (valStr: string) => {
@@ -356,14 +417,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       return;
     }
     const kg = localSettings.unit === 'lbs' ? lbsToKg(val) : val;
-    setLocalSettings({ ...localSettings, targetWeightKg: Math.round(kg * 10) / 10 });
+    setLocalSettings({ ...localSettings, targetWeightKg: Math.round(kg * 100) / 100 });
   };
 
-  // BMI and Delta calculation
+  const handleHeightChange = (valStr: string) => {
+    const val = parseFloat(valStr);
+    if (isNaN(val)) {
+      setLocalSettings({ ...localSettings, heightCm: undefined });
+      return;
+    }
+    const cm = localSettings.unit === 'lbs' ? feetToCm(val) : val;
+    setLocalSettings({ ...localSettings, heightCm: Math.round(cm * 100) / 100 });
+  };
+
+  // BMI and Delta calculation (rounded to 2 decimal places)
   let bmi: string | null = null;
   if (localSettings.bodyWeightKg && localSettings.heightCm && localSettings.heightCm > 0) {
     const hM = localSettings.heightCm / 100;
-    bmi = (localSettings.bodyWeightKg / (hM * hM)).toFixed(1);
+    bmi = (localSettings.bodyWeightKg / (hM * hM)).toFixed(2);
   }
 
   let heightFtIn: string | null = null;
@@ -376,7 +447,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const weightDeltaKg =
     localSettings.targetWeightKg && localSettings.bodyWeightKg
-      ? Math.round((localSettings.targetWeightKg - localSettings.bodyWeightKg) * 10) / 10
+      ? Math.round((localSettings.targetWeightKg - localSettings.bodyWeightKg) * 100) / 100
       : null;
 
   return (
@@ -397,12 +468,187 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        {/* Units Preference */}
+        {/* Membership & Subscription Tier Card */}
+        <div
+          className="gym-card"
+          style={{
+            background: subState.isPro
+              ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(0, 245, 155, 0.08) 50%, rgba(5, 13, 10, 0.95) 100%)'
+              : 'linear-gradient(135deg, rgba(0, 245, 155, 0.08) 0%, rgba(5, 13, 10, 0.95) 100%)',
+            border: subState.isPro
+              ? '1px solid rgba(255, 215, 0, 0.45)'
+              : '1px solid rgba(0, 245, 155, 0.3)',
+            padding: '16px',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 'var(--radius-md)',
+                  background: subState.isPro
+                    ? 'linear-gradient(135deg, #ffd700, #ffaa00)'
+                    : 'rgba(0, 245, 155, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: subState.isPro ? '#050D0A' : 'var(--accent-volt)'
+                }}
+              >
+                {subState.isPro ? <Crown size={20} /> : <Sparkles size={20} />}
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontWeight: 800, fontSize: '1rem', color: '#fff' }}>
+                    {subState.isPro ? 'Overload Pro' : 'Free Athlete'}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.68rem',
+                      fontWeight: 800,
+                      padding: '2px 8px',
+                      borderRadius: 'var(--radius-full)',
+                      background: subState.isPro ? 'rgba(255, 215, 0, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                      color: subState.isPro ? '#ffd700' : 'var(--text-secondary)',
+                      border: subState.isPro ? '1px solid rgba(255, 215, 0, 0.4)' : '1px solid rgba(255, 255, 255, 0.15)'
+                    }}
+                  >
+                    {subState.isPro ? `${subState.plan.toUpperCase()} ACTIVE` : 'STANDARD'}
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
+                  {subState.isPro
+                    ? 'Unlimited routines, AI Coach, volume landmarks & periodization'
+                    : 'Up to 3 custom routines & 3 AI queries daily'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+            {!subState.isPro ? (
+              <button
+                type="button"
+                className="btn-primary"
+                style={{
+                  flex: 1,
+                  minWidth: 140,
+                  fontSize: '0.82rem',
+                  padding: '9px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6
+                }}
+                onClick={() => setShowPaywall(true)}
+              >
+                <Sparkles size={15} /> Upgrade to Pro
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{
+                  flex: 1,
+                  minWidth: 140,
+                  fontSize: '0.82rem',
+                  padding: '9px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6
+                }}
+                onClick={() => setShowPaywall(true)}
+              >
+                View Plans / Change Tier
+              </button>
+            )}
+
+            {/* Google Play Compliance Restore Purchases */}
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{
+                fontSize: '0.82rem',
+                padding: '9px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6
+              }}
+              onClick={handleRestorePurchases}
+              disabled={isRestoring}
+            >
+              <RotateCcw size={14} className={isRestoring ? 'spin' : ''} />
+              {isRestoring ? 'Restoring...' : 'Restore Purchases'}
+            </button>
+          </div>
+
+          {/* Restore feedback toast */}
+          {restoreMsg && (
+            <div
+              style={{
+                marginTop: 10,
+                fontSize: '0.75rem',
+                color: subState.isPro ? 'var(--accent-volt)' : 'var(--text-secondary)',
+                background: 'rgba(0, 0, 0, 0.4)',
+                padding: '6px 10px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid rgba(255, 255, 255, 0.1)'
+              }}
+            >
+              {restoreMsg}
+            </div>
+          )}
+
+          {/* Dev Mode Sandbox Toggle */}
+          <div
+            style={{
+              marginTop: 12,
+              paddingTop: 10,
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+              Developer Sandbox Mode
+            </span>
+            <button
+              type="button"
+              onClick={handleToggleDevPro}
+              style={{
+                background: subState.isPro ? 'rgba(0, 245, 155, 0.15)' : 'rgba(255, 255, 255, 0.08)',
+                border: subState.isPro ? '1px solid var(--accent-volt)' : '1px solid rgba(255, 255, 255, 0.15)',
+                color: subState.isPro ? 'var(--accent-volt)' : 'var(--text-secondary)',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '3px 9px',
+                borderRadius: 'var(--radius-full)',
+                cursor: 'pointer'
+              }}
+            >
+              Switch to {subState.isPro ? 'Free' : 'Pro (Simulated)'}
+            </button>
+          </div>
+        </div>
+
+        {/* Units System Preference */}
         <div className="gym-card" style={{ padding: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Scale size={18} color="var(--accent-volt)" />
-              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Weight Measurement</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>Units System</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                  Weight ({localSettings.unit}) & Height ({localSettings.unit === 'lbs' ? 'ft' : 'cm'}) · 2 decimal precision
+                </div>
+              </div>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
               <button
@@ -415,7 +661,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 }}
                 onClick={() => setLocalSettings({ ...localSettings, unit: 'kg' })}
               >
-                Metric (kg)
+                Metric (kg / cm)
               </button>
               <button
                 className="timer-chip"
@@ -427,9 +673,48 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 }}
                 onClick={() => setLocalSettings({ ...localSettings, unit: 'lbs' })}
               >
-                Imperial (lbs)
+                Imperial (lbs / ft)
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* Currency & Pricing Preference */}
+        <div className="gym-card" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Globe size={18} color="var(--accent-cyan)" />
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>Store Currency</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                  Default is GBP (£). Auto-detects your country currency.
+                </div>
+              </div>
+            </div>
+            <select
+              value={currencyService.getCurrency()}
+              onChange={(e) => {
+                currencyService.setCurrency(e.target.value);
+                setLocalSettings({ ...localSettings, preferredCurrency: e.target.value });
+              }}
+              style={{
+                background: 'var(--bg-surface)',
+                color: '#fff',
+                border: '1px solid var(--border-medium)',
+                borderRadius: 'var(--radius-md)',
+                padding: '6px 10px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              <option value="auto">Auto ({currencyService.getDetectedCurrency()})</option>
+              {Object.values(SUPPORTED_CURRENCIES).map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.code} ({c.symbol}) - {c.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -473,12 +758,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </label>
               <input
                 type="number"
-                step="0.1"
+                step="0.01"
                 className="settings-input"
                 value={displayCurrentWeight}
                 onFocus={(e) => e.target.select()}
                 onChange={(e) => handleCurrentWeightChange(e.target.value)}
-                placeholder={localSettings.unit === 'kg' ? '80' : '176'}
+                placeholder={localSettings.unit === 'kg' ? '80.00' : '176.37'}
               />
             </div>
 
@@ -489,29 +774,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </label>
               <input
                 type="number"
-                step="0.1"
+                step="0.01"
                 className="settings-input"
                 value={displayTargetWeight}
                 onFocus={(e) => e.target.select()}
                 onChange={(e) => handleTargetWeightChange(e.target.value)}
-                placeholder={localSettings.unit === 'kg' ? '85' : '187'}
+                placeholder={localSettings.unit === 'kg' ? '85.00' : '187.39'}
               />
             </div>
 
             {/* Height */}
             <div>
               <label className="settings-label">
-                Height (cm)
+                Height ({localSettings.unit === 'lbs' ? 'ft' : 'cm'})
               </label>
               <input
                 type="number"
+                step="0.01"
                 className="settings-input"
-                value={localSettings.heightCm || ''}
+                value={displayHeight}
                 onFocus={(e) => e.target.select()}
-                onChange={(e) =>
-                  setLocalSettings({ ...localSettings, heightCm: parseFloat(e.target.value) || undefined })
-                }
-                placeholder="180"
+                onChange={(e) => handleHeightChange(e.target.value)}
+                placeholder={localSettings.unit === 'lbs' ? '5.91' : '180.00'}
               />
             </div>
 
@@ -548,47 +832,137 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             >
               {bmi && (
                 <span>
-                  BMI: <strong style={{ color: '#fff' }}>{bmi}</strong>
+                  BMI: <strong style={{ color: 'var(--accent-volt)' }}>{bmi}</strong>
                 </span>
               )}
               {heightFtIn && (
                 <span>
-                  Height Ref: <strong style={{ color: '#fff' }}>{heightFtIn}</strong>
+                  Height:{' '}
+                  <strong style={{ color: '#fff' }}>
+                    {localSettings.unit === 'lbs'
+                      ? `${cmToFeet(localSettings.heightCm || 0)} ft`
+                      : `${Math.round((localSettings.heightCm || 0) * 100) / 100} cm`}{' '}
+                    ({heightFtIn})
+                  </strong>
                 </span>
               )}
             </div>
           )}
         </div>
 
-        {/* Gemini API Key */}
+        {/* AI Intelligence Cloud Engine & Security Proxy Card */}
         <div className="gym-card" style={{ padding: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-            <Key size={18} color="var(--accent-cyan)" />
-            <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Google Gemini API Key</span>
-          </div>
-          <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginBottom: 10, lineHeight: 1.45 }}>
-            Powers instant workout debriefs, smart equipment alternatives, and interactive AI coaching.
-          </p>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <input
-              type={showKey ? 'text' : 'password'}
-              className="settings-input"
-              style={{ flex: 1, fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}
-              value={localSettings.geminiApiKey}
-              onChange={(e) =>
-                setLocalSettings({ ...localSettings, geminiApiKey: e.target.value })
-              }
-              placeholder="AIzaSy..."
-            />
-            <button
-              type="button"
-              className="timer-chip"
-              onClick={() => setShowKey(!showKey)}
-              style={{ minHeight: 44, padding: '0 16px', fontWeight: 800, whiteSpace: 'nowrap' }}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Bot size={18} color="var(--accent-volt)" />
+              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>AI Intelligence Cloud Engine</span>
+            </div>
+            <span
+              style={{
+                fontSize: '0.68rem',
+                fontWeight: 800,
+                padding: '3px 9px',
+                borderRadius: 'var(--radius-full)',
+                background: aiStatus.mode === 'custom_key' ? 'rgba(255, 215, 0, 0.15)' : 'rgba(0, 245, 155, 0.12)',
+                color: aiStatus.mode === 'custom_key' ? '#ffd700' : 'var(--accent-volt)',
+                border: aiStatus.mode === 'custom_key' ? '1px solid rgba(255, 215, 0, 0.35)' : '1px solid rgba(0, 245, 155, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5
+              }}
             >
-              {showKey ? 'Hide' : 'Show'}
-            </button>
+              <ShieldCheck size={11} />
+              <span>{aiStatus.providerName}</span>
+            </span>
           </div>
+
+          <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginBottom: 12, lineHeight: 1.45 }}>
+            Powers Coach Overload debriefs, smart exercise swaps, and periodization tuning with Google Gemini.
+            <strong> No API key setup required</strong> — secured through our cloud proxy.
+          </p>
+
+          {/* Developer BYOK / Custom Proxy Toggle */}
+          <button
+            type="button"
+            onClick={() => setShowDevAIOptions(!showDevAIOptions)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-muted)',
+              fontSize: '0.74rem',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              cursor: 'pointer',
+              padding: 0,
+              marginBottom: showDevAIOptions ? 10 : 0
+            }}
+          >
+            <span>Advanced Developer Options (Custom Key / Proxy)</span>
+            {showDevAIOptions ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+
+          {showDevAIOptions && (
+            <div
+              style={{
+                marginTop: 8,
+                padding: '12px',
+                background: 'var(--bg-surface)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-subtle)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 12
+              }}
+            >
+              <div>
+                <label className="settings-label" style={{ marginBottom: 4 }}>
+                  Custom Gemini API Key (Optional BYOK)
+                </label>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input
+                    type={showKey ? 'text' : 'password'}
+                    className="settings-input"
+                    style={{ flex: 1, fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}
+                    value={localSettings.geminiApiKey || ''}
+                    onChange={(e) =>
+                      setLocalSettings({ ...localSettings, geminiApiKey: e.target.value })
+                    }
+                    placeholder="Leave empty to use managed cloud proxy"
+                  />
+                  <button
+                    type="button"
+                    className="timer-chip"
+                    onClick={() => setShowKey(!showKey)}
+                    style={{ minHeight: 38, padding: '0 12px', fontSize: '0.75rem', fontWeight: 800 }}
+                  >
+                    {showKey ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                  Supply your personal Google AI Studio key to override the cloud engine.
+                </div>
+              </div>
+
+              <div>
+                <label className="settings-label" style={{ marginBottom: 4 }}>
+                  Custom Proxy Endpoint URL (Optional)
+                </label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}
+                  value={customProxyUrl}
+                  onChange={(e) => setCustomProxyUrl(e.target.value)}
+                  placeholder="https://<project-ref>.supabase.co/functions/v1/gemini-proxy"
+                />
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                  Self-hosted Supabase, Firebase, or Cloudflare Worker endpoint URL.
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Rest Timer Default */}
@@ -839,6 +1213,57 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
 
+        {/* Legal & Health Compliance */}
+        <div className="card" style={{ padding: '16px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <ShieldCheck size={18} color="var(--accent-volt)" />
+            <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: '#fff' }}>
+              Legal & Health Compliance
+            </h3>
+          </div>
+
+          <div
+            style={{
+              background: 'rgba(255, 170, 0, 0.08)',
+              border: '1px solid rgba(255, 170, 0, 0.25)',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px',
+              marginBottom: '14px'
+            }}
+          >
+            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#FFD166', marginBottom: 4 }}>
+              ⚠️ Health & Medical Advisory
+            </div>
+            <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+              Overload AI provides periodization targets and progressive overload tracking for educational and fitness logging purposes only. It is not medical advice. Consult a healthcare professional before starting any strenuous training regimen.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ padding: '8px 10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              onClick={() => setShowLegalModal('privacy')}
+            >
+              <FileText size={14} color="var(--accent-cyan)" /> Privacy Policy
+            </button>
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ padding: '8px 10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              onClick={() => setShowLegalModal('terms')}
+            >
+              <FileText size={14} color="var(--accent-volt)" /> Terms of Service
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, borderTop: '1px solid var(--border-subtle)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+            <span>Overload AI v1.0.0 (Build 1)</span>
+            <span style={{ color: 'var(--accent-volt)' }}>100% Offline-First Engine</span>
+          </div>
+        </div>
+
         {/* Action Buttons */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10, paddingBottom: 16 }}>
           <button className="btn-primary" style={{ minHeight: 48, fontSize: '1rem', fontWeight: 800 }} onClick={handleSave}>
@@ -966,6 +1391,89 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <WorkoutImportModal
           onClose={() => setShowWorkoutImportModal(false)}
         />
+      )}
+
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        reason="general"
+        onSuccess={() => setSubState(subscriptionService.getState())}
+      />
+
+      {/* In-App Legal & Compliance Modal */}
+      {showLegalModal && (
+        <SwipeableModalSheet
+          onClose={() => setShowLegalModal(null)}
+          overlayStyle={{ zIndex: 9999 }}
+          maxHeight="85vh"
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <ShieldCheck size={18} color="var(--accent-volt)" />
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+                {showLegalModal === 'privacy' ? 'Privacy Policy' : 'Terms of Service'}
+              </h3>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowLegalModal(null)}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 4 }}
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 4, color: 'var(--text-secondary)', fontSize: '0.82rem', lineHeight: 1.5 }}>
+            {showLegalModal === 'privacy' ? (
+              <>
+                <div style={{ background: 'rgba(0, 245, 155, 0.08)', border: '1px solid rgba(0, 245, 155, 0.25)', borderRadius: 10, padding: 12, marginBottom: 14 }}>
+                  <div style={{ fontWeight: 700, color: 'var(--accent-volt)', marginBottom: 4 }}>At a Glance:</div>
+                  <ul style={{ margin: 0, paddingLeft: 18, color: '#fff' }}>
+                    <li><strong>Offline-First Storage:</strong> Workouts, sets, and weights are stored locally in IndexedDB on your device. Never sold.</li>
+                    <li><strong>Ephemeral Voice Audio:</strong> Spoken entries are transcribed in real-time and immediately discarded. Never stored or shared.</li>
+                    <li><strong>Gemini AI Intelligence:</strong> Questions are proxied securely without personal identity details.</li>
+                  </ul>
+                </div>
+                <p><strong>1. Information Collection:</strong> Overload AI operates locally on your personal device. Workout history, personal bests, and custom routines are stored in your device's local browser/Capacitor database (IndexedDB).</p>
+                <p><strong>2. Microphone Permission:</strong> The microphone is requested solely for optional hands-free workout logging. Audio is processed ephemerally on-the-fly and never stored.</p>
+                <p><strong>3. Artificial Intelligence:</strong> Prompt context for workout advice is sent securely to Google Gemini without personally identifying data.</p>
+                <p><strong>4. User Data Control:</strong> You can completely erase your workout records at any time using the Reset Data button in Settings.</p>
+              </>
+            ) : (
+              <>
+                <div style={{ background: 'rgba(255, 68, 68, 0.08)', border: '1px solid rgba(255, 68, 68, 0.25)', borderRadius: 10, padding: 12, marginBottom: 14 }}>
+                  <div style={{ fontWeight: 700, color: '#FF6B6B', marginBottom: 4 }}>⚠️ Health & Fitness Disclaimer:</div>
+                  <p style={{ margin: 0, color: '#FFBABA' }}>Overload AI is designed solely for self-tracking and educational purposes. It does not provide medical advice. Consult a physician before beginning any exercise routine.</p>
+                </div>
+                <p><strong>1. License:</strong> Praise Ojay grants you a personal, revocable license to use Overload AI for personal fitness logging.</p>
+                <p><strong>2. In-App Subscriptions:</strong> Overload Pro subscriptions and lifetime passes are processed through Google Play Billing. Subscriptions auto-renew unless cancelled at least 24 hours prior to expiration via Google Play Subscriptions settings.</p>
+                <p><strong>3. Limitation of Liability:</strong> You assume full personal risk and responsibility for your physical training activities and exercise execution.</p>
+              </>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ flex: 1, fontSize: '0.8rem', padding: '10px' }}
+              onClick={() => {
+                const url = showLegalModal === 'privacy' ? '/privacy-policy.html' : '/terms.html';
+                window.open(url, '_blank');
+              }}
+            >
+              Open Web Version
+            </button>
+            <button
+              type="button"
+              className="btn-primary"
+              style={{ flex: 1, fontSize: '0.8rem', padding: '10px' }}
+              onClick={() => setShowLegalModal(null)}
+            >
+              Close
+            </button>
+          </div>
+        </SwipeableModalSheet>
       )}
     </>
   );

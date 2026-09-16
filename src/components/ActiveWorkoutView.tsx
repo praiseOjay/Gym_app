@@ -275,15 +275,15 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  // Convert display values based on unit
+  // Convert display values based on unit (rounded to 2 decimal places)
   const displayWeight = (kg: number) => {
     if (settings.unit === 'lbs') return kgToLbs(kg);
-    return kg;
+    return Math.round(kg * 100) / 100;
   };
 
   const toStorageWeight = (val: number) => {
     if (settings.unit === 'lbs') return lbsToKg(val);
-    return val;
+    return Math.round(val * 100) / 100;
   };
 
   // Calculate session volume (excluding warmups and pure cardio)
@@ -1424,7 +1424,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                               onClick={() => {
                                 const cur = displayWeight(set.weightKg);
                                 const step = settings.unit === 'lbs' ? 5 : 2.5;
-                                const next = Math.max(0, Math.round((cur - step) * 10) / 10);
+                                const next = Math.max(0, Math.round((cur - step) * 100) / 100);
                                 handleSetChange(exIdx, setIdx, 'weightKg', toStorageWeight(next));
                                 triggerHaptic('light', settings.vibrationEnabled);
                               }}
@@ -1434,7 +1434,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                             </button>
                             <input
                               type="number"
-                              step="0.5"
+                              step="0.01"
                               className="set-input-box"
                               style={{ minWidth: 0, flex: 1, padding: '8px 2px', fontSize: '0.88rem' }}
                               value={displayWeight(set.weightKg) || ''}
@@ -1455,7 +1455,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                               onClick={() => {
                                 const cur = displayWeight(set.weightKg);
                                 const step = settings.unit === 'lbs' ? 5 : 2.5;
-                                const next = Math.round((cur + step) * 10) / 10;
+                                const next = Math.round((cur + step) * 100) / 100;
                                 handleSetChange(exIdx, setIdx, 'weightKg', toStorageWeight(next));
                                 triggerHaptic('light', settings.vibrationEnabled);
                               }}

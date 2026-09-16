@@ -73,13 +73,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   const [inputNote, setInputNote] = useState<string>('');
 
   const displayVolume = (kg: number) => {
-    if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
-    return `${kg} kg`;
+    if (settings.unit === 'lbs') return `${kgToLbs(kg).toFixed(2)} lbs`;
+    return `${(Math.round(kg * 100) / 100).toFixed(2)} kg`;
   };
 
   const displayWeight = (kg: number) => {
-    if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
-    return `${kg} kg`;
+    if (settings.unit === 'lbs') return `${kgToLbs(kg).toFixed(2)} lbs`;
+    return `${(Math.round(kg * 100) / 100).toFixed(2)} kg`;
   };
 
   // Weekly muscle group set volume calculation (MEV / MRV)
@@ -99,7 +99,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   const handleLogWeighIn = () => {
     const val = parseFloat(inputWeight);
     if (isNaN(val) || val <= 0) return;
-    const kg = settings.unit === 'lbs' ? lbsToKg(val) : val;
+    const kg = settings.unit === 'lbs' ? lbsToKg(val) : Math.round(val * 100) / 100;
     const entry = StorageService.addBodyWeightLog(kg, new Date().toISOString(), inputNote.trim() || undefined);
     setBodyWeightLogs([entry, ...bodyWeightLogs]);
     setInputWeight('');
@@ -446,7 +446,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                 </label>
                 <input
                   type="number"
-                  step="0.5"
+                  step="0.01"
                   className="set-input-box"
                   style={{ marginTop: 4 }}
                   value={calcWeight}
@@ -594,7 +594,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
               <input
                 type="number"
-                step="0.1"
+                step="0.01"
                 placeholder={`Weight (${settings.unit})`}
                 className="set-input-box"
                 style={{ flex: 1, textAlign: 'left', padding: '8px 12px' }}

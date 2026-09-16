@@ -8,7 +8,7 @@ import { kgToLbs } from '../engine/overloadEngine';
 
 export function displayWeight(kg: number, unit: 'kg' | 'lbs' = 'kg'): number {
   if (unit === 'lbs') return kgToLbs(kg);
-  return Math.round(kg * 10) / 10;
+  return Math.round(kg * 100) / 100;
 }
 
 export interface ExerciseMetaLike {

@@ -117,7 +117,7 @@ export const VoiceLoggerModal: React.FC<VoiceLoggerModalProps> = ({
 
   const displayWeight = (kg?: number) => {
     if (kg === undefined) return null;
-    return unit === 'lbs' ? `${kgToLbs(kg)} lbs` : `${kg} kg`;
+    return unit === 'lbs' ? `${kgToLbs(kg).toFixed(2)} lbs` : `${(Math.round(kg * 100) / 100).toFixed(2)} kg`;
   };
 
   return (

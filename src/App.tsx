@@ -469,6 +469,7 @@ export function App() {
         {currentTab === 'routines' && (
           <RoutinesView
             routines={routines}
+            settings={settings}
             onStartRoutine={handleStartRoutine}
             onUpdateRoutines={(updated) => {
               setRoutines(updated);

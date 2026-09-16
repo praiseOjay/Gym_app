@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import type { Routine, Exercise, RoutineExerciseTemplate } from '../types/gym';
+import type { Routine, Exercise, RoutineExerciseTemplate, UserSettings } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import { triggerHaptic } from '../utils/haptics';
 import { sounds } from '../utils/audio';
@@ -8,6 +8,8 @@ import { preloadRoutineGifs } from '../utils/offlineMedia';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
 import { auditRoutineKinematics } from '../engine/biomechanicsEngine';
 import { getExerciseTrackingType, formatDuration } from '../utils/trackingTypeUtils';
+import { formatWeight, kgToLbs, lbsToKg } from '../engine/overloadEngine';
+import { StorageService } from '../db/storage';
 import {
   Play,
   Clock,
@@ -27,18 +29,25 @@ import { SwipeableModalSheet } from './SwipeableModalSheet';
 import { useDraggableList } from '../hooks/useDraggableList';
 import { ExerciseFilterBar } from './ExerciseFilterBar';
 import { filterExerciseLibrary } from '../utils/exerciseFilterUtils';
+import { subscriptionService } from '../services/subscriptionService';
+import { PaywallModal } from './PaywallModal';
+import type { PaywallTriggerReason } from '../types/subscription';
+import { FREE_ROUTINE_LIMIT } from '../types/subscription';
 
 interface RoutinesViewProps {
   routines: Routine[];
   onStartRoutine: (routine: Routine) => void;
   onUpdateRoutines: (updatedRoutines: Routine[]) => void;
+  settings?: UserSettings;
 }
 
 export const RoutinesView: React.FC<RoutinesViewProps> = ({
   routines,
   onStartRoutine,
-  onUpdateRoutines
+  onUpdateRoutines,
+  settings
 }) => {
+  const userUnit = settings?.unit || StorageService.getSettings().unit || 'kg';
   const todayWorkout = useMemo(() => getTodayWorkoutState(routines), [routines]);
   const [selectedRoutineId, setSelectedRoutineId] = useState<string>(
     todayWorkout.routine?.id || routines[0]?.id || ''
@@ -51,6 +60,9 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
   const [exerciseFilterEquipment, setExerciseFilterEquipment] = useState<string>('All Equipment');
   const [exerciseSearch, setExerciseSearch] = useState<string>('');
   const [exerciseDisplayLimit, setExerciseDisplayLimit] = useState<number>(60);
+  const [showPaywall, setShowPaywall] = useState<boolean>(false);
+  const [paywallReason, setPaywallReason] = useState<PaywallTriggerReason>('routine_limit');
+  const isPro = subscriptionService.isPro();
 
   const {
     handleTouchStart: handleTouchStartRoutineEx,
@@ -110,6 +122,11 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
   };
 
   const handleCreateNewRoutine = () => {
+    if (!subscriptionService.canCreateRoutine(routines.length)) {
+      setPaywallReason('routine_limit');
+      setShowPaywall(true);
+      return;
+    }
     const newRoutine: Routine = {
       id: `routine-${Date.now()}`,
       name: 'New Custom Workout',
@@ -313,7 +330,18 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
             }}
           >
             <Plus size={13} />
-            Add Day
+            <span>Add Day</span>
+            {!isPro && (
+              <span
+                style={{
+                  fontSize: '0.62rem',
+                  color: routines.length >= FREE_ROUTINE_LIMIT ? '#FF4D4D' : 'var(--text-muted)',
+                  marginLeft: 2
+                }}
+              >
+                ({routines.length}/{FREE_ROUTINE_LIMIT})
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -540,7 +568,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                           <strong style={{ color: '#fff' }}>{targetReps}</strong> Reps (RPE {template.targetRpe})
                         </div>
                         <div style={{ color: 'var(--accent-volt)', fontWeight: 800 }}>
-                          {targetWeight} Kg
+                          {formatWeight(targetWeight, userUnit, 2)}
                         </div>
                       </>
                     )}
@@ -1187,17 +1215,31 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                             </div>
 
                             <div>
-                              <span style={{ color: 'var(--text-muted)' }}>Weight (kg)</span>
+                              <span style={{ color: 'var(--text-muted)' }}>Weight ({userUnit})</span>
                               <input
                                 type="number"
-                                step="0.5"
+                                step="0.01"
                                 className="set-input-box"
-                                value={template.defaultWeightKg !== undefined && template.defaultWeightKg !== null && (template.defaultWeightKg as any) !== '' ? template.defaultWeightKg : ''}
-                                placeholder="20"
+                                value={
+                                  template.defaultWeightKg !== undefined &&
+                                  template.defaultWeightKg !== null &&
+                                  (template.defaultWeightKg as any) !== ''
+                                    ? userUnit === 'lbs'
+                                      ? kgToLbs(template.defaultWeightKg)
+                                      : Math.round(template.defaultWeightKg * 100) / 100
+                                    : ''
+                                }
+                                placeholder={userUnit === 'lbs' ? '45.00' : '20.00'}
                                 onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
                                   const raw = e.target.value;
-                                  const val = raw === '' ? ('' as unknown as number) : (parseFloat(raw) || 0);
+                                  const num = parseFloat(raw);
+                                  const val =
+                                    raw === ''
+                                      ? ('' as unknown as number)
+                                      : userUnit === 'lbs'
+                                      ? lbsToKg(num || 0)
+                                      : Math.round((num || 0) * 100) / 100;
                                   const updated = [...editingRoutine.exercises];
                                   updated[idx].defaultWeightKg = val;
                                   setEditingRoutine({ ...editingRoutine, exercises: updated });
@@ -1453,6 +1495,12 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
           onClose={() => setInspectExercise(null)}
         />
       )}
+      {/* PAYWALL MODAL */}
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        reason={paywallReason}
+      />
     </div>
   );
 };

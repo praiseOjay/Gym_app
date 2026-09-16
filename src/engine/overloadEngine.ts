@@ -17,33 +17,57 @@ import { getExerciseTrackingType, formatDuration } from '../utils/trackingTypeUt
  */
 export function calculate1RM(weightKg: number, reps: number): number {
   if (reps <= 0 || weightKg <= 0) return 0;
-  if (reps === 1) return weightKg;
+  if (reps === 1) return Math.round(weightKg * 100) / 100;
   const epley = weightKg * (1 + reps / 30);
-  return Math.round(epley * 10) / 10;
+  return Math.round(epley * 100) / 100;
 }
 
 /**
- * Convert kg to lbs with 1 decimal precision
+ * Convert kg to lbs with 2 decimal places precision
  */
 export function kgToLbs(kg: number): number {
-  return Math.round(kg * 2.20462 * 10) / 10;
+  return Math.round(kg * 2.20462262 * 100) / 100;
 }
 
 /**
- * Convert lbs to kg with 1 decimal precision
+ * Convert lbs to kg with 2 decimal places precision
  */
 export function lbsToKg(lbs: number): number {
-  return Math.round((lbs / 2.20462) * 10) / 10;
+  return Math.round((lbs / 2.20462262) * 100) / 100;
 }
 
 /**
- * Format weight according to user's unit preference
+ * Convert cm to decimal feet with 2 decimal places precision (e.g. 180cm -> 5.91ft)
  */
-export function formatWeight(weightKg: number, unit: 'kg' | 'lbs'): string {
+export function cmToFeet(cm: number): number {
+  return Math.round((cm / 30.48) * 100) / 100;
+}
+
+/**
+ * Convert decimal feet to cm with 2 decimal places precision (e.g. 5.91ft -> 180.14cm)
+ */
+export function feetToCm(feet: number): number {
+  return Math.round((feet * 30.48) * 100) / 100;
+}
+
+/**
+ * Format weight according to user's unit preference rounded to 2 decimal places
+ */
+export function formatWeight(weightKg: number, unit: 'kg' | 'lbs', decimals = 2): string {
   if (unit === 'lbs') {
-    return `${kgToLbs(weightKg)} lbs`;
+    return `${kgToLbs(weightKg).toFixed(decimals)} lbs`;
   }
-  return `${weightKg} kg`;
+  return `${(Math.round(weightKg * 100) / 100).toFixed(decimals)} kg`;
+}
+
+/**
+ * Format height according to user's unit preference rounded to 2 decimal places
+ */
+export function formatHeight(heightCm: number, unit: 'kg' | 'lbs', decimals = 2): string {
+  if (unit === 'lbs') {
+    return `${cmToFeet(heightCm).toFixed(decimals)} ft`;
+  }
+  return `${(Math.round(heightCm * 100) / 100).toFixed(decimals)} cm`;
 }
 
 /**
@@ -456,7 +480,7 @@ export function calculateBarbellPlates(
     weightPerSide: (targetWeight - barWeight) / 2,
     platesPerSide,
     isExact: weightNeededPerSide === 0,
-    remainder: Math.round(weightNeededPerSide * 2 * 10) / 10
+    remainder: Math.round(weightNeededPerSide * 2 * 100) / 100
   };
 }
 
@@ -613,9 +637,9 @@ export function calculateRepMaxTable(weightKg: number, reps: number): RepMaxEntr
 
   const repCounts = [1, 2, 3, 4, 5, 6, 8, 10, 12];
   return repCounts.map((r) => {
-    const epley = Math.round((base1RM / (1 + r / 30)) * 10) / 10;
-    const brzycki = Math.round((base1RM * ((37 - r) / 36)) * 10) / 10;
-    const avg = Math.round(((epley + brzycki) / 2) * 10) / 10;
+    const epley = Math.round((base1RM / (1 + r / 30)) * 100) / 100;
+    const brzycki = Math.round((base1RM * ((37 - r) / 36)) * 100) / 100;
+    const avg = Math.round(((epley + brzycki) / 2) * 100) / 100;
     const pct = Math.round((avg / base1RM) * 100);
     return {
       reps: r,

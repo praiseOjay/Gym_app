@@ -201,7 +201,15 @@ export class VoiceLoggerController {
 
       this.recognition.onerror = (event: any) => {
         console.warn('Speech recognition error:', event.error);
-        if (event.error !== 'no-speech') {
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          this.onErrorCallback?.(
+            'Microphone access was declined. Please enable microphone permission in device settings to log sets hands-free.'
+          );
+        } else if (event.error === 'network') {
+          this.onErrorCallback?.(
+            'Voice recognition requires an active network or offline speech pack. Please check your connection.'
+          );
+        } else if (event.error !== 'no-speech') {
           this.onErrorCallback?.(`Microphone notice: ${event.error}`);
         }
       };
@@ -217,13 +225,13 @@ export class VoiceLoggerController {
     this.unit = unit;
   }
 
-  start(
+  async start(
     onResult: (cmd: ParsedVoiceCommand) => void,
     onError: (err: string) => void,
     onListeningChange: (active: boolean) => void
-  ): boolean {
+  ): Promise<boolean> {
     if (!this.recognition) {
-      onError('Speech Recognition is not supported by your browser.');
+      onError('Speech Recognition is not supported by your current browser or device WebView.');
       return false;
     }
 
@@ -234,6 +242,20 @@ export class VoiceLoggerController {
     this.onListeningChange = onListeningChange;
 
     try {
+      // Explicitly prompt for mic permission via getUserMedia if available (standard in modern mobile browsers)
+      if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          // Stop stream immediately as SpeechRecognition creates its own input channel
+          stream.getTracks().forEach((track) => track.stop());
+        } catch (permErr: any) {
+          if (permErr.name === 'NotAllowedError' || permErr.name === 'PermissionDeniedError') {
+            onError('Microphone permission was denied. Please allow microphone access to log sets hands-free.');
+            return false;
+          }
+        }
+      }
+
       this.recognition.start();
       this.isListening = true;
       this.onListeningChange(true);

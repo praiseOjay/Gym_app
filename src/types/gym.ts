@@ -185,6 +185,7 @@ export interface UserSettings {
   targetWeightKg?: number;
   bodyWeightLogs?: BodyWeightEntry[];
   voiceCoachEnabled?: boolean;
+  preferredCurrency?: string;
 }
 
 export interface BodyWeightEntry {

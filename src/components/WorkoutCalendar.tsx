@@ -146,8 +146,8 @@ export const WorkoutCalendar: React.FC<WorkoutCalendarProps> = ({
   }, [sessionsByDate]);
 
   const displayVolume = (kg: number) => {
-    if (settings.unit === 'lbs') return `${kgToLbs(kg)} lbs`;
-    return `${kg} kg`;
+    if (settings.unit === 'lbs') return `${kgToLbs(kg).toFixed(2)} lbs`;
+    return `${(Math.round(kg * 100) / 100).toFixed(2)} kg`;
   };
 
   const selectedSessions = sessionsByDate.get(selectedDateKey) || [];

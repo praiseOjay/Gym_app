@@ -48,14 +48,17 @@ export const PlateCalculatorModal: React.FC<PlateCalculatorModalProps> = ({
   const plateCalc = calculateBarbellPlates(weight, unit, barWeight);
 
   const adjustWeight = (delta: number) => {
-    setWeight((prev) => Math.max(barWeight, Math.round((prev + delta) * 10) / 10));
+    setWeight((prev) => Math.max(barWeight, Math.round((prev + delta) * 100) / 100));
   };
 
   const handleSelectSet = (idx: number) => {
     setActiveSetIdx(idx);
     if (sets && sets[idx]) {
       const setRawKg = sets[idx].weightKg;
-      const converted = unit === 'lbs' ? Math.round(setRawKg * 2.20462 * 10) / 10 : setRawKg;
+      const converted =
+        unit === 'lbs'
+          ? Math.round(setRawKg * 2.20462262 * 100) / 100
+          : Math.round(setRawKg * 100) / 100;
       if (converted > 0) {
         setWeight(converted);
       }

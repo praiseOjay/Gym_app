@@ -102,8 +102,8 @@ export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
 
   const displayVolume =
     settings.unit === 'lbs'
-      ? `${kgToLbs(session.totalVolumeKg)} lbs`
-      : `${session.totalVolumeKg} kg`;
+      ? `${kgToLbs(session.totalVolumeKg).toFixed(2)} lbs`
+      : `${(Math.round(session.totalVolumeKg * 100) / 100).toFixed(2)} kg`;
 
   const minutes = Math.max(1, Math.round(session.durationSeconds / 60));
   const caloriesBurned = session.caloriesBurned || Math.round(minutes * 7.5);
