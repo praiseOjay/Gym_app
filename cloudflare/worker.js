@@ -39,8 +39,8 @@ export default {
         );
       }
 
-      const models = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
-      let lastError = "Unknown error";
+      const models = ["gemini-3.6-flash", "gemini-3.6-pro", "gemini-2.5-flash", "gemini-2.0-flash"];
+      const modelErrors = {};
 
       for (const model of models) {
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -68,7 +68,7 @@ export default {
 
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}));
-          lastError = errData?.error?.message || `HTTP ${response.status}`;
+          modelErrors[model] = errData?.error?.message || `HTTP ${response.status}`;
           continue;
         }
 
@@ -83,7 +83,7 @@ export default {
       }
 
       return new Response(
-        JSON.stringify({ error: `All models failed: ${lastError}` }),
+        JSON.stringify({ error: "All models failed", modelErrors }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     } catch (err) {

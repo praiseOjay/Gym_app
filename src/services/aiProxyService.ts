@@ -19,9 +19,10 @@ const DEV_FALLBACK_KEY =
   'AIzaSyAfyy7j_3Vc9eJ4ds7RxOOmvHzUnjskosQ';
 
 const ACTIVE_GEMINI_MODELS = [
+  'gemini-3.6-flash',
   'gemini-2.5-flash',
-  'gemini-1.5-flash',
-  'gemini-1.5-pro'
+  'gemini-2.0-flash',
+  'gemini-1.5-flash'
 ];
 
 const STORAGE_CUSTOM_PROXY_KEY = 'overload_custom_ai_proxy_url_v1';
@@ -41,8 +42,11 @@ class AIProxyService {
     if (typeof window === 'undefined') return '';
     const envProxy =
       (typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_AI_PROXY_URL) || '';
+    const envKey =
+      (typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_GEMINI_API_KEY) || '';
+    const fallbackUrl = envKey.startsWith('http') ? envKey.trim() : '';
     const stored = localStorage.getItem(STORAGE_CUSTOM_PROXY_KEY) || '';
-    return stored || envProxy;
+    return stored || envProxy || fallbackUrl;
   }
 
   private loadCustomKey(): string {
