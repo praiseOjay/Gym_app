@@ -9,7 +9,10 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "cap:sync": "npm run build && npx cap sync android",
-    "cap:open": "npx cap open android"
+    "cap:open": "npx cap open android",
+    "proxy:login": "cd cloudflare && npx wrangler login",
+    "proxy:secret": "cd cloudflare && npx wrangler secret put GEMINI_API_KEY",
+    "proxy:deploy": "cd cloudflare && npx wrangler deploy"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.1",

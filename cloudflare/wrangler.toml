@@ -1,0 +1,10 @@
+name = "overload-ai-proxy"
+main = "worker.js"
+compatibility_date = "2024-09-16"
+
+# Limits & Observability
+[observability]
+enabled = true
+
+# The GEMINI_API_KEY is stored securely as a Cloudflare Worker secret:
+# Run: npx wrangler secret put GEMINI_API_KEY
