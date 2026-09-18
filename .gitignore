@@ -30,3 +30,12 @@ dist-ssr
 exercisedb_*.json
 exercises_yuhonas.json
 exercise_gif_mapping.json
+
+# Keystore files & credentials
+*.jks
+*.keystore
+keystore.properties
+*.pepk
+*keystore-base64.txt
+
+
