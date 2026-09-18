@@ -122,6 +122,7 @@ When filling out the International Age Rating Coalition (IARC) questionnaire:
 
 ## 6. Official Links for Play Console
 
-- **Privacy Policy URL**: `https://<your-username>.github.io/Gym_app/privacy-policy.html`
+- **Privacy Policy URL**: `https://praiseojay.github.io/Gym_app/privacy-policy.html`
+- **Terms of Service URL**: `https://praiseojay.github.io/Gym_app/terms.html`
 - **Support Email**: `support@overloadai.app` (or your personal developer email)
-- **Website**: `https://github.com/praiseOjay/Gym_app`
+- **Website**: `https://praiseojay.github.io/Gym_app/` (GitHub Repo: `https://github.com/praiseOjay/Gym_app`)

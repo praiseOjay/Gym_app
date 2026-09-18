@@ -419,6 +419,26 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
           <div>
             Secure Google Play Billing. Cancel anytime in Google Play Store subscriptions.
           </div>
+
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: '0.7rem', marginTop: 2 }}>
+            <a
+              href="https://praiseojay.github.io/Gym_app/privacy-policy.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--accent-cyan)', textDecoration: 'underline' }}
+            >
+              Privacy Policy
+            </a>
+            <span>•</span>
+            <a
+              href="https://praiseojay.github.io/Gym_app/terms.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--accent-volt)', textDecoration: 'underline' }}
+            >
+              Terms of Service
+            </a>
+          </div>
         </div>
       </div>
     </SwipeableModalSheet>

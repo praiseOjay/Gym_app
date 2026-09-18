@@ -1438,6 +1438,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <p><strong>2. Microphone Permission:</strong> The microphone is requested solely for optional hands-free workout logging. Audio is processed ephemerally on-the-fly and never stored.</p>
                 <p><strong>3. Artificial Intelligence:</strong> Prompt context for workout advice is sent securely to Google Gemini without personally identifying data.</p>
                 <p><strong>4. User Data Control:</strong> You can completely erase your workout records at any time using the Reset Data button in Settings.</p>
+                <div style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--border-subtle)', fontSize: '0.74rem' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Official Public Policy: </span>
+                  <a href="https://praiseojay.github.io/Gym_app/privacy-policy.html" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-cyan)', textDecoration: 'underline', wordBreak: 'break-all' }}>
+                    https://praiseojay.github.io/Gym_app/privacy-policy.html
+                  </a>
+                </div>
               </>
             ) : (
               <>
@@ -1448,6 +1454,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <p><strong>1. License:</strong> Praise Ojay grants you a personal, revocable license to use Overload AI for personal fitness logging.</p>
                 <p><strong>2. In-App Subscriptions:</strong> Overload Pro subscriptions and lifetime passes are processed through Google Play Billing. Subscriptions auto-renew unless cancelled at least 24 hours prior to expiration via Google Play Subscriptions settings.</p>
                 <p><strong>3. Limitation of Liability:</strong> You assume full personal risk and responsibility for your physical training activities and exercise execution.</p>
+                <div style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--border-subtle)', fontSize: '0.74rem' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Official Public Terms: </span>
+                  <a href="https://praiseojay.github.io/Gym_app/terms.html" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-volt)', textDecoration: 'underline', wordBreak: 'break-all' }}>
+                    https://praiseojay.github.io/Gym_app/terms.html
+                  </a>
+                </div>
               </>
             )}
           </div>
@@ -1458,7 +1470,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               className="btn-secondary"
               style={{ flex: 1, fontSize: '0.8rem', padding: '10px' }}
               onClick={() => {
-                const url = showLegalModal === 'privacy' ? '/privacy-policy.html' : '/terms.html';
+                const url = showLegalModal === 'privacy' 
+                  ? 'https://praiseojay.github.io/Gym_app/privacy-policy.html' 
+                  : 'https://praiseojay.github.io/Gym_app/terms.html';
                 window.open(url, '_blank');
               }}
             >
