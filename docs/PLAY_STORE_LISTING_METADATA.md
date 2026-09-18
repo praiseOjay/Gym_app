@@ -124,5 +124,5 @@ When filling out the International Age Rating Coalition (IARC) questionnaire:
 
 - **Privacy Policy URL**: `https://praiseojay.github.io/Gym_app/privacy-policy.html`
 - **Terms of Service URL**: `https://praiseojay.github.io/Gym_app/terms.html`
-- **Support Email**: `support@overloadai.app` (or your personal developer email)
+- **Support Email**: `ojerinolapraise@gmail.com`
 - **Website**: `https://praiseojay.github.io/Gym_app/` (GitHub Repo: `https://github.com/praiseOjay/Gym_app`)

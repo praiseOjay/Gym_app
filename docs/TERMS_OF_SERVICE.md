@@ -64,5 +64,5 @@ To the maximum extent permitted by applicable law, in no event shall the Develop
 If you have any questions regarding these Terms, please contact:
 
 - **Developer**: Praise Ojay
-- **Email**: support@overloadai.app
+- **Email**: ojerinolapraise@gmail.com
 - **Project**: https://github.com/praiseOjay/Gym_app

@@ -86,5 +86,5 @@ We may update this Privacy Policy from time to time to reflect changes in our pr
 If you have questions, feedback, or privacy-related concerns regarding Overload AI, please contact us at:
 
 - **Developer**: Praise Ojay
-- **Email**: support@overloadai.app (or praiseojay@gmail.com)
+- **Email**: ojerinolapraise@gmail.com
 - **Website**: https://github.com/praiseOjay/Gym_app
