@@ -1,4 +1,4 @@
-package com.overloadai.app;
+package com.nextlevelmobile.overloadai;
 
 import com.getcapacitor.BridgeActivity;
 
