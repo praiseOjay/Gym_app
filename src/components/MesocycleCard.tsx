@@ -33,6 +33,23 @@ export const MesocycleCard: React.FC<MesocycleCardProps> = ({
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [selectedTemplateKey, setSelectedTemplateKey] = useState<string>('HYPERTROPHY_5_WEEK');
 
+  // Dismissal state for auto-deload recommendation in current week
+  const [isDeloadDismissed, setIsDeloadDismissed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(`overload_dismiss_deload_${mesocycleBlock.id}_${mesocycleBlock.currentWeek}`) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleDismissDeload = () => {
+    setIsDeloadDismissed(true);
+    try {
+      localStorage.setItem(`overload_dismiss_deload_${mesocycleBlock.id}_${mesocycleBlock.currentWeek}`, 'true');
+    } catch {}
+    triggerHaptic('light');
+  };
+
   // Evaluate systemic fatigue from past sessions
   const fatigueReport = detectSystemicFatigue(workouts);
 
@@ -112,19 +129,19 @@ export const MesocycleCard: React.FC<MesocycleCardProps> = ({
           overflow: 'hidden'
         }}
       >
-        {/* Top Header Row */}
+        {/* Top Header Row with dynamic wrap for mobile portrait */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: 14,
-            gap: 12,
+            gap: 10,
             flexWrap: 'wrap'
           }}
         >
-          {/* Title group on left */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+          {/* Title group with ample minWidth so portrait never squishes to 57px */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: '220px', flex: '1 1 220px' }}>
             <div
               style={{
                 width: 36,
@@ -141,7 +158,7 @@ export const MesocycleCard: React.FC<MesocycleCardProps> = ({
             >
               <Activity size={18} />
             </div>
-            <div style={{ minWidth: 0 }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
               <h3
                 style={{
                   fontSize: '0.98rem',
@@ -153,7 +170,7 @@ export const MesocycleCard: React.FC<MesocycleCardProps> = ({
               >
                 {mesocycleBlock.name}
               </h3>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>
+              <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: 2 }}>
                 Periodized Training Block · {mesocycleBlock.totalWeeks} Weeks Total
               </div>
             </div>
@@ -360,7 +377,7 @@ export const MesocycleCard: React.FC<MesocycleCardProps> = ({
         </div>
 
         {/* Systemic Fatigue Detection & Auto-Deload Banner */}
-        {fatigueReport.isDeloadRecommended && (
+        {fatigueReport.isDeloadRecommended && !isDeload && !isDeloadDismissed && (
           <div
             style={{
               background: 'linear-gradient(135deg, rgba(255, 71, 87, 0.18) 0%, rgba(255, 184, 0, 0.1) 100%)',
@@ -368,13 +385,36 @@ export const MesocycleCard: React.FC<MesocycleCardProps> = ({
               borderRadius: 'var(--radius-md)',
               padding: '12px 14px',
               marginBottom: 14,
-              animation: 'pulse-glow 2.5s infinite'
+              animation: 'pulse-glow 2.5s infinite',
+              position: 'relative'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <button
+              onClick={handleDismissDeload}
+              style={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: 'none',
+                borderRadius: '50%',
+                width: 24,
+                height: 24,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: 'var(--text-secondary)'
+              }}
+              title="Dismiss deload recommendation for this week"
+            >
+              <X size={14} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, paddingRight: 20 }}>
               <ShieldAlert size={20} color="#FF4757" style={{ flexShrink: 0, marginTop: 2 }} />
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                   <strong style={{ fontSize: '0.85rem', color: '#FF4757' }}>
                     Auto-Deload Recommended
                   </strong>
@@ -394,7 +434,7 @@ export const MesocycleCard: React.FC<MesocycleCardProps> = ({
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 4, lineHeight: 1.4 }}>
                   {fatigueReport.reason}
                 </p>
-                <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
                   <button
                     onClick={handleTriggerDeload}
                     style={{
@@ -413,6 +453,21 @@ export const MesocycleCard: React.FC<MesocycleCardProps> = ({
                   >
                     <Zap size={13} />
                     <span>Apply Deload Week Now (-50% Volume)</span>
+                  </button>
+                  <button
+                    onClick={handleDismissDeload}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      color: 'var(--text-secondary)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '6px 12px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Dismiss (Feeling Strong)
                   </button>
                 </div>
               </div>

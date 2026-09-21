@@ -632,9 +632,13 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
               };
               return (
                 <div key={profile} style={{ minWidth: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4, flexWrap: 'wrap', gap: 2 }}>
-                    <span style={{ fontSize: '0.66rem', color: 'var(--text-secondary)', fontWeight: 600, whiteSpace: 'nowrap' }}>{colors[profile].label}</span>
-                    <span style={{ fontSize: '0.7rem', fontFamily: 'var(--font-mono)', fontWeight: 800, color: colors[profile].bg, whiteSpace: 'nowrap' }}>{count} ({pct}%)</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 6 }}>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                      {colors[profile].label}
+                    </span>
+                    <span style={{ fontSize: '0.74rem', fontFamily: 'var(--font-mono)', fontWeight: 800, color: colors[profile].bg, whiteSpace: 'nowrap' }}>
+                      {count} <span style={{ fontSize: '0.66rem', opacity: 0.85 }}>({pct}%)</span>
+                    </span>
                   </div>
                   <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${pct}%`, background: colors[profile].bg, borderRadius: 3, transition: 'width 0.6s ease' }} />

@@ -586,16 +586,18 @@ export const WorkoutCalendar: React.FC<WorkoutCalendarProps> = ({
                         style={{
                           fontSize: '0.75rem',
                           display: 'flex',
+                          alignItems: 'center',
                           justifyContent: 'space-between',
-                          padding: '4px 6px',
+                          gap: 10,
+                          padding: '5px 8px',
                           background: 'rgba(255, 255, 255, 0.03)',
                           borderRadius: 'var(--radius-sm)'
                         }}
                       >
-                        <span style={{ color: '#fff', fontWeight: 600 }}>
+                        <span style={{ color: '#fff', fontWeight: 600, minWidth: 0, flex: 1 }}>
                           {ex.name}
                         </span>
-                        <span style={{ color: 'var(--accent-volt)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ color: 'var(--accent-volt)', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
                           {statSummary}
                         </span>
                       </div>

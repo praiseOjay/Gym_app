@@ -214,9 +214,9 @@ body {
   width: calc(100% - 20px);
   max-width: 472px;
   z-index: 50;
-  background: rgba(18, 23, 34, 0.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(13, 17, 23, 0.98);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-xl);
   padding: 4px 6px;
@@ -336,6 +336,7 @@ body {
 /* View Container */
 .view-content {
   padding: 16px;
+  padding-bottom: calc(max(125px, env(safe-area-inset-bottom, 0px) + 95px));
   display: flex;
   flex-direction: column;
   gap: 20px;

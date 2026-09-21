@@ -114,7 +114,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   };
 
   return (
-    <div className="view-content" style={{ paddingBottom: 110 }}>
+    <div className="view-content" style={{ paddingBottom: 135 }}>
       {/* Top Section Header */}
       <div className="section-header">
         <div>
@@ -215,20 +215,34 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                       background: 'var(--bg-surface)',
                       border: '1px solid rgba(255, 215, 0, 0.2)',
                       borderRadius: 'var(--radius-md)',
-                      padding: '10px',
+                      padding: '10px 12px',
                       display: 'flex',
                       flexDirection: 'column',
-                      justifyContent: 'space-between'
+                      justifyContent: 'space-between',
+                      minHeight: 78
                     }}
                   >
-                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <span
+                      style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        color: '#fff',
+                        lineHeight: 1.25,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        wordBreak: 'break-word'
+                      }}
+                      title={pr.exerciseName}
+                    >
                       {pr.exerciseName}
                     </span>
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 4 }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.1rem', fontWeight: 900, color: '#FFD700' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.98rem', fontWeight: 900, color: '#FFD700', whiteSpace: 'nowrap' }}>
                         {displayWeight(pr.value)}
                       </span>
-                      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                         {pr.type === '1RM' ? 'Est 1RM' : 'Max Wt'}
                       </span>
                     </div>

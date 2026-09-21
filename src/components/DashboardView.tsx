@@ -224,34 +224,34 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 10,
+            gap: 8,
             marginTop: 16,
             paddingTop: 14,
             borderTop: '1px solid rgba(255, 255, 255, 0.08)'
           }}
         >
-          <div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              {volumeWindow === 'this_week' ? "This Week's Vol" : '7-Day Volume'}
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {volumeWindow === 'this_week' ? "This Wk Vol" : '7-Day Vol'}
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: '#fff' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '0.92rem', color: '#fff', whiteSpace: 'nowrap', marginTop: 2 }}>
               {displayVolume(weeklyVolumeKg)}
             </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', whiteSpace: 'nowrap' }}>
               All-Time PRs
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: '#FFD700' }}>
-              {prs.length} Records
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '0.92rem', color: '#FFD700', whiteSpace: 'nowrap', marginTop: 2 }}>
+              {prs.length} <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)' }}>PRs</span>
             </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', whiteSpace: 'nowrap' }}>
               Readiness
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: readinessMetric.color }}>
-              {readinessMetric.score}% {readinessMetric.label}
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '0.92rem', color: readinessMetric.color, whiteSpace: 'nowrap', marginTop: 2 }}>
+              {readinessMetric.score}% <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>{readinessMetric.label}</span>
             </div>
           </div>
         </div>
@@ -268,26 +268,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 6,
               fontSize: '0.78rem'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
               <span style={{ color: 'var(--accent-volt)', fontWeight: 800 }}>⚖️ Weight:</span>
-              <span style={{ color: '#fff', fontWeight: 700 }}>
+              <span style={{ color: '#fff', fontWeight: 700, whiteSpace: 'nowrap' }}>
                 {settings.bodyWeightKg !== undefined ? formatWeight(settings.bodyWeightKg, settings.unit, 2) : ''}
               </span>
               {settings.targetWeightKg !== undefined && (
-                <>
-                  <span style={{ color: 'var(--text-muted)' }}>→</span>
-                  <span style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>
-                    Target: {formatWeight(settings.targetWeightKg, settings.unit, 2)}
-                  </span>
-                </>
+                <span style={{ color: 'var(--accent-cyan)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                  <span style={{ color: 'var(--text-muted)', margin: '0 3px' }}>→</span>
+                  Target: {formatWeight(settings.targetWeightKg, settings.unit, 2)}
+                </span>
               )}
             </div>
 
             {settings.age && settings.heightCm && (
-              <span style={{ color: 'var(--text-secondary)' }}>
+              <span style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontSize: '0.74rem' }}>
                 {settings.age}y · {formatHeight(settings.heightCm, settings.unit, 2)}
               </span>
             )}

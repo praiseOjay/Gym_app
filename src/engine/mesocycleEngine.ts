@@ -280,15 +280,16 @@ export function detectSystemicFatigue(workouts: WorkoutSession[]): SystemicFatig
     });
   });
 
-  // Compare successive sessions for each exercise
+  // Compare successive sessions for each exercise (look for true, noticeable performance drops)
   for (const [name, logs] of Object.entries(exerciseHistory)) {
     if (logs.length >= 2) {
       const latest = logs[0];
       const prev = logs[1];
-      // If reps decreased at equal/lower weight or volume declined by > 8%
+      // True regression: reps decreased at equal/lower weight AND total exercise volume declined noticeably (>15%)
       if (
-        (latest.bestWeight <= prev.bestWeight && latest.bestReps < prev.bestReps) ||
-        latest.vol < prev.vol * 0.92
+        latest.bestWeight <= prev.bestWeight &&
+        latest.bestReps < prev.bestReps &&
+        latest.vol < prev.vol * 0.85
       ) {
         if (!stalledExercises.includes(name)) {
           stalledExercises.push(name);
@@ -301,23 +302,31 @@ export function detectSystemicFatigue(workouts: WorkoutSession[]): SystemicFatig
   const failureRatio = totalWorkingSets > 0 ? totalFailureSets / totalWorkingSets : 0;
   const highRpeRatio = totalWorkingSets > 0 ? highRpeSetCount / totalWorkingSets : 0;
 
-  let fatigueScore = 20;
-  if (stalledExercises.length >= 1) fatigueScore += 25 * stalledExercises.length;
+  let fatigueScore = 15;
+  if (stalledExercises.length >= 1) fatigueScore += 15 * stalledExercises.length;
   if (failureRatio > 0.35) fatigueScore += 25;
   if (highRpeRatio > 0.5) fatigueScore += 20;
   if (recent.length >= 5) fatigueScore += 10;
 
   fatigueScore = Math.min(100, Math.max(0, fatigueScore));
 
-  const isDeloadRecommended = fatigueScore >= 65 || stalledExercises.length >= 2;
+  // True deload recommendation requires significant fatigue accumulation across multiple movements
+  const isDeloadRecommended =
+    (fatigueScore >= 75 && stalledExercises.length >= 2) ||
+    (stalledExercises.length >= 3 && failureRatio > 0.2);
 
   let reason = 'Readiness is high. Central nervous system and muscular recovery are in balance.';
   let recommendedAction = 'Maintain current progressive overload trajectory.';
 
   if (isDeloadRecommended) {
+    const exertionNote =
+      failureRatio > 0.2
+        ? `with high exertion density (${Math.round(failureRatio * 100)}% sets taken near failure)`
+        : 'with accumulated volume over successive sessions';
+
     reason = `Systemic fatigue accumulation detected. Performance regressions observed across ${
       stalledExercises.length > 0 ? stalledExercises.slice(0, 3).join(', ') : 'multiple compound lifts'
-    } with high exertion density (${Math.round(failureRatio * 100)}% sets taken near failure).`;
+    } ${exertionNote}.`;
     recommendedAction =
       'Schedule a 1-Week Active Recovery Deload. Reduce working sets by 50% and keep effort at 3 RIR to clear accumulated neuromuscular fatigue.';
   } else if (fatigueScore >= 45) {
