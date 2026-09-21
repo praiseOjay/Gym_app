@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { X, Sparkles, RefreshCw, CheckCircle2, ArrowRight, SlidersHorizontal } from 'lucide-react';
+import { X, Sparkles, RefreshCw, CheckCircle2, ArrowRight, SlidersHorizontal, Eye } from 'lucide-react';
 import type { Exercise } from '../types/gym';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import { getSmartExerciseSwap } from '../services/geminiService';
 import { SwipeableModalSheet } from './SwipeableModalSheet';
 import { ExerciseFilterBar } from './ExerciseFilterBar';
 import { filterExerciseLibrary } from '../utils/exerciseFilterUtils';
+import { ExerciseDetailModal } from './ExerciseDetailModal';
 
 interface SmartSwapModalProps {
   exercise: Exercise;
@@ -37,11 +38,48 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
     recommendedWeightAdj: string;
   } | null>(null);
 
+  // Exercise preview before swapping state
+  const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
+
   // Search & Filtering States for library alternatives
   const [swapSearchQuery, setSwapSearchQuery] = useState('');
   const [swapMuscleFilter, setSwapMuscleFilter] = useState<string>(resolvedExercise.muscleGroup || 'All');
   const [swapEquipmentFilter, setSwapEquipmentFilter] = useState<string>('All Equipment');
   const [swapDisplayLimit, setSwapDisplayLimit] = useState(40);
+
+  // Match AI recommended alternative to library exercise for previewing
+  const aiRecommendedExercise = useMemo<Exercise | null>(() => {
+    if (!result) return null;
+    const nameToMatch = result.alternativeName.toLowerCase().trim();
+
+    // 1. Exact match by name or id
+    let matched = EXERCISE_LIBRARY.find(
+      (e) => e.name.toLowerCase() === nameToMatch || e.id.toLowerCase() === nameToMatch
+    );
+
+    // 2. Substring match
+    if (!matched) {
+      matched = EXERCISE_LIBRARY.find(
+        (e) => e.name.toLowerCase().includes(nameToMatch) || nameToMatch.includes(e.name.toLowerCase())
+      );
+    }
+
+    if (matched) return matched;
+
+    // Fallback synthesized exercise with AI biomechanics & recommendations
+    return {
+      id: `swap-${nameToMatch.replace(/[^a-z0-9]/g, '-')}`,
+      name: result.alternativeName,
+      muscleGroup: resolvedExercise.muscleGroup,
+      secondaryMuscles: resolvedExercise.secondaryMuscles,
+      equipment: result.equipment || resolvedExercise.equipment,
+      category: resolvedExercise.category,
+      targetRepRange: resolvedExercise.targetRepRange || [8, 12],
+      targetRpe: resolvedExercise.targetRpe || 8,
+      instructions: result.biomechanicsExplanation,
+      tips: [result.recommendedWeightAdj]
+    } as Exercise;
+  }, [result, resolvedExercise]);
 
   // Reset display limit when filter or search changes
   useEffect(() => {
@@ -75,7 +113,8 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
   }, [resolvedExercise, swapSearchQuery, swapMuscleFilter, swapEquipmentFilter]);
 
   return (
-    <SwipeableModalSheet onClose={onClose} maxHeight="90vh">
+    <>
+      <SwipeableModalSheet onClose={onClose} maxHeight="90vh">
       {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -209,18 +248,38 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
               marginBottom: 16
             }}
           >
-            <div>
-              <span
-                style={{
-                  fontSize: '0.68rem',
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  color: 'var(--accent-cyan)',
-                  letterSpacing: '0.5px'
-                }}
-              >
-                AI Recommended Alternative
-              </span>
+            <div
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                if (aiRecommendedExercise) setPreviewExercise(aiRecommendedExercise);
+              }}
+              title="Click to preview exercise demonstration GIF"
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span
+                  style={{
+                    fontSize: '0.68rem',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    color: 'var(--accent-cyan)',
+                    letterSpacing: '0.5px'
+                  }}
+                >
+                  AI Recommended Alternative
+                </span>
+                <span
+                  style={{
+                    fontSize: '0.72rem',
+                    color: 'var(--accent-cyan)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    fontWeight: 600
+                  }}
+                >
+                  <Eye size={13} /> Tap to preview
+                </span>
+              </div>
               <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', marginTop: 2 }}>
                 {result.alternativeName}
               </div>
@@ -246,18 +305,55 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
               ⚖️ <strong>Weight Adjustment:</strong> {result.recommendedWeightAdj}
             </div>
 
-            <button
-              id="btn-apply-smart-swap"
-              className="btn-accent-cyan"
-              style={{ width: '100%', marginTop: 4, cursor: 'pointer' }}
-              onClick={() => {
-                onSelectAlternative(result.alternativeName, result.equipment);
-                onClose();
-              }}
-            >
-              <CheckCircle2 size={18} />
-              Swap Into Today's Session
-            </button>
+            {/* Action buttons: Preview Form & Swap In */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 8, marginTop: 4 }}>
+              <button
+                type="button"
+                id="btn-preview-smart-swap"
+                className="btn-secondary"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  padding: '10px 8px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  color: 'var(--accent-cyan)',
+                  borderColor: 'rgba(0, 229, 255, 0.35)',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (aiRecommendedExercise) {
+                    setPreviewExercise(aiRecommendedExercise);
+                  }
+                }}
+              >
+                <Eye size={16} />
+                Preview Form
+              </button>
+              <button
+                id="btn-apply-smart-swap"
+                className="btn-accent-cyan"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  padding: '10px 12px',
+                  fontSize: '0.84rem',
+                  fontWeight: 800,
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  onSelectAlternative(result.alternativeName, result.equipment);
+                  onClose();
+                }}
+              >
+                <CheckCircle2 size={18} />
+                Swap In Now
+              </button>
+            </div>
           </div>
         ) : null}
 
@@ -300,6 +396,27 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
             }}
           />
 
+          {/* Preview Guide Banner */}
+          <div
+            style={{
+              background: 'rgba(0, 229, 255, 0.08)',
+              border: '1px solid rgba(0, 229, 255, 0.22)',
+              borderRadius: 'var(--radius-md)',
+              padding: '6px 10px',
+              marginBottom: 8,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: '0.72rem',
+              color: 'var(--text-secondary)'
+            }}
+          >
+            <Eye size={13} color="var(--accent-cyan)" style={{ flexShrink: 0 }} />
+            <span>
+              Tap any exercise or <strong style={{ color: 'var(--accent-cyan)' }}>Preview</strong> to view form GIF & cues before swapping.
+            </span>
+          </div>
+
           {/* Exercise List */}
           <div
             style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 300, overflowY: 'auto' }}
@@ -325,8 +442,7 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
                   transition: 'all 0.15s ease'
                 }}
                 onClick={() => {
-                  onSelectAlternative(alt.name, alt.equipment);
-                  onClose();
+                  setPreviewExercise(alt);
                 }}
               >
                 <div style={{ flex: 1, paddingRight: 8 }}>
@@ -345,17 +461,46 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
                     )}
                   </div>
                 </div>
-                <button
-                  className="btn-secondary"
-                  style={{ fontSize: '0.72rem', padding: '5px 10px', color: 'var(--accent-cyan)', flexShrink: 0 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectAlternative(alt.name, alt.equipment);
-                    onClose();
-                  }}
-                >
-                  Swap In
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    style={{
+                      fontSize: '0.72rem',
+                      padding: '5px 8px',
+                      color: 'var(--text-secondary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPreviewExercise(alt);
+                    }}
+                    title="Preview exercise animation and cues"
+                  >
+                    <Eye size={12} />
+                    Preview
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    style={{
+                      fontSize: '0.72rem',
+                      padding: '5px 10px',
+                      color: 'var(--accent-cyan)',
+                      fontWeight: 700,
+                      borderColor: 'rgba(0, 229, 255, 0.3)'
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectAlternative(alt.name, alt.equipment);
+                      onClose();
+                    }}
+                  >
+                    Swap In
+                  </button>
+                </div>
               </div>
             ))}
 
@@ -386,6 +531,23 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
             )}
           </div>
         </div>
-    </SwipeableModalSheet>
+      </SwipeableModalSheet>
+
+      {/* Exercise Form & GIF Preview Modal Before Swapping */}
+      {previewExercise && (
+        <ExerciseDetailModal
+          exercise={previewExercise}
+          onClose={() => setPreviewExercise(null)}
+          onAddExercise={(ex) => {
+            onSelectAlternative(ex.name, ex.equipment || 'Gym Equipment');
+            setPreviewExercise(null);
+            onClose();
+          }}
+          actionLabel="Swap into Workout"
+          overlayZIndex={130}
+        />
+      )}
+    </>
   );
 };
+
