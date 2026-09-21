@@ -1343,7 +1343,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
             >
               <Eye size={14} color="var(--accent-cyan)" style={{ flexShrink: 0 }} />
               <span>
-                Tap any exercise or <strong style={{ color: 'var(--accent-cyan)' }}>Preview</strong> to inspect animated form, biomechanics & cues before adding.
+                Tap any exercise or <strong style={{ color: 'var(--accent-cyan)' }}>Preview</strong> to inspect animated demonstration GIFs & cues before adding.
               </span>
             </div>
 
@@ -1418,7 +1418,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                         gap: 4,
                         cursor: 'pointer'
                       }}
-                      title="Preview exercise video, biomechanics & form cues"
+                      title="Preview animated exercise GIF & form cues"
                     >
                       <Eye size={13} />
                       <span>Preview</span>
