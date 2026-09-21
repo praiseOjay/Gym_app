@@ -24,7 +24,6 @@ import {
   Zap,
   Flame,
   ArrowRight,
-  Activity,
   Dumbbell,
   Crown
 } from 'lucide-react';
@@ -535,8 +534,6 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
     }
   };
 
-  const freshMuscles = recoveryStates.filter((r) => r.recoveryPercentage >= 80).slice(0, 3);
-
   return (
     <div className="view-content" style={{ paddingBottom: 110 }}>
       {/* Header */}
@@ -669,38 +666,6 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
           >
             Live View <ArrowRight size={12} />
           </button>
-        </div>
-      )}
-
-      {/* Recovery Readiness Pill */}
-      {freshMuscles.length > 0 && !activeSession && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            marginBottom: 10,
-            fontSize: '0.73rem',
-            color: 'var(--text-secondary)'
-          }}
-        >
-          <Activity size={13} color="var(--accent-cyan)" />
-          <span>Prime Readiness:</span>
-          {freshMuscles.map((m, i) => (
-            <span
-              key={i}
-              style={{
-                background: 'rgba(0, 229, 255, 0.1)',
-                color: 'var(--accent-cyan)',
-                padding: '2px 7px',
-                borderRadius: 'var(--radius-full)',
-                fontWeight: 700,
-                fontSize: '0.7rem'
-              }}
-            >
-              {m.muscle} ({m.recoveryPercentage}%)
-            </span>
-          ))}
         </div>
       )}
 

@@ -5,7 +5,8 @@ import {
   lbsToKg,
   calculateMuscleWeeklySets,
   calculateRepMaxTable,
-  calculate1RM
+  calculate1RM,
+  type VolumeWindowMode
 } from '../engine/overloadEngine';
 import { StorageService } from '../db/storage';
 import { triggerHaptic } from '../utils/haptics';
@@ -82,10 +83,15 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
     return `${(Math.round(kg * 100) / 100).toFixed(2)} kg`;
   };
 
+  // Volume window mode (This Week Mon-Sun vs Rolling 7 Days)
+  const [volumeWindow, setVolumeWindow] = useState<VolumeWindowMode>(() => {
+    return (localStorage.getItem('overload_volume_window') as VolumeWindowMode) || 'this_week';
+  });
+
   // Weekly muscle group set volume calculation (MEV / MRV)
   const muscleVolumeStats = useMemo(() => {
-    return calculateMuscleWeeklySets(historySessions, 7);
-  }, [historySessions]);
+    return calculateMuscleWeeklySets(historySessions, volumeWindow);
+  }, [historySessions, volumeWindow]);
 
   // Real-time 1RM & Rep Max calculations
   const repMaxTable = useMemo(() => {
@@ -244,12 +250,84 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
               border: '1px solid rgba(0, 245, 155, 0.3)'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
               <Flame size={18} color="var(--accent-volt)" />
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 800 }}>Weekly Muscle Volume (7 Days)</h3>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 800 }}>
+                {volumeWindow === 'this_week' ? 'Muscle Volume (This Week)' : 'Muscle Volume (Rolling 7 Days)'}
+              </h3>
             </div>
+
+            {/* Segmented Window Toggle */}
+            <div
+              style={{
+                display: 'flex',
+                background: 'rgba(0, 0, 0, 0.4)',
+                borderRadius: 'var(--radius-full)',
+                padding: 3,
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                marginBottom: 10,
+                gap: 2
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  setVolumeWindow('this_week');
+                  localStorage.setItem('overload_volume_window', 'this_week');
+                  triggerHaptic('light');
+                }}
+                style={{
+                  flex: 1,
+                  padding: '5px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: volumeWindow === 'this_week' ? 800 : 600,
+                  color: volumeWindow === 'this_week' ? '#000' : 'var(--text-secondary)',
+                  background: volumeWindow === 'this_week' ? 'var(--accent-volt)' : 'transparent',
+                  border: 'none',
+                  borderRadius: 'var(--radius-full)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 4
+                }}
+              >
+                <span>🗓️ This Week</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setVolumeWindow('rolling_7');
+                  localStorage.setItem('overload_volume_window', 'rolling_7');
+                  triggerHaptic('light');
+                }}
+                style={{
+                  flex: 1,
+                  padding: '5px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: volumeWindow === 'rolling_7' ? 800 : 600,
+                  color: volumeWindow === 'rolling_7' ? '#000' : 'var(--text-secondary)',
+                  background: volumeWindow === 'rolling_7' ? 'var(--accent-volt)' : 'transparent',
+                  border: 'none',
+                  borderRadius: 'var(--radius-full)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 4
+                }}
+              >
+                <span>🔄 Rolling 7 Days</span>
+              </button>
+            </div>
+
             <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
-              Hypertrophy science benchmarks (Dr. Mike Israetel / RP): <strong>10–18 hard sets per week</strong> is the Maximum Adaptive Volume (MAV) sweetspot for muscle hypertrophy. Warmup sets are excluded.
+              {volumeWindow === 'this_week'
+                ? 'Sets logged since Monday 00:00 (resets weekly). '
+                : 'Sets logged in the rolling 7-day fatigue window. '}
+              Hypertrophy sweetspot: <strong>10–18 hard sets</strong> (MAV). Warmup sets are excluded.
             </p>
           </div>
 

@@ -9,7 +9,13 @@ import type {
 } from '../types/gym';
 import { MuscleRecoveryHeatmap } from './MuscleRecoveryHeatmap';
 import { MesocycleCard } from './MesocycleCard';
-import { formatWeight, formatHeight, calculateMuscleWeeklySets } from '../engine/overloadEngine';
+import {
+  formatWeight,
+  formatHeight,
+  calculateMuscleWeeklySets,
+  getWeeklyVolumeCutoff,
+  type VolumeWindowMode
+} from '../engine/overloadEngine';
 import { getPreWorkoutPrimer } from '../services/geminiService';
 import { triggerHaptic } from '../utils/haptics';
 import { getTodayWorkoutState } from '../utils/dateUtils';
@@ -60,10 +66,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [loadingPrimer, setLoadingPrimer] = useState(false);
   const [showAllLandmarks, setShowAllLandmarks] = useState(false);
 
+  // Volume calculation window: 'this_week' (Monday 00:00 reset) vs 'rolling_7' (last 7 days)
+  const [volumeWindow, setVolumeWindow] = useState<VolumeWindowMode>(() => {
+    return (localStorage.getItem('overload_volume_window') as VolumeWindowMode) || 'this_week';
+  });
+
+  const handleToggleVolumeWindow = (mode: VolumeWindowMode) => {
+    setVolumeWindow(mode);
+    localStorage.setItem('overload_volume_window', mode);
+    triggerHaptic('light', settings.vibrationEnabled);
+  };
+
   // Weekly hypertrophy volume landmarks (MEV, MAV, MRV)
   const weeklyLandmarks = useMemo(() => {
-    return calculateMuscleWeeklySets(historySessions, 7);
-  }, [historySessions]);
+    return calculateMuscleWeeklySets(historySessions, volumeWindow);
+  }, [historySessions, volumeWindow]);
 
   // Determine scheduled routine for today (or next in split)
   const todayWorkout = useMemo(
@@ -72,12 +89,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   );
   const nextRoutine = todayWorkout.routine;
 
-  // Calculate 7-day volume safely
-  const [mountTime] = useState(() => Date.now());
+  // Calculate volume safely based on active window
   const recentSessions = useMemo(() => {
-    const cutoff = mountTime - 7 * 24 * 60 * 60 * 1000;
-    return historySessions.filter((s) => new Date(s.date).getTime() > cutoff);
-  }, [historySessions, mountTime]);
+    const cutoff = getWeeklyVolumeCutoff(volumeWindow);
+    return historySessions.filter((s) => new Date(s.date).getTime() >= cutoff);
+  }, [historySessions, volumeWindow]);
 
   const weeklyVolumeKg = useMemo(() => {
     return recentSessions.reduce((sum, s) => sum + s.totalVolumeKg, 0);
@@ -198,7 +214,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <strong style={{ color: 'var(--accent-volt)', fontWeight: 900, fontSize: '0.88rem' }}>
                 {recentSessions.length}
               </strong>{' '}
-              {recentSessions.length === 1 ? 'Day' : 'Days'} This Wk
+              {recentSessions.length === 1 ? 'Day' : 'Days'} {volumeWindow === 'this_week' ? 'This Wk' : '(7d)'}
             </span>
           </div>
         </div>
@@ -216,7 +232,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         >
           <div>
             <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              7-Day Volume
+              {volumeWindow === 'this_week' ? "This Week's Vol" : '7-Day Volume'}
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: '#fff' }}>
               {displayVolume(weeklyVolumeKg)}
@@ -442,8 +458,71 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </span>
         </div>
 
+        {/* Window Selector Segmented Toggle */}
+        <div
+          style={{
+            display: 'flex',
+            background: 'rgba(0, 0, 0, 0.4)',
+            borderRadius: 'var(--radius-full)',
+            padding: 3,
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            marginBottom: 10,
+            gap: 2
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => handleToggleVolumeWindow('this_week')}
+            style={{
+              flex: 1,
+              padding: '6px 10px',
+              fontSize: '0.74rem',
+              fontWeight: volumeWindow === 'this_week' ? 800 : 600,
+              color: volumeWindow === 'this_week' ? '#000' : 'var(--text-secondary)',
+              background: volumeWindow === 'this_week' ? 'var(--accent-volt)' : 'transparent',
+              border: 'none',
+              borderRadius: 'var(--radius-full)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              boxShadow: volumeWindow === 'this_week' ? '0 2px 8px rgba(0, 245, 155, 0.3)' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 5
+            }}
+          >
+            <span>🗓️ This Week (Mon–Sun)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleToggleVolumeWindow('rolling_7')}
+            style={{
+              flex: 1,
+              padding: '6px 10px',
+              fontSize: '0.74rem',
+              fontWeight: volumeWindow === 'rolling_7' ? 800 : 600,
+              color: volumeWindow === 'rolling_7' ? '#000' : 'var(--text-secondary)',
+              background: volumeWindow === 'rolling_7' ? 'var(--accent-volt)' : 'transparent',
+              border: 'none',
+              borderRadius: 'var(--radius-full)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              boxShadow: volumeWindow === 'rolling_7' ? '0 2px 8px rgba(0, 245, 155, 0.3)' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 5
+            }}
+          >
+            <span>🔄 Rolling 7 Days</span>
+          </button>
+        </div>
+
         <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginBottom: 14, lineHeight: 1.4 }}>
-          Weekly working sets mapped against hypertrophy thresholds. Aim for <strong style={{ color: 'var(--accent-volt)' }}>10–18 sets</strong> (Optimal Growth) per target muscle.
+          {volumeWindow === 'this_week'
+            ? 'Calendar week sets (resets fresh every Monday 00:00). Aim for '
+            : 'Working sets over the rolling 7-day window (last 168h). Aim for '}
+          <strong style={{ color: 'var(--accent-volt)' }}>10–18 sets</strong> (Optimal Growth) per target muscle.
         </p>
 
         {/* Landmarks List */}

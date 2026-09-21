@@ -651,6 +651,29 @@ export function calculateRepMaxTable(weightKg: number, reps: number): RepMaxEntr
   });
 }
 
+export type VolumeWindowMode = 'this_week' | 'rolling_7';
+
+/**
+ * Calculates the timestamp cutoff for weekly volume calculations.
+ * - 'this_week': resets on Monday at 00:00:00 local time (Calendar Week: Mon–Sun)
+ * - 'rolling_7': rolling 7 days (168 hours)
+ * - number: custom number of days in the past
+ */
+export function getWeeklyVolumeCutoff(mode: VolumeWindowMode | number = 'this_week'): number {
+  if (mode === 'this_week') {
+    const d = new Date();
+    const day = d.getDay(); // 0 is Sunday, 1 is Monday...
+    const diffToMonday = (day + 6) % 7; // Monday = 0, Tuesday = 1, ..., Sunday = 6
+    d.setDate(d.getDate() - diffToMonday);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }
+  if (typeof mode === 'number') {
+    return Date.now() - mode * 24 * 60 * 60 * 1000;
+  }
+  return Date.now() - 7 * 24 * 60 * 60 * 1000;
+}
+
 /**
  * Calculates total weekly working sets per muscle group and maps against
  * hypertrophy science landmarks (Maintenance MV, Minimum Effective MEV,
@@ -658,7 +681,7 @@ export function calculateRepMaxTable(weightKg: number, reps: number): RepMaxEntr
  */
 export function calculateMuscleWeeklySets(
   sessions: WorkoutSession[],
-  days = 7
+  windowMode: VolumeWindowMode | number = 'this_week'
 ): MuscleVolumeLandmark[] {
   const muscleGroups: MuscleGroup[] = [
     'Chest',
@@ -674,7 +697,7 @@ export function calculateMuscleWeeklySets(
     'Abs'
   ];
 
-  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const cutoff = getWeeklyVolumeCutoff(windowMode);
   const recentSessions = sessions.filter((s) => new Date(s.date).getTime() >= cutoff);
 
   return muscleGroups.map((muscle) => {
