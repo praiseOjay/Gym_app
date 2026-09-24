@@ -8,7 +8,7 @@ import type {
   PRRecord,
   MuscleVolumeLandmark
 } from '../types/gym';
-import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
+import { EXERCISE_LIBRARY, findExercise } from '../data/exerciseLibrary';
 import { getExerciseTrackingType, formatDuration } from '../utils/trackingTypeUtils';
 
 /**
@@ -239,16 +239,19 @@ export function calculateProgressiveOverload(
       };
     }
 
+    const isBodyweight = exerciseMeta?.equipment === 'Bodyweight';
     return {
       exerciseId,
       currentWeight: 0,
       currentReps: 0,
-      targetWeight: 20, // default bar or light baseline
+      targetWeight: isBodyweight ? 0 : 20, // 0 for bodyweight, 20 for barbell/light baseline
       targetReps: minRep,
       targetRpe: 8,
       strategy: 'maintain',
-      badgeText: 'BASELINE SESSION',
-      explanation: 'First time tracking this exercise. Establish a solid working weight aiming for clean form and target RPE 8.'
+      badgeText: isBodyweight ? 'BODYWEIGHT BASELINE' : 'BASELINE SESSION',
+      explanation: isBodyweight
+        ? 'First time tracking this bodyweight movement. Establish clean bodyweight reps (0 kg) before adding external load.'
+        : 'First time tracking this exercise. Establish a solid working weight aiming for clean form and target RPE 8.'
     };
   }
 
@@ -268,8 +271,13 @@ export function calculateProgressiveOverload(
         const maxDur = max.durationSeconds || 0;
         return setDur > maxDur ? set : max;
       }
-      const currentScore = calculate1RM(set.weightKg, set.reps);
-      const maxScore = calculate1RM(max.weightKg, max.reps);
+      const currentWeight = set.weightKg || 0;
+      const maxWeight = max.weightKg || 0;
+      if (currentWeight === 0 && maxWeight === 0) {
+        return (set.reps || 0) > (max.reps || 0) ? set : max;
+      }
+      const currentScore = calculate1RM(currentWeight, set.reps);
+      const maxScore = calculate1RM(maxWeight, max.reps);
       return currentScore > maxScore ? set : max;
     },
     lastSession.sets[0]
@@ -351,6 +359,7 @@ export function calculateProgressiveOverload(
   // Case 1: Reached or exceeded the top of the rep range with manageable RPE
   if (currReps >= maxRep && currRpe <= 8.5) {
     const nextWeight = currWeight + weightIncrement;
+    const isBW = currWeight === 0;
     return {
       exerciseId,
       currentWeight: currWeight,
@@ -360,13 +369,16 @@ export function calculateProgressiveOverload(
       targetRpe: 8,
       strategy: 'increase_weight',
       badgeText: `OVERLOAD: +${weightIncrement}kg`,
-      explanation: `You conquered ${currReps} reps at ${currWeight}kg! Time to level up: increase weight to ${nextWeight}kg and aim for ${minRep} strict reps.`
+      explanation: isBW
+        ? `You conquered ${currReps} reps at bodyweight! Time to level up: add +${weightIncrement}kg (e.g. dip belt, dumbbell, or vest) and aim for ${minRep} strict reps.`
+        : `You conquered ${currReps} reps at ${currWeight}kg! Time to level up: increase weight to ${nextWeight}kg and aim for ${minRep} strict reps.`
     };
   }
 
   // Case 2: In the target rep range, but not at max yet
   if (currReps >= minRep && currReps < maxRep) {
     const nextReps = currReps + 1;
+    const isBW = currWeight === 0;
     return {
       exerciseId,
       currentWeight: currWeight,
@@ -376,7 +388,9 @@ export function calculateProgressiveOverload(
       targetRpe: 8.5,
       strategy: 'increase_reps',
       badgeText: `REP PROGRESSION: +1 REP`,
-      explanation: `Great control with ${currWeight}kg x ${currReps}. Keep the same weight today and push for ${nextReps} reps before adding load.`
+      explanation: isBW
+        ? `Great control with bodyweight × ${currReps} reps. Keep the same load today and push for ${nextReps} reps before adding external weight.`
+        : `Great control with ${currWeight}kg × ${currReps} reps. Keep the same weight today and push for ${nextReps} reps before adding load.`
     };
   }
 
@@ -387,7 +401,8 @@ export function calculateProgressiveOverload(
     pastExerciseLogs[1].sets.some((s) => s.reps < minRep && s.weightKg >= currWeight);
 
   if (currReps < minRep && failedPreviousToo) {
-    const deloadWeight = Math.max(5, Math.round((currWeight * 0.9) / 2.5) * 2.5);
+    const isBW = currWeight === 0;
+    const deloadWeight = isBW ? 0 : Math.max(5, Math.round((currWeight * 0.9) / 2.5) * 2.5);
     return {
       exerciseId,
       currentWeight: currWeight,
@@ -396,8 +411,10 @@ export function calculateProgressiveOverload(
       targetReps: maxRep,
       targetRpe: 7,
       strategy: 'deload',
-      badgeText: 'DELOAD / RESET (-10%)',
-      explanation: `Consecutive sessions below target rep range (${currReps} reps). Recommended deload to ${deloadWeight}kg to allow tendon recovery and explosive rep quality.`
+      badgeText: isBW ? 'FORM & ASSIST FOCUS' : 'DELOAD / RESET (-10%)',
+      explanation: isBW
+        ? `Consecutive sessions below target rep range (${currReps} reps). Focus on slow negatives, light band assistance, or clean bodyweight reps.`
+        : `Consecutive sessions below target rep range (${currReps} reps). Recommended deload to ${deloadWeight}kg to allow tendon recovery and explosive rep quality.`
     };
   }
 
@@ -485,6 +502,67 @@ export function calculateBarbellPlates(
 }
 
 /**
+ * Robustly resolves the primary and secondary muscle groups for an exercise,
+ * properly identifying cardio and healing any misattributed muscle groups.
+ */
+export function getExerciseMuscles(ex: {
+  exerciseId: string;
+  name?: string;
+  muscleGroup?: MuscleGroup;
+  trackingType?: string;
+}): {
+  primary: MuscleGroup | null;
+  secondaries: MuscleGroup[];
+  isCardio: boolean;
+} {
+  // If explicitly tracked as cardio distance/time or marked as Cardio
+  if (ex.trackingType === 'distance_time' || ex.muscleGroup === 'Cardio') {
+    return { primary: 'Cardio', secondaries: [], isCardio: true };
+  }
+
+  const meta = findExercise(ex.exerciseId) || findExercise(ex.name);
+  let primary = meta?.muscleGroup || ex.muscleGroup || null;
+  const secondaries = meta?.secondaryMuscles || [];
+
+  if (primary === 'Cardio') {
+    return { primary: 'Cardio', secondaries: [], isCardio: true };
+  }
+
+  // Name heuristic fallback if primary was incorrectly defaulted to Chest
+  if (primary === 'Chest' && ex.name) {
+    const lower = ex.name.toLowerCase();
+    const isActuallyChest =
+      lower.includes('bench') ||
+      lower.includes('chest') ||
+      lower.includes('push up') ||
+      lower.includes('push-up') ||
+      lower.includes('pec') ||
+      lower.includes('dip') ||
+      lower.includes('fly');
+
+    if (!isActuallyChest) {
+      if (lower.includes('squat') || lower.includes('leg press') || lower.includes('lunge') || lower.includes('extension')) {
+        primary = 'Quads';
+      } else if (lower.includes('deadlift') || lower.includes('curl') || lower.includes('rdl') || lower.includes('hamstring')) {
+        primary = 'Hamstrings';
+      } else if (lower.includes('calf') || lower.includes('calves')) {
+        primary = 'Calves';
+      } else if (lower.includes('lat') || lower.includes('pulldown') || lower.includes('row') || lower.includes('pull up')) {
+        primary = 'Back';
+      } else if (lower.includes('shoulder') || lower.includes('lateral raise') || lower.includes('overhead')) {
+        primary = 'Shoulders';
+      } else if (lower.includes('crunch') || lower.includes('sit up') || lower.includes('plank') || lower.includes('ab ')) {
+        primary = 'Abs';
+      } else if (lower.includes('run') || lower.includes('bike') || lower.includes('cycle') || lower.includes('treadmill')) {
+        return { primary: 'Cardio', secondaries: [], isCardio: true };
+      }
+    }
+  }
+
+  return { primary, secondaries, isCardio: false };
+}
+
+/**
  * Calculates recovery status for all major muscle groups based on workout log history.
  */
 export function calculateMuscleRecovery(
@@ -521,9 +599,11 @@ export function calculateMuscleRecovery(
 
       let trainedMuscle = false;
       for (const ex of session.exercises) {
-        const exMeta = EXERCISE_LIBRARY.find((e) => e.id === ex.exerciseId);
-        const isPrimary = exMeta?.muscleGroup === muscle;
-        const isSecondary = exMeta?.secondaryMuscles.includes(muscle);
+        const { primary, secondaries, isCardio } = getExerciseMuscles(ex);
+        if (isCardio) continue;
+
+        const isPrimary = primary === muscle;
+        const isSecondary = !isPrimary && secondaries.includes(muscle);
 
         if (isPrimary || isSecondary) {
           trainedMuscle = true;
@@ -704,9 +784,12 @@ export function calculateMuscleWeeklySets(
     let directSets = 0;
     for (const s of recentSessions) {
       for (const ex of s.exercises) {
-        const exMeta = EXERCISE_LIBRARY.find((e) => e.id === ex.exerciseId);
-        const isPrimary = exMeta?.muscleGroup === muscle;
-        const isSecondary = exMeta?.secondaryMuscles.includes(muscle);
+        const { primary, secondaries, isCardio } = getExerciseMuscles(ex);
+        // Exclude cardio/endurance from hypertrophy volume landmarks
+        if (isCardio) continue;
+
+        const isPrimary = primary === muscle;
+        const isSecondary = !isPrimary && secondaries.includes(muscle);
 
         if (isPrimary) {
           const completedWorkingSets = ex.sets.filter((st) => st.completed && st.type !== 'warmup').length;

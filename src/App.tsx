@@ -8,10 +8,10 @@ import type {
   MesocycleBlock
 } from './types/gym';
 import { StorageService } from './db/storage';
-import { calculateMuscleRecovery, calculateProgressiveOverload } from './engine/overloadEngine';
+import { calculateMuscleRecovery, calculateProgressiveOverload, getExerciseMuscles } from './engine/overloadEngine';
 import { calculateSessionTotalCalories } from './engine/calorieEngine';
 import { getExerciseTrackingType } from './utils/trackingTypeUtils';
-import { EXERCISE_LIBRARY } from './data/exerciseLibrary';
+import { findExercise } from './data/exerciseLibrary';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import type { NavTab } from './components/BottomNav';
@@ -87,18 +87,14 @@ export function App() {
     if (!raw) return null;
     const startTime = raw.startTime || (raw.date ? new Date(raw.date).getTime() : Date.now());
     const sanitizedExercises = raw.exercises.map((ex) => {
-      const meta = EXERCISE_LIBRARY.find(
-        (e) => e.id.toLowerCase() === ex.exerciseId.toLowerCase() || e.name.toLowerCase() === ex.name.toLowerCase()
-      );
-      if (meta) {
-        return {
-          ...ex,
-          name: meta.name,
-          muscleGroup: meta.muscleGroup,
-          equipment: meta.equipment
-        };
-      }
-      return ex;
+      const meta = findExercise(ex.exerciseId) || findExercise(ex.name);
+      const { primary } = getExerciseMuscles(ex);
+      return {
+        ...ex,
+        name: meta?.name || ex.name,
+        muscleGroup: primary || ex.muscleGroup || 'Quads',
+        equipment: meta?.equipment || ex.equipment || 'Barbell'
+      };
     });
     return { ...raw, startTime, exercises: sanitizedExercises };
   });
@@ -129,9 +125,7 @@ export function App() {
   const handleStartRoutine = (routine: Routine) => {
     // Generate exercises with progressive overload targets
     const workoutExercises: WorkoutExercise[] = routine.exercises.map((template, idx) => {
-      const exMeta = EXERCISE_LIBRARY.find(
-        (e) => e.id.toLowerCase() === template.exerciseId.toLowerCase() || e.name.toLowerCase() === template.exerciseId.toLowerCase()
-      );
+      const exMeta = findExercise(template.exerciseId);
       const overload = calculateProgressiveOverload(
         template.exerciseId,
         template.targetRepRange,
@@ -143,11 +137,18 @@ export function App() {
       const isCardioDist = trackingType === 'distance_time';
       const isTimed = trackingType === 'time_only';
 
+      const resolvedName = exMeta?.name || template.exerciseId.replace(/^db-/, 'Dumbbell ').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      const { primary } = getExerciseMuscles({
+        exerciseId: template.exerciseId,
+        name: resolvedName,
+        trackingType
+      });
+
       return {
         id: `we-${Date.now()}-${idx}`,
         exerciseId: exMeta?.id || template.exerciseId,
-        name: exMeta?.name || template.exerciseId.replace(/^db-/, 'Dumbbell ').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-        muscleGroup: exMeta?.muscleGroup || 'Chest',
+        name: resolvedName,
+        muscleGroup: primary || 'Quads',
         equipment: exMeta?.equipment || 'Barbell',
         trackingType,
         restSeconds: template.restSeconds,

@@ -1,5 +1,6 @@
 import type {
   WorkoutSession,
+  WorkoutExercise,
   Routine,
   PRRecord,
   UserSettings,
@@ -12,6 +13,7 @@ import type {
 import { PRESET_ROUTINES } from '../data/presetRoutines';
 import { IndexedDBService, STORES } from './indexedDb';
 import { createDefaultMesocycle } from '../engine/mesocycleEngine';
+import { getExerciseMuscles } from '../engine/overloadEngine';
 import {
   parseWorkoutLogs,
   computePRsFromSessions,
@@ -69,15 +71,34 @@ export const StorageService = {
       let needsResave = false;
       const workouts: WorkoutSession[] = parsed.map((s, idx) => {
         if (!s || typeof s !== 'object') return s;
+        let current = s;
         if (!s.id || typeof s.id !== 'string' || s.id.trim() === '') {
           needsResave = true;
           const timestamp = s.date ? new Date(s.date).getTime() : Date.now();
-          return {
-            ...s,
+          current = {
+            ...current,
             id: `session-${isNaN(timestamp) ? Date.now() : timestamp}-${idx}-${Math.random().toString(36).substring(2, 7)}`
           };
         }
-        return s;
+
+        // Heal any corrupted exercise muscle groups (e.g. Legs or Cardio tagged as Chest)
+        let exerciseSanitized = false;
+        const sanitizedExercises = (current.exercises || []).map((ex: WorkoutExercise) => {
+          const { primary, isCardio } = getExerciseMuscles(ex);
+          const targetGroup = isCardio ? 'Cardio' : primary;
+          if (targetGroup && targetGroup !== ex.muscleGroup) {
+            exerciseSanitized = true;
+            return { ...ex, muscleGroup: targetGroup };
+          }
+          return ex;
+        });
+
+        if (exerciseSanitized) {
+          needsResave = true;
+          current = { ...current, exercises: sanitizedExercises };
+        }
+
+        return current;
       });
       if (needsResave) {
         try {

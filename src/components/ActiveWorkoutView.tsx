@@ -1298,7 +1298,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                   </span>
                   {trackingType === 'weight_reps' && (
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>
-                      Target: {displayWeight(overload.targetWeight)} {settings.unit} × {overload.targetReps} reps
+                      Target: {overload.targetWeight === 0 && (displayEquipment === 'Bodyweight' || exMeta?.equipment === 'Bodyweight') ? 'Bodyweight' : `${displayWeight(overload.targetWeight)} ${settings.unit}`} × {overload.targetReps} reps
                     </span>
                   )}
                   {trackingType === 'reps_only' && (
@@ -1336,6 +1336,13 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                   className="exercise-notes-input"
                 />
               </div>
+
+              {/* Bodyweight tracking helper badge */}
+              {(displayEquipment === 'Bodyweight' || exMeta?.equipment === 'Bodyweight') && trackingType === 'weight_reps' && (
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                  <span>💡 <strong style={{ color: 'var(--text-secondary)' }}>Bodyweight:</strong> enter 0 for bodyweight, or +weight for weighted sets (belt/vest/dumbbell).</span>
+                </div>
+              )}
 
               {/* Set Table */}
               <div className="set-table">
@@ -1388,9 +1395,13 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                       <div className="set-previous-text">
                         {(() => {
                           if (trackingType === 'weight_reps') {
-                            return overload.currentWeight > 0
-                              ? `${displayWeight(overload.currentWeight)}×${overload.currentReps}`
-                              : '—';
+                            if (overload.currentWeight > 0) {
+                              return `${displayWeight(overload.currentWeight)}×${overload.currentReps}`;
+                            }
+                            if (overload.currentReps > 0) {
+                              return `BW×${overload.currentReps}`;
+                            }
+                            return '—';
                           }
                           if (trackingType === 'distance_time') {
                             const prevD = set.previousDistanceKm || (setIdx > 0 ? ex.sets[setIdx - 1].distanceKm : undefined);
@@ -1438,7 +1449,11 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                               className="set-input-box"
                               style={{ minWidth: 0, flex: 1, padding: '8px 2px', fontSize: '0.88rem' }}
                               value={displayWeight(set.weightKg) || ''}
-                              placeholder={String(displayWeight(overload.targetWeight))}
+                              placeholder={
+                                overload.targetWeight === 0 && (displayEquipment === 'Bodyweight' || exMeta?.equipment === 'Bodyweight')
+                                  ? '0 (BW)'
+                                  : String(displayWeight(overload.targetWeight))
+                              }
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleSetChange(

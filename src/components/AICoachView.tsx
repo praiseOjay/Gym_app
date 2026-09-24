@@ -13,7 +13,8 @@ import type {
 } from '../types/gym';
 import { chatWithAICoach } from '../services/geminiService';
 import type { CoachProposedAction } from '../services/geminiService';
-import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
+import { EXERCISE_LIBRARY, findExercise } from '../data/exerciseLibrary';
+import { getExerciseMuscles } from '../engine/overloadEngine';
 import { sounds } from '../utils/audio';
 import {
   Sparkles,
@@ -284,19 +285,19 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
       // If activeWorkoutChanges is missing, synthesize it from action.exercises
       if (!changes && action.exercises && action.exercises.length > 0) {
         const pEx = action.exercises[0];
-        const libMatch = EXERCISE_LIBRARY.find(
-          (lib) =>
-            lib.id.toLowerCase() === pEx.exerciseId.toLowerCase() ||
-            (pEx.name && lib.name.toLowerCase() === pEx.name.toLowerCase()) ||
-            (pEx.name && lib.name.toLowerCase().includes(pEx.name.toLowerCase()))
-        );
+        const libMatch = findExercise(pEx.exerciseId) || findExercise(pEx.name);
+        const derivedMuscles = getExerciseMuscles({
+          exerciseId: libMatch?.id || pEx.exerciseId,
+          name: libMatch?.name || pEx.name || ''
+        });
+        const resolvedGroup = (libMatch?.muscleGroup || (derivedMuscles.isCardio ? 'Cardio' : derivedMuscles.primary) || 'Full Body') as MuscleGroup;
         changes = {
           type: 'SWAP_EXERCISE',
           oldExerciseName: 'first exercise',
           newExercise: {
             exerciseId: libMatch?.id || pEx.exerciseId,
             name: libMatch?.name || pEx.name || pEx.exerciseId,
-            muscleGroup: (libMatch?.muscleGroup || 'Chest') as MuscleGroup,
+            muscleGroup: resolvedGroup,
             equipment: (libMatch?.equipment || 'Dumbbell') as EquipmentType,
             sets: pEx.defaultSets || 3,
             targetWeightKg: pEx.defaultWeightKg || 24,
@@ -367,11 +368,17 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
             completed: false
           }));
 
+          const resolvedMuscles = getExerciseMuscles({
+            exerciseId: libMatch?.id || newEx.exerciseId,
+            name: libMatch?.name || newEx.name || ''
+          });
+          const resolvedGroup = (libMatch?.muscleGroup || newEx.muscleGroup || existingExercise?.muscleGroup || (resolvedMuscles.isCardio ? 'Cardio' : resolvedMuscles.primary) || 'Full Body') as MuscleGroup;
+
           const replacementExercise: WorkoutExercise = {
             id: existingExercise ? existingExercise.id : `we-${Date.now()}-${updatedExercises.length}`,
             exerciseId: libMatch?.id || newEx.exerciseId,
             name: libMatch?.name || newEx.name,
-            muscleGroup: (libMatch?.muscleGroup || newEx.muscleGroup || existingExercise?.muscleGroup || 'Chest') as MuscleGroup,
+            muscleGroup: resolvedGroup,
             equipment: (libMatch?.equipment || newEx.equipment || existingExercise?.equipment || 'Machine') as EquipmentType,
             sets: newSets,
             restSeconds: newEx.restSeconds || 90
@@ -386,11 +393,12 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
       } else if (changes.type === 'ADD_EXERCISE') {
         const newEx = changes.newExercise;
         if (newEx) {
-          const libMatch = EXERCISE_LIBRARY.find(
-            (lib) =>
-              lib.id.toLowerCase() === newEx.exerciseId.toLowerCase() ||
-              lib.name.toLowerCase() === newEx.name.toLowerCase()
-          );
+          const libMatch = findExercise(newEx.exerciseId) || findExercise(newEx.name);
+          const resolvedMuscles = getExerciseMuscles({
+            exerciseId: libMatch?.id || newEx.exerciseId,
+            name: libMatch?.name || newEx.name || ''
+          });
+          const resolvedGroup = (libMatch?.muscleGroup || newEx.muscleGroup || (resolvedMuscles.isCardio ? 'Cardio' : resolvedMuscles.primary) || 'Full Body') as MuscleGroup;
           const setsCount = newEx.sets || 3;
           const defaultWeight = newEx.targetWeightKg || 20;
           const defaultReps = newEx.targetReps || 10;
@@ -409,7 +417,7 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
             id: `we-${Date.now()}-${updatedExercises.length}`,
             exerciseId: libMatch?.id || newEx.exerciseId,
             name: libMatch?.name || newEx.name,
-            muscleGroup: (libMatch?.muscleGroup || newEx.muscleGroup || 'Chest') as MuscleGroup,
+            muscleGroup: resolvedGroup,
             equipment: (libMatch?.equipment || newEx.equipment || 'Machine') as EquipmentType,
             sets: newSets,
             restSeconds: newEx.restSeconds || 90

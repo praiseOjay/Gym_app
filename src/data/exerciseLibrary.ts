@@ -1,5 +1,5 @@
 // Auto-generated Comprehensive Exercise Library
-// Sourced from ExerciseDB OSS Catalog
+// Sourced from ExerciseDB OSS Catalog with strict biomechanical muscle group mapping
 import type { Exercise } from '../types/gym';
 
 export const EXERCISE_LIBRARY = ([
@@ -8,7 +8,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "3/4 Sit-up",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -28,9 +28,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0002",
     "name": "45° Side Bend",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -49,9 +47,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0003",
     "name": "Air Bike",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -70,9 +66,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0006",
     "name": "Alternate Heel Touchers",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -92,8 +86,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Alternate Lateral Pulldown",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -114,7 +107,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Assisted Chest Dip (kneeling)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -135,7 +129,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Assisted Hanging Knee Raise With Throw Down",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -155,9 +149,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0011",
     "name": "Assisted Hanging Knee Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -176,9 +168,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0012",
     "name": "Assisted Lying Leg Raise With Lateral Throw Down",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Compound",
     "targetRepRange": [
@@ -197,10 +187,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0013",
     "name": "Assisted Lying Leg Raise With Throw Down",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest",
-      "Quads"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Compound",
     "targetRepRange": [
@@ -220,7 +207,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Assisted Motion Russian Twist",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -263,8 +250,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Assisted Prone Hamstring",
     "muscleGroup": "Hamstrings",
     "secondaryMuscles": [
-      "Glutes",
-      "Chest"
+      "Glutes"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -307,7 +293,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Assisted Standing Triceps Extension (with Towel)",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -328,7 +314,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Assisted Triceps Dip (kneeling)",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -373,7 +360,8 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -438,7 +426,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -505,9 +494,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Quads",
     "secondaryMuscles": [
       "Hamstrings",
-      "Glutes",
-      "Chest",
-      "Triceps"
+      "Glutes"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -531,7 +518,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -552,7 +539,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Close-grip Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -595,7 +583,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -616,7 +604,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Decline Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -659,7 +648,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Decline Close Grip To Skull Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -680,7 +670,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Decline Wide-grip Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -747,7 +738,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -768,6 +759,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Front Raise And Pullover",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Barbell",
@@ -814,7 +806,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -838,7 +830,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -858,9 +850,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0044",
     "name": "Barbell Good Morning",
     "muscleGroup": "Hamstrings",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Barbell",
     "category": "Compound",
     "targetRepRange": [
@@ -880,6 +870,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Guillotine Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Barbell",
@@ -924,6 +915,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Incline Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Barbell",
@@ -945,7 +937,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Incline Reverse-grip Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -987,7 +980,10 @@ export const EXERCISE_LIBRARY = ([
     "id": "0050",
     "name": "Barbell Incline Shoulder Raise",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders",
+      "Back"
+    ],
     "equipment": "Barbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -1030,7 +1026,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Jm Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -1097,7 +1094,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Lying Close-grip Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1118,7 +1116,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Lying Close-grip Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1139,7 +1137,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Lying Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1203,7 +1201,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Lying Triceps Extension Skull Crusher",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1224,7 +1222,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Lying Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1290,7 +1288,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell One Arm Floor Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -1313,7 +1312,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Hamstrings",
       "Quads",
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -1334,9 +1333,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell One Arm Snatch",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Forearms",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -1383,7 +1382,7 @@ export const EXERCISE_LIBRARY = ([
       "Glutes",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -1425,7 +1424,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Press Sit-up",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1489,8 +1488,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Rack Pull",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -1511,8 +1509,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Rear Delt Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1533,7 +1530,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Rear Delt Row",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Barbell",
@@ -1601,8 +1598,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Reverse Wrist Curl V. 2",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1665,8 +1661,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Reverse Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1687,7 +1682,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Rollerout From Bench",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Barbell",
@@ -1709,7 +1704,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Rollerout",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1731,7 +1726,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -1839,8 +1834,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Seated Good Morning",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -1883,7 +1877,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Seated Overhead Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1904,7 +1898,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Seated Twist",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1925,7 +1919,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Shrug",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -1946,7 +1940,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Side Bent V. 2",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -2037,7 +2031,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -2104,7 +2098,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Standing Ab Rollerout",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -2126,7 +2121,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -2234,7 +2229,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Standing Overhead Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -2298,7 +2293,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Standing Twist",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -2320,7 +2315,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -2364,8 +2359,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Stiff Leg Good Morning",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -2387,7 +2381,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Hamstrings",
     "secondaryMuscles": [
       "Glutes",
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -2410,7 +2404,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Hamstrings",
       "Quads",
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -2453,7 +2447,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Upright Row V. 2",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Biceps"
     ],
     "equipment": "Barbell",
@@ -2475,7 +2469,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Upright Row",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Biceps"
     ],
     "equipment": "Barbell",
@@ -2497,7 +2491,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Upright Row V. 3",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Biceps"
     ],
     "equipment": "Barbell",
@@ -2519,6 +2513,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Wide Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Barbell",
@@ -2540,7 +2535,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Wide-grip Upright Row",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Biceps"
     ],
     "equipment": "Barbell",
@@ -2585,8 +2580,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Wrist Curl V. 2",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -2607,8 +2601,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -2632,7 +2625,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -2654,7 +2647,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -2675,7 +2668,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Bench Dip (knees Bent)",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -2717,7 +2711,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Body-up",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -2737,9 +2732,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0138",
     "name": "Bottoms-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -2760,7 +2753,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -2782,7 +2775,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -2825,7 +2818,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Alternate Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -2847,7 +2840,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -2868,7 +2861,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -2911,7 +2905,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -2932,7 +2926,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Cross-over Reverse Fly",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -2953,6 +2947,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Cross-over Variation",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -2976,7 +2971,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Hamstrings",
       "Quads",
-      "Chest"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -2997,6 +2992,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Decline Fly",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -3106,7 +3102,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Front Shoulder Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Cable",
@@ -3150,7 +3146,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -3192,6 +3188,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Incline Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -3213,6 +3210,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Incline Fly (on Stability Ball)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -3234,6 +3232,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Incline Fly",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -3256,7 +3255,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -3277,7 +3276,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Incline Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -3298,7 +3297,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Judo Flip",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -3318,9 +3317,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0175",
     "name": "Cable Kneeling Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -3340,7 +3337,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Kneeling Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -3383,7 +3380,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -3405,6 +3402,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Low Fly",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -3470,7 +3468,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -3491,6 +3489,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Lying Fly",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -3512,7 +3511,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Lying Triceps Extension V. 2",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -3533,6 +3532,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Middle Fly",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -3596,7 +3596,10 @@ export const EXERCISE_LIBRARY = ([
     "id": "0191",
     "name": "Cable One Arm Lateral Bent-over",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders",
+      "Back"
+    ],
     "equipment": "Cable",
     "category": "Compound",
     "targetRepRange": [
@@ -3616,7 +3619,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable One Arm Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -3639,7 +3642,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -3660,7 +3663,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Overhead Triceps Extension (rope Attachment)",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -3703,7 +3706,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -3769,7 +3772,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -3832,7 +3835,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Rear Delt Row (stirrups)",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Cable",
@@ -3854,7 +3857,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Rear Delt Row (with Rope)",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Cable",
@@ -3876,7 +3879,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Rear Drive",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -3898,7 +3902,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -4003,9 +4007,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0210",
     "name": "Cable Reverse Wrist Curl",
     "muscleGroup": "Forearms",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -4025,7 +4027,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Russian Twists (on Stability Ball)",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -4045,9 +4047,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0212",
     "name": "Cable Seated Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -4068,7 +4068,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -4111,8 +4111,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Seated Rear Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -4133,7 +4132,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Seated Shoulder Internal Rotation",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -4199,7 +4197,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Shrug",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -4219,9 +4217,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0221",
     "name": "Cable Side Bend Crunch (bosu Ball)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -4240,9 +4236,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0222",
     "name": "Cable Side Bend",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -4261,9 +4255,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0223",
     "name": "Cable Side Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -4283,8 +4275,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Standing Back Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -4305,7 +4296,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Standing Cross-over High Reverse Fly",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -4325,9 +4316,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0226",
     "name": "Cable Standing Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -4347,6 +4336,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Standing Fly",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -4411,7 +4401,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Standing Lift",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -4432,7 +4422,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Standing One Arm Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -4454,7 +4444,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -4475,7 +4465,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Standing Rear Delt Row (with Rope)",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Cable",
@@ -4498,7 +4488,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -4519,7 +4509,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Standing Shoulder External Rotation",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -4541,7 +4531,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -4584,7 +4574,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Straight Arm Pulldown",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Biceps"
     ],
     "equipment": "Cable",
@@ -4608,7 +4598,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Biceps",
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -4629,7 +4619,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Supine Reverse Fly",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -4670,9 +4660,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0242",
     "name": "Cable Tuck Reverse Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -4691,9 +4679,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0243",
     "name": "Cable Twist",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -4713,7 +4699,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Twisting Pull",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Biceps"
     ],
     "equipment": "Cable",
@@ -4757,7 +4743,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Upright Row",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Biceps"
     ],
     "equipment": "Cable",
@@ -4779,8 +4765,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -4823,7 +4808,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Chest Dip",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -4888,7 +4874,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Clock Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -4909,7 +4897,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Close-grip Push-up",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -4930,7 +4919,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cocoons",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -4950,9 +4939,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0262",
     "name": "Cross Body Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -4971,9 +4958,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0267",
     "name": "Crunch (hands Overhead)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -4992,9 +4977,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0271",
     "name": "Crunch (on Stability Ball)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -5013,9 +4996,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0272",
     "name": "Crunch (on Stability Ball, Arms Straight)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -5034,9 +5015,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0274",
     "name": "Crunch Floor",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -5056,7 +5035,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dead Bug",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -5076,9 +5055,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0277",
     "name": "Decline Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -5098,7 +5075,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Decline Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -5119,7 +5097,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Decline Sit-up",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -5140,7 +5118,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Diamond Push-up",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -5205,7 +5184,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -5248,7 +5227,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Around Pullover",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -5269,7 +5249,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -5423,7 +5404,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Close-grip Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -5509,7 +5491,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -5530,7 +5512,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Decline Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -5550,7 +5533,9 @@ export const EXERCISE_LIBRARY = ([
     "id": "0302",
     "name": "Dumbbell Decline Fly",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders"
+    ],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -5570,7 +5555,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Decline Hammer Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -5591,7 +5577,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Decline Shrug V. 2",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -5612,7 +5599,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Decline Shrug",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -5633,7 +5621,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Decline Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -5654,6 +5642,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Decline Twist Fly",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -5674,7 +5663,9 @@ export const EXERCISE_LIBRARY = ([
     "id": "0308",
     "name": "Dumbbell Fly",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders"
+    ],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -5694,7 +5685,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Front Raise V. 2",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Dumbbell",
@@ -5717,7 +5708,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -5738,8 +5729,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Full Can Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -5802,6 +5792,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -5844,6 +5835,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Breeding",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -5906,7 +5898,9 @@ export const EXERCISE_LIBRARY = ([
     "id": "0319",
     "name": "Dumbbell Incline Fly",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders"
+    ],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -5947,6 +5941,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Hammer Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -5989,7 +5984,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline One Arm Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -6011,6 +6006,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Palm-in Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -6032,7 +6028,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -6054,8 +6050,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Rear Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6077,7 +6072,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -6097,7 +6092,10 @@ export const EXERCISE_LIBRARY = ([
     "id": "0328",
     "name": "Dumbbell Incline Shoulder Raise",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders",
+      "Back"
+    ],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -6117,7 +6115,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Shrug",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6138,7 +6136,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6159,6 +6157,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Twisted Flyes",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -6202,7 +6201,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Kickback",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6223,7 +6222,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6244,7 +6243,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lateral To Front Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Dumbbell",
@@ -6289,7 +6288,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying Extension (across Face)",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6310,7 +6309,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying Elbow Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6352,7 +6352,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying Hammer Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -6373,7 +6374,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying One Arm Deltoid Rear",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -6394,7 +6395,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying One Arm Press V. 2",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -6415,7 +6417,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying One Arm Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -6436,7 +6439,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying One Arm Pronated Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6457,8 +6460,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying One Arm Rear Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6501,7 +6503,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6522,8 +6524,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying Rear Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6545,7 +6546,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6587,7 +6588,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6608,7 +6609,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Neutral Grip Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -6650,7 +6652,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Kickback",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6671,7 +6673,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -6693,7 +6695,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Lateral Raise With Support",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6713,9 +6715,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0358",
     "name": "Dumbbell One Arm Reverse Wrist Curl",
     "muscleGroup": "Forearms",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -6735,7 +6735,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Reverse Fly (with Support)",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6800,7 +6800,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Triceps Extension (on Bench)",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6821,7 +6821,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Upright Row",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Biceps"
     ],
     "equipment": "Dumbbell",
@@ -6843,8 +6843,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6908,7 +6907,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6929,8 +6928,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Over Bench Reverse Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -6951,8 +6949,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Over Bench Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7080,6 +7077,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Pullover",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Back",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -7101,8 +7099,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7123,7 +7120,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Rear Delt Row (shoulder)",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -7144,7 +7141,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Rear Fly",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7165,8 +7162,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Rear Lateral Raise (support Head)",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7187,8 +7183,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Rear Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7253,7 +7248,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Reverse Fly",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7295,8 +7290,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Reverse Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7317,7 +7311,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Rotation Reverse Fly",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7338,7 +7332,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Alternate Front Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Dumbbell",
@@ -7382,7 +7376,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Bench Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7445,7 +7439,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Front Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Dumbbell",
@@ -7488,7 +7482,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Kickback",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7509,7 +7503,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Lateral Raise V. 2",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -7531,7 +7525,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
       "Back"
     ],
     "equipment": "Dumbbell",
@@ -7574,7 +7567,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated One Arm Kickback",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7595,7 +7588,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated One Arm Rotate",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Biceps"
     ],
     "equipment": "Dumbbell",
@@ -7640,7 +7633,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7747,7 +7740,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Shrug",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7767,9 +7760,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0407",
     "name": "Dumbbell Side Bend",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -7789,7 +7780,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Side Lying One Hand Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -7809,9 +7800,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0409",
     "name": "Dumbbell Single Leg Calf Raise",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -7901,7 +7890,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -7922,7 +7911,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Standing Alternate Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Forearms"
     ],
     "equipment": "Dumbbell",
@@ -7964,9 +7953,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0417",
     "name": "Dumbbell Standing Calf Raise",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -8007,7 +7994,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Standing Front Raise Above Head",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Dumbbell",
@@ -8029,7 +8016,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Standing Kickback",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -8092,7 +8079,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Standing One Arm Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -8114,7 +8101,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -8242,7 +8229,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Standing Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -8287,7 +8274,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -8308,6 +8295,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Straight Arm Pullover",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Back",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -8330,7 +8318,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -8351,7 +8339,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Tate Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -8372,7 +8360,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Upright Row",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Biceps"
     ],
     "equipment": "Dumbbell",
@@ -8436,9 +8424,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0443",
     "name": "Elbow-to-knee",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -8522,7 +8508,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ez Barbell Decline Close Grip Face Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -8543,7 +8530,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ez Barbell Incline Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -8564,7 +8551,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ez Barbell Jm Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -8627,7 +8615,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ez Barbell Seated Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -8668,9 +8656,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0455",
     "name": "Finger Curls",
     "muscleGroup": "Forearms",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Barbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -8689,9 +8675,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0456",
     "name": "Flexion Leg Sit Up (bent Knee)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -8710,10 +8694,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0457",
     "name": "Flexion Leg Sit Up (straight Arm)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest",
-      "Quads"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -8733,6 +8714,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Floor Fly (with Barbell)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Barbell",
@@ -8754,7 +8736,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Flutter Kicks",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Chest",
       "Abs"
     ],
     "equipment": "Bodyweight",
@@ -8776,7 +8757,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Front Plank With Twist",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -8798,7 +8779,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -8818,10 +8799,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0467",
     "name": "Gorilla Chin",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Forearms",
-      "Biceps"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -8841,7 +8819,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Groin Crunch",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Glutes"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -8862,7 +8840,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Handstand Push-up",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Chest",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -8882,9 +8862,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0472",
     "name": "Hanging Leg Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -8904,7 +8882,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Hanging Pike",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -8924,9 +8902,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0474",
     "name": "Hanging Straight Leg Hip Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -8945,9 +8921,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0475",
     "name": "Hanging Straight Leg Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -8966,9 +8940,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0476",
     "name": "Hanging Straight Twisting Leg Hip Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -8988,8 +8960,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Hip Raise (bent Knee)",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
+      "Glutes"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -9054,7 +9025,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Incline Close-grip Push-up",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -9074,9 +9046,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0491",
     "name": "Incline Leg Hip Raise (leg Straight)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -9096,7 +9066,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Incline Push Up Depth Jump",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -9117,7 +9089,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Incline Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -9138,7 +9111,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Incline Reverse Grip Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -9158,9 +9132,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0495",
     "name": "Incline Twisting Sit-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -9268,7 +9240,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Isometric Wipers",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Shoulders",
+      "Triceps",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -9288,13 +9262,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0501",
     "name": "Jack Burpee",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves",
-      "Chest",
-      "Triceps"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -9313,9 +9281,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0507",
     "name": "Jackknife Sit-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -9335,7 +9301,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Janda Sit-up",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -9402,7 +9368,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Advanced Windmill",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Kettlebell",
     "category": "Isolation",
@@ -9423,8 +9389,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Alternating Hang Clean",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Chest",
-      "Traps"
+      "Shoulders",
+      "Back",
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9445,6 +9412,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Alternating Press On Floor",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Kettlebell",
@@ -9467,7 +9435,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9488,7 +9456,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Alternating Renegade Row",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Abs",
+      "Shoulders"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9553,7 +9522,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Bent Press",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Kettlebell",
@@ -9576,7 +9545,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9598,7 +9567,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9620,7 +9589,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9642,7 +9611,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9663,8 +9632,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Double Snatch",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
-      "Forearms"
+      "Back",
+      "Forearms",
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9685,8 +9655,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Double Windmill",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
-      "Hamstrings"
+      "Shoulders"
     ],
     "equipment": "Kettlebell",
     "category": "Isolation",
@@ -9707,7 +9676,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Extended Range One Arm Press On Floor",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9728,8 +9698,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Figure 8",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
-      "Forearms"
+      "Shoulders"
     ],
     "equipment": "Kettlebell",
     "category": "Isolation",
@@ -9843,7 +9812,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9865,7 +9834,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9887,7 +9856,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9909,7 +9878,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -9952,8 +9921,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell One Arm Snatch",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
-      "Forearms"
+      "Back",
+      "Forearms",
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -10019,7 +9989,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Plyo Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -10041,7 +10013,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -10063,7 +10035,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -10084,7 +10056,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Sumo High Pull",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Glutes",
       "Hamstrings"
     ],
@@ -10108,7 +10080,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -10131,7 +10103,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Quads",
       "Glutes",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -10154,7 +10126,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Quads",
       "Hamstrings",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -10175,7 +10147,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Two Arm Clean",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Forearms"
     ],
     "equipment": "Kettlebell",
@@ -10219,7 +10191,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell Windmill",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Kettlebell",
     "category": "Isolation",
@@ -10264,7 +10236,8 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Biceps",
       "Triceps",
-      "Chest"
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -10284,10 +10257,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0562",
     "name": "Landmine 180",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest",
-      "Quads"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Barbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -10307,7 +10277,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Leg Pull In Flat Bench",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -10371,10 +10341,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0573",
     "name": "Lever Back Extension",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -10437,7 +10404,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Chest Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -10458,7 +10426,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Chest Press V. 2",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -10502,7 +10471,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -10523,7 +10492,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Gripless Shrug",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Forearms"
     ],
     "equipment": "Machine",
@@ -10546,7 +10515,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -10588,7 +10557,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Kneeling Twist",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Machine",
     "category": "Isolation",
@@ -10609,7 +10578,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
       "Back"
     ],
     "equipment": "Machine",
@@ -10761,7 +10729,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Overhand Triceps Dip",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -10803,8 +10772,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Reverse Hyperextension",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Machine",
     "category": "Isolation",
@@ -10824,9 +10792,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0594",
     "name": "Lever Seated Calf Raise",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -10845,9 +10811,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0595",
     "name": "Lever Seated Crunch (chest Pad)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -10866,7 +10830,10 @@ export const EXERCISE_LIBRARY = ([
     "id": "0596",
     "name": "Lever Seated Fly",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders",
+      "Back"
+    ],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -10950,9 +10917,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0600",
     "name": "Lever Seated Leg Raise Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -10972,7 +10937,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Seated Reverse Fly (parallel Grip)",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Machine",
     "category": "Isolation",
@@ -10993,7 +10958,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Seated Reverse Fly",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Machine",
     "category": "Isolation",
@@ -11036,7 +11001,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Shrug",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Isolation",
@@ -11056,9 +11021,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0605",
     "name": "Lever Standing Calf Raise",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -11100,7 +11063,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Isolation",
@@ -11121,7 +11084,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "London Bridge",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Biceps",
       "Forearms"
     ],
@@ -11164,9 +11127,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0620",
     "name": "Lying Leg Raise Flat Bench",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -11252,10 +11213,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0630",
     "name": "Mountain Climber",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Chest",
-      "Triceps"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -11277,6 +11235,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Biceps",
       "Triceps",
+      "Shoulders",
       "Chest"
     ],
     "equipment": "Bodyweight",
@@ -11297,9 +11256,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0634",
     "name": "Negative Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -11318,9 +11275,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0635",
     "name": "Oblique Crunches Floor",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -11361,7 +11316,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Olympic Barbell Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -11404,7 +11359,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "One Arm Dip",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -11425,7 +11381,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "One Arm Slam (with Medicine Ball)",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -11446,7 +11403,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Otis Up",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -11490,7 +11447,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Overhead Triceps Stretch",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -11533,9 +11490,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0650",
     "name": "Pull-in (on Stability Ball)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -11599,7 +11554,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push-up (bosu Ball)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -11620,7 +11577,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push-up (on Stability Ball)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -11641,7 +11600,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Feet-elevated Push-up (on Stability Ball)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -11662,7 +11623,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push-up (wall) V. 2",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -11683,7 +11645,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push-up (wall)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -11704,7 +11667,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push-up Close-grip Off Dumbbell",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -11728,7 +11692,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -11749,7 +11713,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -11770,7 +11736,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push-up Medicine Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -11791,6 +11759,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push-up To Side Plank",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest",
       "Triceps"
     ],
@@ -11813,7 +11782,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Raise Single Arm Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -11834,8 +11805,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Rear Decline Bridge",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -11856,7 +11826,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Rear Deltoid Stretch",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -11899,7 +11869,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Reverse Dip",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -11964,8 +11935,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Reverse Hyper Extension (on Stability Ball)",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -11986,7 +11956,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ring Dips",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -12031,7 +12002,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Forearms",
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -12051,11 +12022,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0684",
     "name": "Run (equipment)",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -12074,11 +12041,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0685",
     "name": "Run",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -12097,9 +12060,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0687",
     "name": "Russian Twist",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -12120,7 +12081,8 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Traps",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Back",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -12140,9 +12102,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0689",
     "name": "Seated Leg Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -12161,10 +12121,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0690",
     "name": "Seated Lower Back Stretch",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -12183,9 +12140,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0691",
     "name": "Seated Side Crunch (wall)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -12249,7 +12204,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Shoulder Tap Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -12270,7 +12226,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Side Bridge V. 2",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
       "Glutes"
     ],
     "equipment": "Bodyweight",
@@ -12291,9 +12246,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0709",
     "name": "Side Hip (on Parallel Bars)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -12334,7 +12287,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Side Push Neck Stretch",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -12355,7 +12308,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Side Push-up",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Chest",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -12397,9 +12352,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0721",
     "name": "Side Wrist Pull Stretch",
     "muscleGroup": "Forearms",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -12419,7 +12372,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Single Arm Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -12439,9 +12394,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0727",
     "name": "Single Leg Calf Raise (on A Dumbbell)",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -12482,9 +12435,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0735",
     "name": "Sit-up V. 2",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -12662,7 +12613,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Back Shrug",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Isolation",
@@ -12705,7 +12656,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -12726,8 +12678,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Bent Knee Good Morning",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -12771,7 +12722,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Close-grip Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -12794,7 +12746,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Hamstrings",
       "Quads",
-      "Chest"
+      "Back"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -12815,7 +12767,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Decline Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -12836,7 +12789,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Decline Reverse-grip Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -12880,8 +12834,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Hip Raise",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
+      "Glutes"
     ],
     "equipment": "Smith Machine",
     "category": "Isolation",
@@ -12902,6 +12855,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Incline Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Smith Machine",
@@ -12923,7 +12877,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Incline Reverse-grip Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -12943,7 +12898,10 @@ export const EXERCISE_LIBRARY = ([
     "id": "0759",
     "name": "Smith Incline Shoulder Raises",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders",
+      "Back"
+    ],
     "equipment": "Smith Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -12987,7 +12945,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -13008,7 +12966,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Rear Delt Row",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Smith Machine",
@@ -13051,7 +13009,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Reverse-grip Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -13116,7 +13075,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Shrug",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Isolation",
@@ -13293,7 +13252,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Upright Row",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Biceps"
     ],
     "equipment": "Smith Machine",
@@ -13338,7 +13297,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Spell Caster",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -13359,7 +13318,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Spider Crawl Push Up",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -13383,7 +13342,7 @@ export const EXERCISE_LIBRARY = ([
       "Glutes",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -13426,7 +13385,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Standing Lateral Stretch",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -13468,7 +13428,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Standing Wheel Rollerout",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -13488,11 +13449,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0798",
     "name": "Stationary Bike Walk",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Compound",
     "targetRepRange": [
@@ -13511,7 +13468,10 @@ export const EXERCISE_LIBRARY = ([
     "id": "0803",
     "name": "Superman Push-up",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Abs",
+      "Shoulders"
+    ],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -13530,9 +13490,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0805",
     "name": "Suspended Abdominal Fallout",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -13552,7 +13510,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Suspended Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -13572,9 +13532,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0807",
     "name": "Suspended Reverse Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -13595,7 +13553,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -13641,7 +13599,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Hamstrings",
       "Quads",
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -13662,7 +13620,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Triceps Dip (bench Leg)",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -13683,7 +13642,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Triceps Dip (between Benches)",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -13704,7 +13664,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Triceps Dip",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -13725,7 +13686,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Triceps Dips Floor",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -13746,7 +13708,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Triceps Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -13767,7 +13729,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Triceps Stretch",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -13789,7 +13751,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -13809,9 +13771,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0826",
     "name": "Vertical Leg Raise (on Parallel Bars)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -13831,7 +13791,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Bench Dip",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -13851,9 +13812,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0832",
     "name": "Weighted Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -13939,7 +13898,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Overhead Crunch (on Stability Ball)",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -14003,9 +13962,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0845",
     "name": "Weighted Russian Twist (legs Up)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -14025,7 +13982,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Russian Twist",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -14067,7 +14024,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Seated Twist (on Stability Ball)",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -14088,7 +14045,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Side Bend (on Stability Ball)",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -14198,6 +14155,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Svend Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -14218,9 +14176,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0857",
     "name": "Wheel Rollout",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -14239,11 +14195,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0858",
     "name": "Wind Sprints",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -14262,10 +14214,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0859",
     "name": "Wrist Roller",
     "muscleGroup": "Forearms",
-    "secondaryMuscles": [
-      "Biceps",
-      "Triceps"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -14285,7 +14234,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Kickback",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -14328,7 +14277,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Twist (up-down)",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -14349,7 +14298,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying External Shoulder Rotation",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -14371,7 +14319,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Upright Shoulder External Rotation",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -14391,9 +14339,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0865",
     "name": "Lying Leg-hip Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -14413,7 +14359,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Hanging Leg-hip Raise",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -14477,7 +14423,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Butt-ups",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -14497,9 +14443,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0871",
     "name": "Tuck Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -14518,9 +14462,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0872",
     "name": "Reverse Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -14539,9 +14481,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0873",
     "name": "Cable Reverse Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -14560,9 +14500,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0874",
     "name": "Cable Standing Crunch (with Rope Attachment)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -14602,9 +14540,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0969",
     "name": "Band Alternating V-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -14646,7 +14582,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Assisted Wheel Rollerout",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -14666,9 +14602,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0972",
     "name": "Band Bicycle Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -14710,7 +14644,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Close-grip Push-up",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -14752,7 +14687,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Front Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
       "Back"
     ],
     "equipment": "Other",
@@ -14796,7 +14730,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Horizontal Pallof Press",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
       "Glutes"
     ],
     "equipment": "Other",
@@ -14818,8 +14751,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Bent-over Hip Extension",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -14839,9 +14771,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0981",
     "name": "Band Jack Knife Sit-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -14861,8 +14791,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Kneeling One Arm Pulldown",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -14904,9 +14833,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0985",
     "name": "Band Kneeling Twisting Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -14927,7 +14854,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -14971,7 +14898,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -14992,6 +14919,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band One Arm Twisting Chest Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -15014,7 +14942,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -15036,7 +14964,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -15057,6 +14985,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Push Sit-up",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest"
     ],
     "equipment": "Other",
@@ -15078,8 +15007,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Reverse Fly",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Back",
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -15163,7 +15091,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Side Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -15183,9 +15111,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "0999",
     "name": "Band Single Leg Calf Raise",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -15248,9 +15174,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1002",
     "name": "Band Lying Straight Leg Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -15271,8 +15195,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Quads",
-      "Chest"
+      "Quads"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -15315,9 +15238,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1005",
     "name": "Band Standing Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -15336,9 +15257,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1007",
     "name": "Band Standing Twisting Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -15382,7 +15301,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -15424,9 +15343,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1011",
     "name": "Band Seated Twist",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -15489,9 +15406,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1014",
     "name": "Band V-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -15511,7 +15426,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Vertical Pallof Press",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
       "Glutes"
     ],
     "equipment": "Other",
@@ -15555,8 +15469,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Y-raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -15577,7 +15490,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Shrug",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -15598,7 +15511,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Standing Rear Delt Row",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Other",
@@ -15621,7 +15534,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -15641,12 +15554,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1160",
     "name": "Burpee",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves",
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -15666,6 +15574,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dynamic Chest Stretch (male)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Bodyweight",
@@ -15686,13 +15595,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1201",
     "name": "Dumbbell Burpee",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves",
-      "Chest",
-      "Triceps"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Compound",
     "targetRepRange": [
@@ -15734,7 +15637,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -15755,7 +15659,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Decline Pullover",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -15776,7 +15681,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Reverse Grip Decline Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -15797,7 +15703,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Reverse Grip Incline Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -15818,7 +15725,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Wide Reverse Grip Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -15839,6 +15747,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Behind Head Chest Stretch",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -15860,7 +15769,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Decline One Arm Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -15881,7 +15791,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Decline Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -15902,6 +15813,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable One Arm Decline Chest Fly",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -15923,6 +15835,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable One Arm Fly On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -15944,6 +15857,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable One Arm Incline Fly On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -15965,6 +15879,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable One Arm Incline Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -15986,6 +15901,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable One Arm Incline Press On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -16007,6 +15923,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable One Arm Press On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -16028,6 +15945,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Press On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -16049,6 +15967,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Standing Up Straight Crossovers",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -16070,6 +15989,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Upper Chest Crossovers",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -16090,7 +16010,9 @@ export const EXERCISE_LIBRARY = ([
     "id": "1271",
     "name": "Chest And Front Of Shoulder Stretch",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders"
+    ],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -16110,6 +16032,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Chest Stretch With Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -16131,7 +16054,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Clap Push Up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -16152,7 +16076,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Deep Push Up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -16173,7 +16098,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Drop Push Up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -16193,7 +16119,9 @@ export const EXERCISE_LIBRARY = ([
     "id": "1276",
     "name": "Dumbbell Decline One Arm Fly",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders"
+    ],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -16213,6 +16141,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Fly On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -16233,7 +16162,9 @@ export const EXERCISE_LIBRARY = ([
     "id": "1278",
     "name": "Dumbbell Incline Fly On Exercise Ball",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders"
+    ],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -16253,6 +16184,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline One Arm Fly",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -16273,7 +16205,9 @@ export const EXERCISE_LIBRARY = ([
     "id": "1280",
     "name": "Dumbbell Incline One Arm Fly On Exercise Ball",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders"
+    ],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -16293,6 +16227,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline One Arm Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -16314,6 +16249,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline One Arm Press On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -16335,6 +16271,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Press On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -16356,7 +16293,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying Pullover On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -16376,7 +16315,9 @@ export const EXERCISE_LIBRARY = ([
     "id": "1285",
     "name": "Dumbbell One Arm Bench Fly",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders"
+    ],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -16396,6 +16337,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Chest Fly On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -16417,7 +16359,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Decline Chest Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -16438,6 +16381,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Fly On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -16459,6 +16403,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Incline Chest Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -16480,7 +16425,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Press On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Shoulders",
+      "Triceps",
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -16501,7 +16448,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Pullover On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -16522,6 +16470,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Leg Fly On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -16543,6 +16492,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Press On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -16564,7 +16514,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Pullover Hip Extension On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -16585,7 +16537,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Pullover On Exercise Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -16606,7 +16559,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Pike Push Up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Shoulders",
+      "Triceps",
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -16627,7 +16582,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Isometric Chest Squeeze",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -16648,7 +16604,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kettlebell One Arm Floor Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Kettlebell",
     "category": "Compound",
@@ -16669,6 +16626,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Incline Chest Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Machine",
@@ -16690,7 +16648,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Decline Chest Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -16711,7 +16670,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Machine Inner Chest Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -16732,6 +16692,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Medicine Ball Chest Pass",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -16753,6 +16714,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Medicine Ball Chest Push From 3 Point Stance",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -16774,7 +16736,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Medicine Ball Chest Push Multiple Response",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -16795,7 +16758,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Medicine Ball Chest Push Single Response",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -16816,7 +16780,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Plyo Push Up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -16837,7 +16803,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push Up On Bosu Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -16858,7 +16826,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Wide Grip Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -16879,7 +16848,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Wide Grip Decline Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -16900,7 +16870,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Drop Push Up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -16921,7 +16892,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Wide Hand Push Up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -16942,7 +16914,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Medicine Ball Chest Push With Run Release",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -16984,10 +16958,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1314",
     "name": "Back Extension On Exercise Ball",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -17052,7 +17023,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -17140,7 +17111,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -17184,7 +17155,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -17206,7 +17177,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -17271,7 +17242,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying Rear Delt Row",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Biceps"
     ],
     "equipment": "Dumbbell",
@@ -17316,7 +17287,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -17359,7 +17330,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Alternating Arm Ups",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -17379,10 +17351,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1333",
     "name": "Exercise Ball Back Extension With Arms Extended",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -17401,10 +17370,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1334",
     "name": "Exercise Ball Back Extension With Hands Behind Head",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -17423,10 +17389,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1335",
     "name": "Exercise Ball Back Extension With Knees Off Ground",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -17445,10 +17408,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1336",
     "name": "Exercise Ball Back Extension With Rotation",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -17468,7 +17428,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Hug",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -17489,7 +17449,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Lat Stretch",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -17510,10 +17470,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1341",
     "name": "Exercise Ball Lower Back Stretch (pyramid)",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Compound",
     "targetRepRange": [
@@ -17533,7 +17490,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Lying Side Lat Stretch",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -17555,8 +17512,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Prone Leg Raise",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
-      "Glutes"
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -17621,7 +17577,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kneeling Lat Stretch",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Bodyweight",
@@ -17644,7 +17600,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -17752,10 +17708,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1352",
     "name": "Lower Back Curl",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -17775,7 +17728,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Medicine Ball Catch And Overhead Throw",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -17796,7 +17750,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Medicine Ball Overhead Slam",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -17817,7 +17772,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "One Arm Against Wall",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Bodyweight",
@@ -17840,7 +17795,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -17861,8 +17816,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Side Lying Floor Stretch",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
-      "Glutes"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -17948,10 +17902,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1362",
     "name": "Sphinx",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -17970,10 +17921,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1363",
     "name": "Spine Stretch",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Hamstrings",
-      "Glutes"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -17993,7 +17941,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Standing Pelvic Tilt",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -18014,7 +17962,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Upper Back Stretch",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -18035,7 +17983,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Upward Facing Dog",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -18077,9 +18025,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1368",
     "name": "Ankle Circles",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -18098,9 +18044,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1369",
     "name": "Band Two Legs Calf Raise - (band Under Both Legs) V. 2",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -18141,7 +18085,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Seated Calf Raise",
     "muscleGroup": "Calves",
     "secondaryMuscles": [
-      "Hamstrings"
+      "Hamstrings",
+      "Quads"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -18183,9 +18128,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1373",
     "name": "Bodyweight Standing Calf Raise",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -18249,9 +18192,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1376",
     "name": "Cable Standing One Leg Calf Raise",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -18488,9 +18429,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1387",
     "name": "One Leg Floor Calf Raise",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -18509,9 +18448,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1388",
     "name": "Peroneals Stretch",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -18681,9 +18618,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1396",
     "name": "Smith Toe Raise",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Smith Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -18747,7 +18682,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Bench Dip On Floor",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -18791,7 +18727,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Neck Side Stretch",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -18812,7 +18748,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Back Pec Stretch",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -18876,8 +18812,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Glute Bridge",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -18921,8 +18856,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Palms Down Wrist Curl Over A Bench",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -18944,7 +18878,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -19007,8 +18941,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Seated Neutral Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -19031,7 +18964,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Hamstrings",
       "Quads",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -19142,7 +19075,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -19164,7 +19097,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -19185,8 +19118,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Reverse Hyper On Flat Bench",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -19251,8 +19183,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Seated Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Smith Machine",
     "category": "Isolation",
@@ -19294,9 +19225,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1428",
     "name": "Wrist Circles",
     "muscleGroup": "Forearms",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -19338,7 +19267,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Chest Dip (on Dip-pull-up Cage)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -19406,7 +19336,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -19476,7 +19406,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -19496,9 +19426,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1437",
     "name": "Dumbbell Finger Curls",
     "muscleGroup": "Forearms",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -19540,7 +19468,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Gripless Shrug V. 2",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Forearms"
     ],
     "equipment": "Machine",
@@ -19562,8 +19490,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Over Bench One Arm Reverse Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -19584,7 +19511,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Seated Dip",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -19604,9 +19532,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1452",
     "name": "Lever Seated Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -19692,7 +19618,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -19739,7 +19665,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -19763,7 +19689,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -19830,7 +19756,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Twist Hip Lift",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Chest",
+      "Abs",
       "Hamstrings"
     ],
     "equipment": "Bodyweight",
@@ -19852,7 +19778,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push-up On Lower Arms",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -19872,9 +19799,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1468",
     "name": "Crab Twist Toe Touch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -19894,8 +19819,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Inchworm",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
-      "Hamstrings"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -19985,7 +19909,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Incline Chest Press V. 2",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -20027,9 +19952,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1490",
     "name": "Standing Calf Raise (on A Staircase)",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -20050,7 +19973,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Quads",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Glutes"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -20070,9 +19993,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1495",
     "name": "Oblique Crunch V. 2",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -20092,8 +20013,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Sledge Hammer",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -20160,7 +20080,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Hamstrings",
       "Calves",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -20225,8 +20145,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Seated Hamstring Stretch",
     "muscleGroup": "Hamstrings",
     "secondaryMuscles": [
-      "Glutes",
-      "Chest"
+      "Glutes"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -20463,7 +20382,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Decline One Arm Hammer Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -20484,7 +20404,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Hammer Press On Exercise Ball",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -20505,6 +20426,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline One Arm Hammer Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest"
     ],
     "equipment": "Dumbbell",
@@ -20526,6 +20448,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline One Arm Hammer Press On Exercise Ball",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest"
     ],
     "equipment": "Dumbbell",
@@ -20547,6 +20470,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Hammer Press On Exercise Ball",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest"
     ],
     "equipment": "Dumbbell",
@@ -20568,7 +20492,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm Reverse Grip Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -20589,7 +20514,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Palms In Incline Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -20610,7 +20536,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Reverse Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -20631,7 +20558,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Machine Decline Close Grip Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -20652,7 +20580,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Machine Reverse Decline Close Grip Bench Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Compound",
@@ -20863,7 +20792,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -20885,7 +20814,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -21012,7 +20941,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -21139,7 +21068,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -21182,7 +21111,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -21204,7 +21133,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -21289,7 +21218,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -21330,10 +21259,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1658",
     "name": "Dumbbell Lunge With Bicep Curl",
     "muscleGroup": "Biceps",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Compound",
     "targetRepRange": [
@@ -21774,7 +21700,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -21857,11 +21783,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1684",
     "name": "Dumbbell Step Up Single Leg Balance With Bicep Curl",
     "muscleGroup": "Biceps",
-    "secondaryMuscles": [
-      "Quads",
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Compound",
     "targetRepRange": [
@@ -21883,7 +21805,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Glutes",
       "Hamstrings",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -21906,7 +21828,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Glutes",
       "Hamstrings",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -21928,9 +21850,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Abs",
     "secondaryMuscles": [
       "Glutes",
-      "Hamstrings",
-      "Quads",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -21951,9 +21871,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lunge With Twist",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Quads",
-      "Glutes",
-      "Hamstrings"
+      "Glutes"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -21974,7 +21892,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push And Pull Bodyweight",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -21996,7 +21915,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -22017,7 +21936,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Medicine Ball Close Grip Push Up",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -22061,7 +21981,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Prone Twist On Stability Ball",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -22188,9 +22108,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1714",
     "name": "Assisted Prone Rectus Femoris Stretch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Quads"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -22210,6 +22128,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Assisted Seated Pectoralis Major Stretch With Stability Ball",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -22232,7 +22151,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -22253,7 +22172,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Seated Close Grip Behind Neck Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -22274,7 +22193,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Incline Close Grip Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -22295,7 +22215,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Lying Back Of The Head Tricep Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -22337,7 +22257,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable High Pulley Overhead Tricep Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -22379,7 +22299,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Rope High Pulley Overhead Tricep Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -22400,7 +22320,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Rope Incline Tricep Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -22421,7 +22341,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Rope Lying On Floor Tricep Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -22442,7 +22362,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Standing Reverse Grip One Arm Overhead Tricep Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -22463,7 +22383,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Two Arm Tricep Kickback",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -22484,7 +22404,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying Alternate Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22505,7 +22425,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Bent Over Alternate Kickback",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22526,7 +22447,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Close Grip Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22547,7 +22469,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Forward Lunge Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -22568,7 +22491,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Two Arm Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22589,7 +22512,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Kickbacks On Exercise Ball",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22610,7 +22534,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying Single Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22631,7 +22555,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell One Arm French Press On Exercise Ball",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22652,7 +22576,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Bent Over Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22673,7 +22598,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Reverse Grip One Arm Overhead Tricep Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22694,7 +22619,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Standing Alternating Tricep Kickback",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22715,7 +22640,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Standing Bent Over One Arm Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22736,7 +22662,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Standing Bent Over Two Arm Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22757,7 +22684,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Tricep Kickback With Stork Stance",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22778,7 +22705,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Twisting Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -22799,7 +22727,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Dip",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -22820,7 +22749,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Seated Triceps Stretch",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -22841,7 +22770,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Supine Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -22862,7 +22791,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ez Bar French Press On Exercise Ball",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -22883,7 +22812,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ez Bar Lying Close Grip Triceps Extension Behind Head",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -22904,7 +22833,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ez Bar Standing French Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -22925,7 +22854,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Medicine Ball Supine Chest Throw",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -22946,7 +22876,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Pin Presses",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -22967,7 +22897,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Smith Machine Incline Tricep Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Smith Machine",
     "category": "Isolation",
@@ -22988,7 +22918,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Three Bench Dip",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -23009,7 +22940,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Three Bench Dips",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -23030,7 +22962,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Tricep Dips",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -23052,7 +22985,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -23074,7 +23007,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -23094,9 +23027,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1758",
     "name": "Assisted Sit-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -23161,9 +23092,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "1761",
     "name": "Hanging Oblique Knee Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -23205,7 +23134,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Hanging Leg Hip Raise",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -23226,7 +23155,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Upright Row (back Pov)",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Biceps"
     ],
     "equipment": "Dumbbell",
@@ -23270,7 +23199,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Triceps Dip On High Parallel Bars",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -23333,6 +23263,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Bodyweight Kneeling Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest"
     ],
     "equipment": "Bodyweight",
@@ -23355,7 +23286,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -23399,7 +23330,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Quads",
     "secondaryMuscles": [
       "Glutes",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -23420,7 +23351,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Side Plank Hip Adduction",
     "muscleGroup": "Quads",
     "secondaryMuscles": [
-      "Chest",
+      "Abs",
       "Glutes"
     ],
     "equipment": "Bodyweight",
@@ -23443,8 +23374,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Quads",
     "secondaryMuscles": [
       "Calves",
-      "Forearms",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -23465,7 +23395,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Front Plank",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -23529,11 +23460,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2138",
     "name": "Stationary Bike Run V. 3",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cardio Machine",
     "category": "Compound",
     "targetRepRange": [
@@ -23553,7 +23480,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Hands Bike",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Cardio Machine",
     "category": "Compound",
@@ -23573,12 +23501,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2141",
     "name": "Walk Elliptical Cross Trainer",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cardio Machine",
     "category": "Compound",
     "targetRepRange": [
@@ -23598,7 +23521,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ski Ergometer",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Forearms"
     ],
     "equipment": "Cardio Machine",
@@ -23642,6 +23565,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Seated Chest Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -23663,7 +23587,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ez Barbell Decline Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -23684,7 +23608,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Reverse Close-grip Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -23705,7 +23630,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -23726,7 +23651,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbells Seated Triceps Extension",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -23769,6 +23694,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Roller Seated Shoulder Flexor Depresor Retractor",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -23790,7 +23716,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Roller Body Saw",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -23833,9 +23759,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2206",
     "name": "Roller Reverse Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -23855,7 +23779,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Roller Side Lat Stretch",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -23876,10 +23800,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2208",
     "name": "Roller Back Stretch",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Hamstrings",
-      "Glutes"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Compound",
     "targetRepRange": [
@@ -23899,6 +23820,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Roller Seated Single Leg Shoulder Flexor Depresor Retractor",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -23944,7 +23866,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Isolation",
@@ -24051,7 +23973,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Rear Delt Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -24113,9 +24035,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2297",
     "name": "Stability Ball Crunch (full Range Hands Behind Head)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
@@ -24178,12 +24098,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2311",
     "name": "Walking On Stepmill",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cardio Machine",
     "category": "Compound",
     "targetRepRange": [
@@ -24203,7 +24118,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lying Elbow To Knee",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -24223,9 +24138,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2315",
     "name": "Lever Rotary Calf",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -24245,7 +24158,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Bent Arm Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -24331,7 +24244,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Narrow Push-up On Exercise Ball",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -24352,7 +24266,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Spine Twist",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -24374,7 +24288,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -24394,11 +24308,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2331",
     "name": "Cycle Cross Trainer",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Compound",
     "targetRepRange": [
@@ -24418,7 +24328,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Arm Slingers Hanging Straight Legs",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -24461,7 +24372,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Seated Calf Press",
     "muscleGroup": "Calves",
     "secondaryMuscles": [
-      "Chest",
       "Hamstrings"
     ],
     "equipment": "Machine",
@@ -24483,7 +24393,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Arm Slingers Hanging Bent Knee Legs",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -24504,7 +24415,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Wide-grip Chest Dip On High Parallel Bars",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -24525,7 +24437,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Assisted Wide-grip Chest Dip (kneeling)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -24569,7 +24482,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Russian Twist V. 2",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -24612,7 +24525,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Close-grip Push-up (on Knees)",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -24632,9 +24546,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2399",
     "name": "Cable Seated Twist",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
@@ -24843,9 +24755,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2429",
     "name": "Frog Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -24865,7 +24775,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Ez-bar Close-grip Bench Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -24888,7 +24799,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Hamstrings",
       "Quads",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -24909,7 +24820,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Chest Dip On Straight Bar",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -24931,7 +24843,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Cable",
     "category": "Compound",
@@ -24953,9 +24865,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Abs",
     "secondaryMuscles": [
       "Glutes",
-      "Quads",
-      "Hamstrings",
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Bodyweight",
@@ -24977,7 +24887,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Lying On Floor Rear Delt Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -25063,12 +24973,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2612",
     "name": "Jump Rope",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Calves",
-      "Quads",
-      "Hamstrings",
-      "Glutes"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Compound",
     "targetRepRange": [
@@ -25133,7 +25038,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -25155,7 +25060,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -25242,9 +25147,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2799",
     "name": "Barbell Sitted Alternate Leg Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Barbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -25263,10 +25166,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2800",
     "name": "Barbell Sitted Alternate Leg Raise (female)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest",
-      "Quads"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Barbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -25285,9 +25185,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2801",
     "name": "Twisted Leg Raise (female)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -25306,9 +25204,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2802",
     "name": "Twisted Leg Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -25352,7 +25248,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -25375,7 +25271,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Hamstrings",
       "Quads",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -25441,9 +25337,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "2963",
     "name": "Captains Chair Straight Leg Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -25550,7 +25444,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Incline Scapula Push Up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -25571,7 +25466,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Scapula Dips",
     "muscleGroup": "Traps",
     "secondaryMuscles": [
-      "Chest"
+      "Back",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -25593,7 +25489,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -25613,9 +25509,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3016",
     "name": "Curl-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -25679,7 +25573,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Scapula Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -25701,7 +25596,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -25744,7 +25639,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Potty Squat",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Quads",
       "Glutes"
     ],
     "equipment": "Bodyweight",
@@ -25809,6 +25703,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Resistance Band Seated Chest Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Other",
@@ -25877,7 +25772,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -25898,7 +25793,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Push-up Plus",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -25919,7 +25815,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Pelvic Tilt",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -26029,7 +25925,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26051,7 +25947,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26073,7 +25969,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26095,7 +25991,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26116,8 +26012,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Glute-ham Raise",
     "muscleGroup": "Hamstrings",
     "secondaryMuscles": [
-      "Glutes",
-      "Chest"
+      "Glutes"
     ],
     "equipment": "Machine",
     "category": "Isolation",
@@ -26203,9 +26098,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3201",
     "name": "Quarter Sit-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -26224,9 +26117,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3202",
     "name": "Half Sit-up (male)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -26245,9 +26136,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3203",
     "name": "Prisoner Half Sit-up (male)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -26267,7 +26156,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Arms Overhead Full Sit-up (male)",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -26288,7 +26177,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kneeling Push-up (male)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26330,9 +26220,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3213",
     "name": "Side-to-side Toe Touch (male)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -26398,7 +26286,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Chest Tap Push-up (male)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26419,7 +26308,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Modified Hindu Push-up (male)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26462,11 +26353,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3219",
     "name": "Scissor Jumps (male)",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -26485,11 +26372,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3220",
     "name": "Astride Jumps (male)",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -26508,11 +26391,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3221",
     "name": "Half Knee Bends (male)",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -26531,11 +26410,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3222",
     "name": "Semi Squat Jump (male)",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -26554,11 +26429,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3223",
     "name": "Star Jump (male)",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -26577,10 +26448,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3224",
     "name": "Jack Jump (male)",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -26599,10 +26467,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3231",
     "name": "Two Toe Touch (male)",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Hamstrings",
-      "Glutes"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -26621,7 +26486,9 @@ export const EXERCISE_LIBRARY = ([
     "id": "3234",
     "name": "Hyght Dumbbell Fly",
     "muscleGroup": "Chest",
-    "secondaryMuscles": [],
+    "secondaryMuscles": [
+      "Shoulders"
+    ],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
@@ -26685,7 +26552,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Landmine Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
       "Back"
     ],
     "equipment": "Barbell",
@@ -26707,7 +26573,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Kneeling Plank Tap Shoulder (male)",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Bodyweight",
@@ -26798,6 +26664,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Biceps",
       "Triceps",
+      "Shoulders",
       "Chest"
     ],
     "equipment": "Other",
@@ -26819,7 +26686,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Elbow Dips",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26840,7 +26708,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Korean Dips",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26861,7 +26730,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Impossible Dips",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Chest",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26904,7 +26774,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Stalder Press",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26925,7 +26796,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Elevator",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26968,7 +26839,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Archer Push Up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -26989,7 +26862,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Front Lever Reps",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Abs",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -27011,8 +26885,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Abs",
     "secondaryMuscles": [
       "Back",
-      "Chest",
-      "Forearms"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -27035,7 +26908,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Biceps",
       "Forearms",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -27056,8 +26929,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Straddle Planche",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
-      "Triceps"
+      "Shoulders",
+      "Triceps",
+      "Chest"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -27078,6 +26952,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Full Planche",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest",
       "Triceps"
     ],
@@ -27100,6 +26975,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lean Planche",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest",
       "Triceps"
     ],
@@ -27122,6 +26998,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Frog Planche",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest",
       "Triceps"
     ],
@@ -27144,7 +27021,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Handstand",
     "muscleGroup": "Triceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -27165,7 +27043,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Flag",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -27186,7 +27064,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Skin The Cat",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -27210,7 +27089,7 @@ export const EXERCISE_LIBRARY = ([
       "Quads",
       "Glutes",
       "Hamstrings",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -27233,7 +27112,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Biceps",
       "Triceps",
-      "Chest",
+      "Shoulders",
       "Forearms"
     ],
     "equipment": "Other",
@@ -27255,7 +27134,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Straight Bar Dip",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -27276,6 +27156,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Straddle Maltese",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest"
     ],
     "equipment": "Bodyweight",
@@ -27297,6 +27178,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Full Maltese",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
+      "Shoulders",
       "Chest"
     ],
     "equipment": "Bodyweight",
@@ -27317,9 +27199,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3318",
     "name": "Swing 360",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -27339,7 +27219,9 @@ export const EXERCISE_LIBRARY = ([
     "name": "Full Planche Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Shoulders",
+      "Triceps",
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -27359,10 +27241,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3360",
     "name": "Bear Crawl",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Chest",
-      "Triceps"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -27381,12 +27260,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3361",
     "name": "Skater Hops",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -27427,9 +27301,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3419",
     "name": "L-sit On Floor",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -27448,9 +27320,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3420",
     "name": "V-sit On Floor",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -27517,7 +27387,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -27538,9 +27408,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Bulgarian Split Squat",
     "muscleGroup": "Quads",
     "secondaryMuscles": [
-      "Hamstrings",
       "Glutes",
-      "Calves"
+      "Hamstrings"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -27561,7 +27430,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Y-raise",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -27582,8 +27451,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline T-raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -27627,7 +27495,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Bodyweight Incline Side Plank",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -27648,6 +27516,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Incline Alternate Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Dumbbell",
@@ -27691,7 +27560,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Seated Biceps Curl To Shoulder Press",
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -27712,8 +27581,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Single Arm Overhead Carry",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest"
+      "Back",
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -27757,7 +27626,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -27801,7 +27670,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -27889,12 +27758,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3636",
     "name": "High Knee Against Wall",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -27913,11 +27777,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3637",
     "name": "Wheel Run",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Compound",
     "targetRepRange": [
@@ -27936,11 +27796,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3638",
     "name": "Push To Run",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -27960,7 +27816,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Bent Knee Lying Twist (male)",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Chest"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -27980,9 +27836,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3640",
     "name": "Knee Touch Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -28003,7 +27857,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Triceps",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Other",
     "category": "Compound",
@@ -28114,12 +27968,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3655",
     "name": "Walking High Knees Lunge",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -28138,11 +27987,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3656",
     "name": "Short Stride Run",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -28162,8 +28007,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Pike-to-cobra Push-up",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Chest",
-      "Triceps"
+      "Abs"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -28185,8 +28029,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Abs",
     "secondaryMuscles": [
       "Glutes",
-      "Hamstrings",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -28207,7 +28050,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Side Plank With Rear Fly",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest"
+      "Shoulders",
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -28228,7 +28072,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Power Point Plank",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps",
       "Glutes"
     ],
@@ -28250,11 +28094,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3666",
     "name": "Walking On Incline Treadmill",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Compound",
     "targetRepRange": [
@@ -28296,7 +28136,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Standing Archer",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Biceps",
       "Forearms"
     ],
@@ -28319,7 +28159,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Weighted Decline Sit-up",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest"
+      "Back"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -28339,12 +28179,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3671",
     "name": "Ski Step",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -28363,12 +28198,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3672",
     "name": "Back And Forth Step",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Compound",
     "targetRepRange": [
@@ -28387,9 +28217,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3679",
     "name": "Sit-up With Arms On Chest",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
@@ -28409,7 +28237,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Kneeling Rear Delt Row (with Rope) (male)",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Chest",
+      "Back",
       "Biceps"
     ],
     "equipment": "Cable",
@@ -28431,8 +28259,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Inchworm V. 2",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
-      "Hamstrings"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -28453,7 +28280,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Shoulder Tap",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Bodyweight",
@@ -28475,6 +28302,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Standing Chest Press",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
+      "Shoulders",
       "Triceps"
     ],
     "equipment": "Machine",
@@ -28496,8 +28324,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Lever Seated Good Morning",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Machine",
     "category": "Compound",
@@ -28517,9 +28344,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "3760",
     "name": "Lever Seated Crunch V. 2",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
@@ -28562,7 +28387,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Incline Push-up (on Box)",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps"
+      "Triceps",
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Compound",
@@ -28585,7 +28411,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Hamstrings",
       "Quads",
-      "Chest"
+      "Abs"
     ],
     "equipment": "Dumbbell",
     "category": "Compound",
@@ -28607,7 +28433,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Biceps",
     "secondaryMuscles": [
       "Forearms",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -28628,8 +28454,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Front Plank",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
-      "Glutes"
+      "Shoulders"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -28650,9 +28475,8 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Face Pull",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
-      "Chest",
-      "Biceps"
+      "Glutes",
+      "Calves"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -28673,7 +28497,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Forearm Push-up",
     "muscleGroup": "Chest",
     "secondaryMuscles": [
-      "Triceps",
       "Abs"
     ],
     "equipment": "Bodyweight",
@@ -28704,7 +28527,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach the band to a high anchor point, such as a pull-up bar or sturdy beam.\nStand facing the anchor point with your feet shoulder-width apart.\nGrasp the band with an underhand grip, hands slightly wider than shoulder-width apart. Emphasize classic control.\nExtend your arms fully overhead, keeping your elbows slightly bent.\nEngage your lats and pull the band down towards your chest, squeezing your shoulder blades together.\nPause for a moment at the bottom of the movement, then slowly release the tension and return to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach the band to a high anchor point, such as a pull-up bar or sturdy beam.",
@@ -28726,7 +28549,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Adjust the seat height so that your thighs are parallel to the ground and your feet are flat on the floor.\nGrasp the lat bar with an overhand grip, slightly wider than shoulder-width apart.\nSit down and lean back slightly, keeping your chest up and your back straight.\nPull the bar down towards your chest, squeezing your shoulder blades together. Maintain gentle form throughout.\nPause for a moment at the bottom of the movement, then slowly release the bar back up to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Adjust the seat height so that your thighs are parallel to the ground and your feet are flat on the floor.",
@@ -28748,7 +28571,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start in a plank position with your forearms on the ground and elbows directly below your shoulders.\nEngage your core and keep your body in a straight line from head to toe.\nLower your chest towards the ground by bending your elbows, keeping them close to your body. Emphasize resistance control.\nPause for a moment at the bottom, then push yourself back up to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Start in a plank position with your forearms on the ground and elbows directly below your shoulders.",
@@ -28761,7 +28584,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Core Barbell Upright Row V. 2",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Biceps"
     ],
     "equipment": "Barbell",
@@ -28792,7 +28615,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand at your sides.\nRaise your arms out to the sides until they are parallel to the ground, forming a T shape with your body. Perform with improved intensity.\nPause for a moment, then slowly lower your arms back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand with your feet shoulder-width apart, holding a dumbbell in each hand at your sides.",
@@ -28813,7 +28636,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on a bench with your feet flat on the ground and your head at the end of the bench.\nHold the barbell with an overhand grip, hands shoulder-width apart, and extend your arms straight up over your chest.\nKeeping your upper arms stationary, slowly lower the barbell towards your forehead by bending your elbows. Focus on double movement.\nPause for a moment at the bottom, then extend your arms back up to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Lie flat on a bench with your feet flat on the ground and your head at the end of the bench.",
@@ -28901,7 +28724,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a cable handle to a low pulley and stand facing the machine.\nGrasp the handle with your left hand and step away from the machine, extending your arm fully.\nPosition your feet shoulder-width apart, with your knees slightly bent.\nKeep your back straight and your core engaged throughout the exercise.\nPull the handle towards your body, rotating your torso to the right as you do so.\nSqueeze your back muscles at the end of the movement.\nSlowly return to the starting position, keeping tension on the cable.\n(intensified variation) Repeat for the desired number of repetitions, then switch sides and perform with your right hand.",
     "tips": [
       "Attach a cable handle to a low pulley and stand facing the machine.",
@@ -28913,16 +28736,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5215",
     "name": "Band Alternating V-up With Simple",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on your back with your legs straight and your arms extended overhead, holding the band.\nEngage your abs and lift your legs and upper body off the ground simultaneously, reaching your hands towards your toes.\nAs you lower your legs and upper body back down, switch the position of your legs, crossing one over the other. Focus on simple movement.\nRepeat the movement, alternating the position of your legs with each repetition.\nContinue for the desired number of repetitions.",
     "tips": [
       "Lie flat on your back with your legs straight and your arms extended overhead, holding the band.",
@@ -28957,8 +28778,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Dumbbell Over Bench Revers Wrist Curl",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -28966,7 +28786,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a bench with your feet flat on the ground and hold a dumbbell in each hand, palms facing down.\nRest your forearms on the bench, allowing your wrists to hang off the edge.\nSlowly curl your wrists upward, bringing the dumbbells towards your body.\nPause for a moment at the top, then slowly lower the dumbbells back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Sit on a bench with your feet flat on the ground and hold a dumbbell in each hand, palms facing down.",
@@ -29002,7 +28822,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Gentle Prone Twist On Stability Ball",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
       "Back"
     ],
     "equipment": "Other",
@@ -29011,7 +28830,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start by lying face down on a stability ball with your feet shoulder-width apart and your toes touching the ground.\nPlace your hands behind your head or cross them over your chest.\nEngage your core muscles and slowly lift your upper body off the ball, keeping your back straight.\nRotate your torso to one side, bringing your shoulder towards your hip. Keep your hips and legs stable throughout the movement.\nPause for a moment, then return to the starting position.\n(gentle variation) Repeat the rotation to the other side.\nContinue alternating sides for the desired number of repetitions.",
     "tips": [
       "Start by lying face down on a stability ball with your feet shoulder-width apart and your toes touching the ground.",
@@ -29023,9 +28842,7 @@ export const EXERCISE_LIBRARY = ([
     "id": "5220",
     "name": "Narrow Style Band Jack Knife Sit-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Compound",
     "targetRepRange": [
@@ -29088,16 +28905,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5223",
     "name": "Hanging Straight Leg Raise With Elevated",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Hang from a pull-up bar with your arms fully extended and your palms facing away from you.\nEngage your core and lift your legs up in front of you, keeping them straight.\nContinue lifting until your legs are parallel to the ground or as high as you can comfortably go. Maintain elevated form throughout.\nPause for a moment at the top, then slowly lower your legs back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Hang from a pull-up bar with your arms fully extended and your palms facing away from you.",
@@ -29109,16 +28924,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5224",
     "name": "Rounded Twisted Leg Raise (Female)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on your back with your legs extended and your arms by your sides.\nBend your knees and lift your legs off the ground, bringing them towards your chest. Emphasize rounded control.\nAs you lift your legs, twist your hips to one side, bringing your knees towards your opposite shoulder.\nPause for a moment at the top, then slowly lower your legs back down to the starting position.\nRepeat the movement, this time twisting your hips to the other side.\nContinue alternating sides for the desired number of repetitions.",
     "tips": [
       "Lie flat on your back with your legs extended and your arms by your sides.",
@@ -29140,7 +28953,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart.\nLower your body by bending your knees and pushing your hips back as if sitting on a chair.\nKeep your chest up and your back straight.\nLower yourself until your thighs are parallel to the ground.\nPush through your heels to return to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand with your feet shoulder-width apart.",
@@ -29184,7 +28997,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand up straight with a dumbbell in each hand, palms facing your torso.\nKeep your elbows close to your torso and rotate the palms of your hands until they are facing forward.\nThis will be your starting position.\nNow, keeping the upper arms stationary, exhale and curl the weights while contracting your biceps.\nContinue to raise the weights until your biceps are fully contracted and the dumbbells are at shoulder level.\nHold the contracted position for a brief pause as you squeeze your biceps.\nThen, inhale and slowly begin to lower the dumbbells back to the starting position.\nRepeat for the recommended amount of repetitions. Focus on traditional movement.",
     "tips": [
       "Stand up straight with a dumbbell in each hand, palms facing your torso.",
@@ -29206,7 +29019,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a bench with your feet flat on the ground and hold a dumbbell in one hand, palm facing down.\nRest your forearm on the bench with your wrist hanging off the edge.\nSlowly curl your wrist upwards, bringing the dumbbell towards your forearm.\nPause for a moment at the top, then slowly lower the dumbbell back down to the starting position. Maintain strength form throughout.\nRepeat for the desired number of repetitions, then switch to the other arm.",
     "tips": [
       "Sit on a bench with your feet flat on the ground and hold a dumbbell in one hand, palm facing down.",
@@ -29219,7 +29032,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cocoons With Mega",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
       "Back"
     ],
     "equipment": "Bodyweight",
@@ -29228,7 +29040,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on your back with your knees bent and feet flat on the ground.\nPlace your hands behind your head with your elbows pointing outwards.\nEngaging your abs, slowly lift your upper body off the ground, curling forward until your torso is at a 45-degree angle.\nPause for a moment at the top, then slowly lower your upper body back down to the starting position.\nRepeat for the desired number of repetitions. Emphasize mega control.",
     "tips": [
       "Lie flat on your back with your knees bent and feet flat on the ground.",
@@ -29249,7 +29061,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart and hold a towel with both hands behind your head.\nKeep your elbows close to your ears and your upper arms stationary.\n(horizontal variation) Slowly extend your forearms upward, squeezing your triceps at the top.\nPause for a moment, then slowly lower the towel back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand with your feet shoulder-width apart and hold a towel with both hands behind your head.",
@@ -29270,7 +29082,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Adjust the seat of the smith machine so that the bar is at shoulder height.\nSit on the bench with your back against the pad and your feet flat on the ground.\nGrasp the bar with an overhand grip, slightly wider than shoulder-width apart.\nExtend your arms fully, lifting the bar off the rack and holding it directly above your chest. Focus on straight movement.\nLower the bar slowly towards your forehead, keeping your elbows close to your head.\nPause for a moment at the bottom, then push the bar back up to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Adjust the seat of the smith machine so that the bar is at shoulder height.",
@@ -29291,7 +29103,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Adjust the seat height and position yourself on the leverage machine.\nGrasp the handles with an underhand grip, palms facing up.\nRest your upper arms on the preacher pad, ensuring your elbows are fully extended. Maintain precision form throughout.\nKeeping your upper arms stationary, exhale and curl the handles towards your shoulders.\nPause for a moment at the top of the movement, squeezing your biceps.\nInhale and slowly lower the handles back to the starting position, fully extending your elbows.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Adjust the seat height and position yourself on the leverage machine.",
@@ -29325,16 +29137,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5234",
     "name": "Single Style Cable Standing Crunch (with Rope Attachment)",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a rope to a cable machine at chest height.\nStand facing away from the machine with your feet shoulder-width apart. Focus on single movement.\nHold the rope with both hands and bring it behind your head, keeping your elbows bent.\nEngage your abs and slowly crunch your torso forward, bringing your elbows towards your knees.\nPause for a moment at the top of the crunch, then slowly return to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a rope to a cable machine at chest height.",
@@ -29356,7 +29166,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie on your back with your knees bent and feet flat on the ground.\nPlace a resistance band just above your knees.\nEngage your glutes and core muscles.\nPress your heels into the ground and lift your hips off the floor, squeezing your glutes at the top.\nPause for a moment at the top, then slowly lower your hips back down to the starting position.\nRepeat for the desired number of repetitions. Focus on rough movement.",
     "tips": [
       "Lie on your back with your knees bent and feet flat on the ground.",
@@ -29377,7 +29187,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a bench or chair with your feet flat on the floor and your knees slightly bent.\nHold the cable handle with an underhand grip and rest your elbow against the inside of your thigh. Focus on tempo movement.\nKeeping your upper arm stationary, exhale and curl the cable handle towards your shoulder while contracting your biceps.\nPause for a moment at the top of the movement, then inhale and slowly lower the cable handle back to the starting position.\nRepeat for the desired number of repetitions, then switch arms.",
     "tips": [
       "Sit on a bench or chair with your feet flat on the floor and your knees slightly bent.",
@@ -29420,7 +29230,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a v-bar attachment to the cable machine at the highest setting.\nStand facing the cable machine with your feet shoulder-width apart.\nGrasp the v-bar with an overhand grip, palms facing down, and your hands shoulder-width apart.\nKeep your elbows close to your sides and your upper arms stationary throughout the exercise.\nEngage your triceps and exhale as you push the v-bar down until your arms are fully extended. Perform with flexible intensity.\nPause for a moment at the bottom of the movement, squeezing your triceps.\nInhale as you slowly return the v-bar to the starting position, maintaining control.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a v-bar attachment to the cable machine at the highest setting.",
@@ -29530,7 +29340,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand up straight with your feet shoulder-width apart and hold a barbell with an underhand grip, palms facing up.\nKeep your elbows close to your torso and your upper arms stationary.\nExhale and curl the weights while contracting your biceps, bringing the barbell as close to your shoulders as possible.\nHold the contracted position for a brief pause as you squeeze your biceps.\nInhale and slowly lower the barbell back to the starting position.\nRepeat for the desired number of repetitions. Focus on resistance movement.",
     "tips": [
       "Stand up straight with your feet shoulder-width apart and hold a barbell with an underhand grip, palms facing up.",
@@ -29574,7 +29384,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a stability ball with your feet flat on the ground and your back straight.\nHold a stability ball with both hands and extend your arms straight out in front of you.\nSlowly lower the stability ball towards your chest, feeling a stretch in your pectoral muscles.\nHold the stretch for a few seconds, then slowly return to the starting position. Emphasize isolation control.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Sit on a stability ball with your feet flat on the ground and your back straight.",
@@ -29588,7 +29398,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Chest",
-      "Traps"
+      "Back"
     ],
     "equipment": "Cable",
     "category": "Isolation",
@@ -29596,7 +29406,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a D-handle to each low pulley cable and stand in the middle of the cable crossover machine.\nGrasp the handles with a pronated grip (palms facing down) and take a step forward, positioning your feet shoulder-width apart.\nBend your knees slightly and lean forward at the waist, keeping your back straight and your abs engaged.\nWith your arms extended out to the sides and slightly bent at the elbows, exhale and squeeze your shoulder blades together as you pull the cables back and upward in a reverse fly motion.\nPause for a moment at the peak contraction, then inhale and slowly return to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a D-handle to each low pulley cable and stand in the middle of the cable crossover machine.",
@@ -29618,7 +29428,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Adjust the seat height and position yourself on the machine with your knees under the pads and your feet flat on the ground.\nGrasp the handles with an underhand grip, slightly wider than shoulder-width apart.\nSit upright with your chest out and shoulders back, maintaining a slight arch in your lower back.\nPull the handles down towards your chest, squeezing your shoulder blades together. Maintain squared form throughout.\nPause for a moment at the bottom of the movement, then slowly release the handles back to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Adjust the seat height and position yourself on the machine with your knees under the pads and your feet flat on the ground.",
@@ -29631,8 +29441,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Exercise Ball Alternating Arm Ups With Fast",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Shoulders",
-      "Chest"
+      "Shoulders"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -29640,7 +29449,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on the stability ball with your feet flat on the ground and your back straight.\nHold a dumbbell in each hand with your palms facing inwards and your arms extended down by your sides.\nEngage your core and slowly lift one arm up towards your shoulder, keeping your elbow slightly bent. Perform with fast intensity.\nPause for a moment at the top, then slowly lower your arm back down to the starting position.\nRepeat the movement with the other arm.\nContinue alternating arms for the desired number of repetitions.",
     "tips": [
       "Sit on the stability ball with your feet flat on the ground and your back straight.",
@@ -29662,7 +29471,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a weight to one end of a rope or bar.\nHold the other end of the rope or bar with both hands, palms facing down.\nStand with your feet shoulder-width apart and your arms fully extended in front of you.\nSlowly roll the weight up towards your hands by flexing your wrists.\nPause for a moment at the top, then slowly lower the weight back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a weight to one end of a rope or bar.",
@@ -29684,7 +29493,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart and your knees slightly bent.\nGrasp a pull-up bar with an overhand grip, hands slightly wider than shoulder-width apart.\nHang from the bar with your arms fully extended and your body relaxed.\nPull yourself up by bending your elbows and bringing your chin towards the bar, while keeping your body straight. Perform with reverse intensity.\nOnce your chin is above the bar, lower yourself back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand with your feet shoulder-width apart and your knees slightly bent.",
@@ -29741,16 +29550,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5253",
     "name": "Cable Kneeling Crunch - Gentle Variation",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a rope handle to a high pulley and kneel down facing away from the machine.\nHold the rope handle with both hands and place it behind your head, keeping your elbows out to the sides.\nKeeping your hips stationary, flex your waist and crunch your torso down towards your thighs.\nPause for a moment at the bottom, then slowly return to the starting position. Maintain gentle form throughout.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a rope handle to a high pulley and kneel down facing away from the machine.",
@@ -29784,16 +29591,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5255",
     "name": "Targeted Style Single Leg Calf Raise (on A Dumbbell)",
     "muscleGroup": "Calves",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet hip-width apart and hold a dumbbell in one hand.\nLift one foot off the ground and balance on the other foot.\nSlowly raise your heel as high as possible, using your calf muscles. Emphasize targeted control.\nPause for a moment at the top, then slowly lower your heel back down.\nRepeat for the desired number of repetitions, then switch to the other leg.",
     "tips": [
       "Stand with your feet hip-width apart and hold a dumbbell in one hand.",
@@ -29837,7 +29642,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Adjust the cable machine to a low position and attach the handles.\nSit on an incline bench with your back against the pad and feet flat on the floor. Perform with balance intensity.\nGrasp the handles with an overhand grip and extend your arms straight out in front of you.\nKeeping a slight bend in your elbows, open your arms out to the sides in a controlled motion.\nPause for a moment at the fully extended position, then slowly return to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Adjust the cable machine to a low position and attach the handles.",
@@ -29902,7 +29707,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand up straight with a dumbbell in each hand, palms facing down and arms fully extended.\nKeeping your upper arms stationary, exhale and curl the weights while contracting your biceps.\nContinue to raise the weights until your biceps are fully contracted and the dumbbells are at shoulder level.\nHold the contracted position for a brief pause as you squeeze your biceps.\nInhale and slowly begin to lower the dumbbells back to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand up straight with a dumbbell in each hand, palms facing down and arms fully extended.",
@@ -29947,7 +29752,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on a bench with your head at one end and your feet on the floor.\nHold a barbell with a shoulder-width grip and extend your arms straight above your chest.\nLower the barbell behind your head while keeping your arms slightly bent.\nPause for a moment, then raise the barbell back to the starting position.\nRepeat for the desired number of repetitions. Focus on powerful movement.",
     "tips": [
       "Lie flat on a bench with your head at one end and your feet on the floor.",
@@ -29969,7 +29774,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Find an elevated surface, such as a bench or step, and place your hands shoulder-width apart on the edge.\nStep your feet back, keeping your body in a straight line from head to heels.\nLower your chest towards the edge of the surface, bending your elbows and keeping your body aligned. Maintain complex form throughout.\nPush through your palms to extend your arms and return to the starting position.\nJump off the edge of the surface, landing softly with your knees slightly bent.\nRepeat the push-up and depth jump for the desired number of repetitions.",
     "tips": [
       "Find an elevated surface, such as a bench or step, and place your hands shoulder-width apart on the edge.",
@@ -29990,7 +29795,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a preacher bench with your chest against the pad and your arms extended straight down, holding a barbell with an overhand grip.\nKeeping your upper arms stationary, exhale and curl the barbell upward while contracting your biceps.\nContinue to raise the barbell until your biceps are fully contracted and the barbell is at shoulder level. Perform with inclined intensity.\nHold the contracted position for a brief pause as you squeeze your biceps.\nInhale and slowly lower the barbell back to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Sit on a preacher bench with your chest against the pad and your arms extended straight down, holding a barbell with an overhand grip.",
@@ -30003,7 +29808,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Kneeling Rear Delt Row (with Rope) (Male) Expanded",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Chest",
       "Biceps"
     ],
@@ -30034,7 +29839,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand up straight with a dumbbell in each hand, palms facing your torso.\nKeep your elbows close to your torso and rotate the palms of your hands until they are facing forward.\nThis will be your starting position.\nNow, keeping the upper arms stationary, exhale and curl the weights while contracting your biceps.\nContinue to raise the weights until your biceps are fully contracted and the dumbbells are at shoulder level.\nHold the contracted position for a brief pause as you squeeze your biceps.\nThen, inhale and slowly begin to lower the dumbbells back to the starting position.\nRepeat for the recommended amount of repetitions.",
     "tips": [
       "Stand up straight with a dumbbell in each hand, palms facing your torso.",
@@ -30069,8 +29874,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Flexible Assisted Prone Hamstring",
     "muscleGroup": "Hamstrings",
     "secondaryMuscles": [
-      "Glutes",
-      "Back"
+      "Glutes"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -30078,7 +29882,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie face down on a mat or bench with your legs fully extended.\n(flexible variation) Have a partner or use a resistance band to secure your ankles.\nEngage your hamstrings and lift your legs towards your glutes, keeping your knees straight.\nPause for a moment at the top, then slowly lower your legs back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Lie face down on a mat or bench with your legs fully extended.",
@@ -30100,7 +29904,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on the edge of a chair with your back straight and feet flat on the ground.\nExtend one leg straight out in front of you, keeping your heel on the ground.\nLean forward slightly, feeling a stretch in your quadriceps.\nHold this position for 20-30 seconds. Focus on modified movement.\nSwitch legs and repeat the stretch.",
     "tips": [
       "Sit on the edge of a chair with your back straight and feet flat on the ground.",
@@ -30166,7 +29970,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Grab the pull-up bar with an overhand grip, slightly wider than shoulder-width apart.\nHang from the bar with your arm fully extended and your body straight. Perform with macro intensity.\nEngage your core and pull your body up towards the bar by bending your elbow and squeezing your back muscles.\nContinue pulling until your chin is above the bar.\nLower your body back down to the starting position with control.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Grab the pull-up bar with an overhand grip, slightly wider than shoulder-width apart.",
@@ -30179,7 +29983,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Hanging Pike With Intense",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
       "Shoulders"
     ],
     "equipment": "Bodyweight",
@@ -30188,7 +29991,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Hang from a pull-up bar with your arms fully extended and your palms facing away from you.\nEngage your core and lift your legs up towards the bar, keeping them straight.\n(intense variation) Continue lifting until your body forms a 'V' shape, with your legs parallel to the ground.\nHold the position for a moment, then slowly lower your legs back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Hang from a pull-up bar with your arms fully extended and your palms facing away from you.",
@@ -30210,7 +30013,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start in a high plank position with your hands directly under your shoulders and your body in a straight line.\nLower your chest towards the ground, keeping your elbows close to your body.\nAs you lower, squeeze your shoulder blades together and push your chest forward. Focus on high movement.\nPause for a moment at the bottom, then push back up to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Start in a high plank position with your hands directly under your shoulders and your body in a straight line.",
@@ -30222,16 +30025,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5275",
     "name": "Sit-up With Arms On Chest With Mini",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on your back with your knees bent and feet flat on the ground.\nCross your arms over your chest.\nEngaging your abs, lift your upper body off the ground towards your knees.\nPause for a moment at the top, then slowly lower your upper body back down to the starting position. Maintain mini form throughout.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Lie flat on your back with your knees bent and feet flat on the ground.",
@@ -30243,18 +30044,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5276",
     "name": "Alternating Bear Crawl",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Chest",
-      "Shoulders",
-      "Triceps"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start on all fours with your hands directly under your shoulders and your knees directly under your hips.\nLift your knees slightly off the ground, keeping your back flat and your core engaged.\nMove your right hand and left foot forward simultaneously, followed by your left hand and right foot.\nContinue crawling forward, alternating your hand and foot movements.\nMaintain a steady pace and keep your core tight throughout the exercise.\n(alternating variation) Continue for the desired distance or time.",
     "tips": [
       "Start on all fours with your hands directly under your shoulders and your knees directly under your hips.",
@@ -30310,18 +30107,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5279",
     "name": "Stationary Bike Run",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cardio Machine",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Adjust the seat height and position to ensure proper alignment.\nPlace your feet on the pedals and secure them with the straps if available.\nStart pedaling at a comfortable pace.\nMaintain a steady rhythm and increase the resistance as desired.\nEngage your core muscles to maintain stability and proper posture.\nContinue pedaling for the desired duration of your workout.\nGradually decrease the resistance and slow down before coming to a complete stop.\nStretch your legs and cool down after the workout.",
     "tips": [
       "Adjust the seat height and position to ensure proper alignment.",
@@ -30343,7 +30136,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Place the stability ball on the ground and kneel in front of it.\nPlace your right foot on top of the stability ball, with your knee bent at a 90-degree angle.\nExtend your left leg behind you, keeping it straight.\nLean forward, pushing your hips towards the stability ball, until you feel a stretch in your right hip flexor.\nHold the stretch for 20-30 seconds, then switch sides and repeat. Emphasize pointed control.",
     "tips": [
       "Place the stability ball on the ground and kneel in front of it.",
@@ -30387,7 +30180,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart and knees slightly bent.\nHold one end of the rope in each hand, with your palms facing each other.\nRaise your arms to shoulder height, keeping your elbows slightly bent.\n(athletic variation) Begin making alternating waves with the ropes by rapidly raising and lowering each arm.\nContinue for the desired duration or number of repetitions.",
     "tips": [
       "Stand with your feet shoulder-width apart and knees slightly bent.",
@@ -30399,16 +30192,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5283",
     "name": "Suspended Abdominal Fallout - Inclined Variation",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a suspension trainer to a high anchor point and adjust the straps to waist height.\nStand facing away from the anchor point and hold the handles with your arms extended in front of you. Maintain inclined form throughout.\nLean forward at the waist, keeping your body straight and your core engaged.\nLower your body as far as you can while maintaining control and tension in your abs.\nPause for a moment at the bottom, then slowly raise your body back up to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a suspension trainer to a high anchor point and adjust the straps to waist height.",
@@ -30429,7 +30220,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on a bench with your feet flat on the ground and your head at the end of the bench.\nHold the ez barbell with a close grip, palms facing up, and extend your arms straight up over your chest.\nKeeping your upper arms stationary, slowly lower the barbell behind your head by bending your elbows.\nPause for a moment, then extend your arms back up to the starting position. Maintain complete form throughout.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Lie flat on a bench with your feet flat on the ground and your head at the end of the bench.",
@@ -30451,7 +30242,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart and your arms by your sides.\nBegin by rapidly moving your feet up and down, as if you were running in place.\nKeep your movements quick and light, focusing on staying on the balls of your feet.\nContinue for the desired duration or number of repetitions. Emphasize bent control.",
     "tips": [
       "Stand with your feet shoulder-width apart and your arms by your sides.",
@@ -30494,7 +30285,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand tall with your feet shoulder-width apart.\nExtend your arms straight out in front of you at shoulder height.\nCross your arms in front of your body, with your right arm on top of your left arm.\nInterlace your fingers and press your palms together.\nGently squeeze your shoulder blades together and push your hands forward, feeling a stretch in your chest and front of your shoulders.\n(micro variation) Hold the stretch for 20-30 seconds, then release.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand tall with your feet shoulder-width apart.",
@@ -30516,7 +30307,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start in a high plank position with your hands on the medicine ball, shoulder-width apart.\nLower your body towards the ground by bending your elbows, keeping them close to your sides.\nPush back up to the starting position, fully extending your arms.\nRepeat for the desired number of repetitions. Maintain prone form throughout.",
     "tips": [
       "Start in a high plank position with your hands on the medicine ball, shoulder-width apart.",
@@ -30538,7 +30329,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Set up a decline bench at a 45-degree angle.\nLie face down on the bench with your chest and stomach resting against it.\n(rigid variation) Hold a dumbbell in each hand with your arms fully extended towards the floor.\nKeeping your arms straight, raise your shoulders towards your ears as high as possible.\nHold the contraction for a moment, then slowly lower the dumbbells back to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Set up a decline bench at a 45-degree angle.",
@@ -30596,7 +30387,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Cable Judo Flip With Static",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
       "Shoulders"
     ],
     "equipment": "Cable",
@@ -30605,7 +30395,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand facing the cable machine with your feet shoulder-width apart.\nHold the cable handle with both hands at chest level, palms facing down.\nEngage your core and rotate your torso to the right, pulling the cable across your body.\nAs you rotate, pivot your back foot and allow your hips to rotate naturally. Emphasize static control.\nExtend your arms fully and finish the movement by flipping the cable handle over your shoulder.\nReturn to the starting position by reversing the movement, rotating your torso back to the center.\nRepeat the movement on the opposite side.\nContinue alternating sides for the desired number of repetitions.",
     "tips": [
       "Stand facing the cable machine with your feet shoulder-width apart.",
@@ -30627,7 +30417,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Grab the pull-up bar with an overhand grip, slightly wider than shoulder-width apart.\nHang from the bar with your arm fully extended and your body straight.\nEngage your core and pull your body up towards the bar by bending your elbow and squeezing your back muscles.\nContinue pulling until your chin is above the bar.\n(fast variation) Lower your body back down to the starting position with control.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Grab the pull-up bar with an overhand grip, slightly wider than shoulder-width apart.",
@@ -30671,7 +30461,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Adjust the cable machine to a decline position.\nStand facing away from the machine with your feet shoulder-width apart.\nHold the handles with your palms facing forward and your arms extended straight out in front of you.\nKeeping a slight bend in your elbows, open your arms out to the sides in a controlled motion. Perform with rough intensity.\nPause for a moment at the fully extended position, then slowly return to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Adjust the cable machine to a decline position.",
@@ -30706,8 +30496,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Stability Style Band Kneeling One Arm Pulldown",
     "muscleGroup": "Back",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -30715,7 +30504,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach the band to a sturdy anchor point above your head.\nKneel down and hold the band with one hand, palm facing down.\nExtend your arm fully overhead, keeping your elbow slightly bent.\nEngage your lat muscles and pull the band down towards your side, bringing your elbow towards your ribcage.\nPause for a moment at the bottom, then slowly release the tension and return to the starting position.\nRepeat for the desired number of repetitions, then switch sides. Perform with stability intensity.",
     "tips": [
       "Attach the band to a sturdy anchor point above your head.",
@@ -30730,8 +30519,7 @@ export const EXERCISE_LIBRARY = ([
     "secondaryMuscles": [
       "Quads",
       "Hamstrings",
-      "Calves",
-      "Chest"
+      "Calves"
     ],
     "equipment": "Barbell",
     "category": "Compound",
@@ -30762,7 +30550,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start in a push-up position with your hands shoulder-width apart and your body in a straight line.\nLower your body towards the ground by bending your elbows, keeping your core engaged.\nPush back up to the starting position. Emphasize athletic control.\nShift your weight onto your left hand and rotate your body to the right, lifting your right arm towards the ceiling.\nHold the side plank position for a few seconds, then return to the starting position.\nRepeat the push-up and side plank on the opposite side.\nContinue alternating sides for the desired number of repetitions.",
     "tips": [
       "Start in a push-up position with your hands shoulder-width apart and your body in a straight line.",
@@ -30776,8 +30564,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Quads",
-      "Chest"
+      "Quads"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -30785,7 +30572,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie face down on the stability ball with your hips resting on the ball and your legs extended straight behind you.\nPlace your hands on the ground in front of you for support.\nEngage your glutes and core muscles to stabilize your body.\nSlowly lift one leg off the ground, keeping it straight and parallel to the floor.\nRotate your leg outward, away from your body, while keeping your hips and upper body stable.\nPause for a moment at the end of the rotation, then slowly return your leg to the starting position.\nRepeat the rotation with the other leg. Focus on fierce movement.\nContinue alternating legs for the desired number of repetitions.",
     "tips": [
       "Lie face down on the stability ball with your hips resting on the ball and your legs extended straight behind you.",
@@ -30798,7 +30585,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Band Vertical Pallof Press - Seated Variation",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
       "Glutes"
     ],
     "equipment": "Other",
@@ -30863,16 +30649,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5304",
     "name": "Band Seated Twist Pure",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on the ground with your legs extended in front of you and your back straight.\nWrap the band around your waist and hold the ends with both hands.\nEngage your abs and slowly twist your torso to one side, keeping your back straight and your feet on the ground.\nPause for a moment at the end of the twist, then slowly return to the starting position.\n(pure variation) Repeat the twist to the other side.\nContinue alternating sides for the desired number of repetitions.",
     "tips": [
       "Sit on the ground with your legs extended in front of you and your back straight.",
@@ -30884,16 +30668,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5305",
     "name": "Firm Style Hanging Oblique Knee Raise",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Hang from a pull-up bar with your arms fully extended and your palms facing away from you.\nEngage your core and lift your knees towards your chest, twisting your torso to the side as you do so.\nPause for a moment at the top, then slowly lower your legs back down to the starting position.\nRepeat on the other side, twisting your torso in the opposite direction.\nContinue alternating sides for the desired number of repetitions. Emphasize firm control.",
     "tips": [
       "Hang from a pull-up bar with your arms fully extended and your palms facing away from you.",
@@ -30907,8 +30689,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
       "Hamstrings",
-      "Quads",
-      "Chest"
+      "Quads"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -30916,7 +30697,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet wider than shoulder-width apart, toes pointed outwards.\nHold a dumbbell with both hands in front of your body, arms extended.\nBend your knees and lower your hips down into a squat position, keeping your back straight. Focus on sharp movement.\nLower the dumbbell down between your legs, keeping your arms straight.\nDrive through your heels and extend your hips forward, pulling the dumbbell up and in front of your body.\nSqueeze your glutes at the top of the movement, then lower the dumbbell back down between your legs.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand with your feet wider than shoulder-width apart, toes pointed outwards.",
@@ -30981,7 +30762,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a bench with your feet flat on the ground and hold a dumbbell in one hand, palm facing up.\nRest your elbow on the inside of your thigh, just above the knee.\nKeeping your upper arm stationary, exhale and curl the dumbbell towards your shoulder.\nPause for a moment at the top, squeezing your biceps.\nInhale and slowly lower the dumbbell back to the starting position.\nRepeat for the desired number of repetitions, then switch arms.",
     "tips": [
       "Sit on a bench with your feet flat on the ground and hold a dumbbell in one hand, palm facing up.",
@@ -31003,7 +30784,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start on all fours with your hands directly under your shoulders and your knees directly under your hips.\nExtend one leg straight back, keeping your knee bent and your foot flexed. Maintain elevated form throughout.\nSlowly lower your hips towards the ground, feeling a stretch in your quads.\nHold this position for 20-30 seconds.\nSwitch legs and repeat the stretch on the other side.",
     "tips": [
       "Start on all fours with your hands directly under your shoulders and your knees directly under your hips.",
@@ -31024,7 +30805,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a preacher curl bench and place your upper arms on the pad, gripping the ez barbell with an underhand grip.\nRest your triceps on the pad and fully extend your arms, keeping your back straight.\nSlowly curl the barbell towards your shoulders, contracting your biceps.\nPause for a moment at the top, squeezing your biceps.\nLower the barbell back to the starting position, fully extending your arms.\nRepeat for the desired number of repetitions. Emphasize precision control.",
     "tips": [
       "Sit on a preacher curl bench and place your upper arms on the pad, gripping the ez barbell with an underhand grip.",
@@ -31046,7 +30827,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start in a push-up position with your hands placed slightly wider than shoulder-width apart.\nEngage your core and lower your body down towards the ground, keeping your elbows close to your sides.\nAs you lower yourself, lean your body forward and lift your feet off the ground, balancing on your hands. Perform with stretched intensity.\nContinue to lower your body until your chest is just above the ground.\nPush through your hands and extend your arms to lift your body back up to the starting position.\nMaintain a straight line from your head to your heels throughout the movement.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Start in a push-up position with your hands placed slightly wider than shoulder-width apart.",
@@ -31068,7 +30849,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart.\nLower your body by bending your knees and pushing your hips back as if sitting on a chair.\nKeep your chest up and your back straight.\nLower yourself until your thighs are parallel to the ground.\nPush through your heels to return to the starting position. Emphasize complex control.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand with your feet shoulder-width apart.",
@@ -31080,16 +30861,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5314",
     "name": "Lying Leg-hip Raise - Contracted Variation",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on your back with your legs extended and your arms by your sides.\nPlace your hands under your glutes for support.\nEngage your core and lift your legs off the ground, raising them towards the ceiling.\nPause for a moment at the top, then slowly lower your legs back down to the starting position. Emphasize contracted control.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Lie flat on your back with your legs extended and your arms by your sides.",
@@ -31111,7 +30890,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a weight to one end of a rope or bar.\nHold the other end of the rope or bar with both hands, palms facing down.\nStand with your feet shoulder-width apart and your arms fully extended in front of you.\nSlowly roll the weight up towards your hands by flexing your wrists.\nPause for a moment at the top, then slowly lower the weight back down to the starting position. Perform with controlled intensity.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a weight to one end of a rope or bar.",
@@ -31168,7 +30947,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Tough Cable One Arm Lateral Raise",
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
-      "Traps",
+      "Back",
       "Triceps"
     ],
     "equipment": "Cable",
@@ -31177,7 +30956,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart, facing the cable machine.\nHold the cable handle with one hand, palm facing down, and stand far enough away from the machine so that there is tension on the cable.\nKeep your arm straight and slowly raise it out to the side until it is parallel to the ground.\nPause for a moment at the top, then slowly lower your arm back down to the starting position. Focus on tough movement.\nRepeat for the desired number of repetitions, then switch sides.",
     "tips": [
       "Stand with your feet shoulder-width apart, facing the cable machine.",
@@ -31242,7 +31021,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Kneel on the floor and place the wheel roller in front of you.\nPlace your hands on the handles of the wheel roller and extend your arms straight out in front of you.\nEngage your core muscles and slowly roll the wheel forward, keeping your back straight and your abs tight.\nContinue rolling forward until your body is fully extended and your arms are overhead.\nPause for a moment, then slowly roll the wheel back towards your knees, maintaining control and keeping your abs engaged.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Kneel on the floor and place the wheel roller in front of you.",
@@ -31264,7 +31043,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a rope attachment to the cable machine at a high position.\nStand facing the machine with your feet shoulder-width apart.\nGrasp the rope with an overhand grip, palms facing each other.\nKeep your back straight and lean slightly back.\nPull the rope down towards your sides, squeezing your shoulder blades together. Emphasize core control.\nPause for a moment at the bottom of the movement.\nSlowly release the tension and allow the rope to return to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a rope attachment to the cable machine at a high position.",
@@ -31286,7 +31065,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart and your knees slightly bent.\nGrasp a pull-up bar with an overhand grip, hands slightly wider than shoulder-width apart.\nHang from the bar with your arms fully extended and your body relaxed.\nPull yourself up by bending your elbows and bringing your chin towards the bar, while keeping your body straight.\nOnce your chin is above the bar, lower yourself back down to the starting position.\nRepeat for the desired number of repetitions. Perform with twisted intensity.",
     "tips": [
       "Stand with your feet shoulder-width apart and your knees slightly bent.",
@@ -31298,17 +31077,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5324",
     "name": "Barbell Sitted Alternate Leg Raise (Female) With Intermediate",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest",
-      "Quads"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Barbell",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a bench with your back straight and hold a barbell across your thighs.\n(intermediate variation) Place your hands on the sides of the bench for support.\nKeeping your legs straight, lift one leg up as high as possible while keeping it parallel to the ground.\nLower the leg back down and repeat with the other leg.\nContinue alternating legs for the desired number of repetitions.",
     "tips": [
       "Sit on a bench with your back straight and hold a barbell across your thighs.",
@@ -31342,17 +31118,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5326",
     "name": "Improved Sphinx",
     "muscleGroup": "Back",
-    "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie face down on the ground with your forearms flat on the floor, elbows directly under your shoulders.\nEngage your core and lift your chest off the ground, keeping your forearms and toes on the floor.\nHold this position for a few seconds, making sure to keep your neck in a neutral position.\nSlowly lower your chest back down to the starting position. Emphasize improved control.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Lie face down on the ground with your forearms flat on the floor, elbows directly under your shoulders.",
@@ -31417,7 +31190,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on a bench with your feet flat on the ground and your head at the end of the bench.\nHold a barbell with an overhand grip, hands shoulder-width apart, and extend your arms straight up over your chest.\nKeeping your upper arms stationary, slowly lower the barbell behind your head by bending your elbows. Maintain dynamic form throughout.\nPause for a moment, then extend your arms back up to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Lie flat on a bench with your feet flat on the ground and your head at the end of the bench.",
@@ -31438,7 +31211,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart and hold the band with both hands, palms facing down.\nExtend your arms straight out to the sides, keeping them parallel to the ground.\nSlowly bend your elbows and bring your hands towards your shoulders, keeping your upper arms still.\nPause for a moment, then slowly extend your arms back out to the starting position.\n(dynamic variation) Repeat for the desired number of repetitions.",
     "tips": [
       "Stand with your feet shoulder-width apart and hold the band with both hands, palms facing down.",
@@ -31482,7 +31255,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on an exercise ball with your feet flat on the ground and the dumbbell resting on your thighs.\nSlowly walk your feet forward, rolling the exercise ball down your back until your head, neck, and upper back are supported on the ball.\nHold the dumbbell with both hands and extend your arms straight up over your chest, keeping a slight bend in your elbows.\nLower the dumbbell behind your head, keeping your arms straight and maintaining control.\nPause for a moment, then raise the dumbbell back to the starting position.\nWhile keeping your arms extended, lift your hips off the ground, squeezing your glutes and engaging your core.\n(wall variation) Lower your hips back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Sit on an exercise ball with your feet flat on the ground and the dumbbell resting on your thighs.",
@@ -31527,7 +31300,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on your back with your arms extended out to the sides.\nRaise your legs up towards the ceiling, keeping them straight.\nSlowly lower your legs to one side, aiming to touch the floor with your feet.\nHold the stretch for a few seconds, then return your legs to the starting position.\nRepeat the stretch on the other side. Maintain deep form throughout.\nContinue alternating sides for the desired number of repetitions.",
     "tips": [
       "Lie flat on your back with your arms extended out to the sides.",
@@ -31549,7 +31322,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Place the bosu ball on the ground with the flat side facing up.\nPosition yourself in a push-up position with your hands on the outer edges of the bosu ball.\nEngage your core and lower your body down towards the bosu ball by bending your elbows. Focus on improved movement.\nPush yourself back up to the starting position by extending your arms.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Place the bosu ball on the ground with the flat side facing up.",
@@ -31561,19 +31334,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5336",
     "name": "Pulse Style Walk Elliptical Cross Trainer",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Adjust the resistance level and incline of the elliptical machine to your desired settings.\nStep onto the pedals of the machine and grip the handles lightly.\nBegin by pushing down with your feet and pulling the handles towards your body.\nContinue this motion, alternating between pushing and pulling, to simulate a walking or running motion.\nMaintain a steady pace and keep your core engaged throughout the exercise. Emphasize pulse control.\nContinue for the desired duration of your cardio workout.\nGradually decrease the intensity and speed of the machine before stepping off.",
     "tips": [
       "Adjust the resistance level and incline of the elliptical machine to your desired settings.",
@@ -31607,19 +31375,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5338",
     "name": "Walk Elliptical Cross Trainer - Expanded Variation",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes",
-      "Calves"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Machine",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Adjust the resistance level and incline of the elliptical machine to your desired settings.\nStep onto the pedals of the machine and grip the handles lightly.\nBegin by pushing down with your feet and pulling the handles towards your body.\nContinue this motion, alternating between pushing and pulling, to simulate a walking or running motion. Emphasize expanded control.\nMaintain a steady pace and keep your core engaged throughout the exercise.\nContinue for the desired duration of your cardio workout.\nGradually decrease the intensity and speed of the machine before stepping off.",
     "tips": [
       "Adjust the resistance level and incline of the elliptical machine to your desired settings.",
@@ -31663,7 +31426,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach the band securely to a stable anchor point.\nLie flat on your back with your knees bent and feet flat on the ground.\nHold the band with both hands and extend your arms straight up towards the ceiling. Focus on rough movement.\nEngaging your abs, slowly lift your upper body off the ground, curling forward until your torso is at a 45-degree angle.\nPause for a moment at the top, then slowly lower your upper body back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach the band securely to a stable anchor point.",
@@ -31684,7 +31447,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a stability ball with your feet flat on the ground and your back straight.\nHold a dumbbell in one hand and extend your arm straight up above your head.\nBend your elbow and lower the dumbbell behind your head, keeping your upper arm close to your ear. Maintain wide form throughout.\nHold the stretch for a few seconds, then return to the starting position.\nRepeat with the other arm.",
     "tips": [
       "Sit on a stability ball with your feet flat on the ground and your back straight.",
@@ -31706,7 +31469,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start on all fours with your hands directly under your shoulders and your knees directly under your hips.\nExtend one leg straight back, keeping your knee bent and your foot flexed.\nSlowly lower your hips towards the ground, feeling a stretch in your quads.\nHold this position for 20-30 seconds.\nSwitch legs and repeat the stretch on the other side.",
     "tips": [
       "Start on all fours with your hands directly under your shoulders and your knees directly under your hips.",
@@ -31728,7 +31491,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand facing a wall, about arm's length away.\nPlace your hands on the wall at shoulder height, slightly wider than shoulder-width apart.\nStep back a few feet, keeping your body straight and your feet hip-width apart.\n(static variation) Bend your elbows and lower your chest towards the wall, keeping your body in a straight line.\nPush back up to the starting position, straightening your arms.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand facing a wall, about arm's length away.",
@@ -31741,8 +31504,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Revers Wrist Curl V. 2",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -31750,7 +31512,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a bench with your feet flat on the ground and your knees bent.\nHold a barbell with an overhand grip, palms facing down, and your hands shoulder-width apart.\nRest your forearms on your thighs, allowing your wrists to hang off the edge.\nKeeping your forearms stationary, exhale and curl your wrists upward as far as possible.\nHold the contracted position for a brief pause, then inhale and slowly lower the barbell back to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Sit on a bench with your feet flat on the ground and your knees bent.",
@@ -31786,8 +31548,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Fast Style Resistance Band Seated Hip Abduction",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Glutes",
-      "Hamstrings"
+      "Glutes"
     ],
     "equipment": "Other",
     "category": "Isolation",
@@ -31795,7 +31556,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a chair or bench with your back straight and feet flat on the ground.\nWrap the resistance band around your thighs, just above your knees.\nPlace your hands on the sides of the chair or bench for support.\n(fast variation) Engage your abductors (outer thigh muscles) and slowly push your knees apart, against the resistance of the band.\nPause for a moment at the end of the movement, then slowly bring your knees back together.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Sit on a chair or bench with your back straight and feet flat on the ground.",
@@ -31883,7 +31644,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on an exercise ball with your feet flat on the ground and your back straight.\nHold a dumbbell in one hand with an underhand grip, resting your elbow on the exercise ball.\n(intermediate variation) Keeping your upper arm stationary, exhale and curl the dumbbell up towards your shoulder.\nPause for a moment at the top, then inhale and slowly lower the dumbbell back to the starting position.\nRepeat for the desired number of repetitions, then switch arms.",
     "tips": [
       "Sit on an exercise ball with your feet flat on the ground and your back straight.",
@@ -31904,7 +31665,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart, facing the cable machine.\nHold the cable handle with your right hand, palm facing down, and position your arm so that it is fully extended and parallel to the ground.\nKeep your elbow stationary and close to your body.\nSlowly bend your elbow, lowering the cable handle towards the back of your head.\nPause for a moment at the bottom of the movement, then extend your arm back to the starting position. Focus on rough movement.\nRepeat for the desired number of repetitions, then switch sides and perform the exercise with your left arm.",
     "tips": [
       "Stand with your feet shoulder-width apart, facing the cable machine.",
@@ -31926,7 +31687,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on an exercise ball with a dumbbell in one hand and your feet flat on the ground.\nWalk your feet forward and roll your body down until your upper back is resting on the exercise ball.\nExtend your arm with the dumbbell straight up above your chest, palm facing inwards.\nSlowly lower the dumbbell out to the side, keeping a slight bend in your elbow.\nPause for a moment, then squeeze your chest muscles to bring the dumbbell back to the starting position.\nRepeat for the desired number of repetitions, then switch arms. Focus on improved movement.",
     "tips": [
       "Sit on an exercise ball with a dumbbell in one hand and your feet flat on the ground.",
@@ -31961,7 +31722,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Hanging Pike Weak",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
       "Shoulders"
     ],
     "equipment": "Bodyweight",
@@ -31970,7 +31730,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Hang from a pull-up bar with your arms fully extended and your palms facing away from you.\nEngage your core and lift your legs up towards the bar, keeping them straight.\nContinue lifting until your body forms a 'V' shape, with your legs parallel to the ground. Emphasize weak control.\nHold the position for a moment, then slowly lower your legs back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Hang from a pull-up bar with your arms fully extended and your palms facing away from you.",
@@ -32013,7 +31773,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a bench or chair with your back straight and feet flat on the ground.\nHold a dumbbell with both hands, palms facing down, and extend your arms straight up overhead.\nKeeping your upper arms close to your head and elbows pointing forward, slowly lower the dumbbell behind your head by bending your elbows.\nPause for a moment, then extend your arms back up to the starting position.\nRepeat for the desired number of repetitions. Focus on rotated movement.",
     "tips": [
       "Sit on a bench or chair with your back straight and feet flat on the ground.",
@@ -32057,7 +31817,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start in a kneeling position with your hands on the ground, shoulder-width apart.\nExtend your legs behind you, resting on your toes, and lift your body into a plank position.\n(intermediate variation) Keeping your core engaged and your hips stable, lift one hand off the ground and tap the opposite shoulder.\nReturn the hand to the ground and repeat with the other hand.\nContinue alternating sides for the desired number of repetitions.",
     "tips": [
       "Start in a kneeling position with your hands on the ground, shoulder-width apart.",
@@ -32071,7 +31831,7 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Shoulders",
     "secondaryMuscles": [
       "Chest",
-      "Traps"
+      "Back"
     ],
     "equipment": "Dumbbell",
     "category": "Isolation",
@@ -32079,7 +31839,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart and hold a dumbbell in each hand with your palms facing your body.\nRaise your arms out to the sides until they are parallel to the ground, keeping your elbows slightly bent. Emphasize prone control.\nRotate your arms externally, bringing the dumbbells up towards your head while keeping your elbows in the same position.\nPause for a moment at the top, then slowly lower the dumbbells back to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand with your feet shoulder-width apart and hold a dumbbell in each hand with your palms facing your body.",
@@ -32113,16 +31873,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5361",
     "name": "Supine Style Band Alternating V-up",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Other",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on your back with your legs straight and your arms extended overhead, holding the band.\nEngage your abs and lift your legs and upper body off the ground simultaneously, reaching your hands towards your toes.\nAs you lower your legs and upper body back down, switch the position of your legs, crossing one over the other. Focus on supine movement.\nRepeat the movement, alternating the position of your legs with each repetition.\nContinue for the desired number of repetitions.",
     "tips": [
       "Lie flat on your back with your legs straight and your arms extended overhead, holding the band.",
@@ -32143,7 +31901,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach the resistance band to a sturdy anchor point and secure it around your ankle.\nStand facing the anchor point with your feet shoulder-width apart.\nKeeping your core engaged and your upper body stable, extend your leg straight out in front of you.\nPause for a moment at the top, then slowly return your leg to the starting position. Focus on declined movement.\nRepeat for the desired number of repetitions, then switch legs.",
     "tips": [
       "Attach the resistance band to a sturdy anchor point and secure it around your ankle.",
@@ -32164,7 +31922,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Set up an incline bench at a 45-degree angle.\nLie face down on the bench with your chest and stomach resting against it.\nHold a barbell with an underhand grip, shoulder-width apart.\nExtend your arms fully, allowing the barbell to hang down towards the floor.\nKeeping your upper arms stationary, exhale and curl the weights while contracting your biceps.\nContinue to raise the barbell until your biceps are fully contracted and the bar is at shoulder level.\n(intensive variation) Hold the contracted position for a brief pause as you squeeze your biceps.\nInhale and slowly begin to lower the barbell back to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Set up an incline bench at a 45-degree angle.",
@@ -32176,16 +31934,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5364",
     "name": "Cable Side Bend Smooth",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart and grasp the cable handle with one hand.\nKeep your back straight and your core engaged.\nSlowly bend sideways at the waist, lowering the cable handle towards your knee.\nPause for a moment, then return to the starting position. Focus on smooth movement.\nRepeat on the other side.\nAlternate sides for the desired number of repetitions.",
     "tips": [
       "Stand with your feet shoulder-width apart and grasp the cable handle with one hand.",
@@ -32207,7 +31963,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a bench or chair with your feet flat on the ground and a dumbbell resting on your thighs.\nPlace one foot on a raised surface, such as a step or block, with your heel hanging off the edge.\nHold the dumbbell with a hammer grip, meaning your palms are facing each other and your fingers are wrapped around the handle.\nKeeping your core engaged and your back straight, slowly raise your heel as high as possible by pushing through the ball of your foot.\nPause for a moment at the top, then slowly lower your heel back down to the starting position.\n(deep variation) Repeat for the desired number of repetitions, then switch to the other leg.",
     "tips": [
       "Sit on a bench or chair with your feet flat on the ground and a dumbbell resting on your thighs.",
@@ -32242,18 +31998,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5367",
     "name": "Half Knee Bends (Male) With Blunt",
     "muscleGroup": "Cardio",
-    "secondaryMuscles": [
-      "Quads",
-      "Hamstrings",
-      "Glutes"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand with your feet shoulder-width apart.\nBend your knees and lower your body down as if you were sitting back into a chair. Emphasize blunt control.\nKeep your chest up and your weight in your heels.\nPause for a moment at the bottom, then push through your heels to return to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Stand with your feet shoulder-width apart.",
@@ -32287,16 +32039,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5369",
     "name": "Blunt Cable Standing Crunch",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Cable",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a cable handle to a high pulley and stand facing away from the machine.\nHold the handle with both hands and place it behind your head, keeping your elbows bent.\nStand with your feet shoulder-width apart and your knees slightly bent.\nKeeping your abs engaged, exhale and crunch your torso down towards your knees, bringing your elbows towards your thighs.\nPause for a moment at the bottom of the movement, then slowly return to the starting position. Emphasize blunt control.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a cable handle to a high pulley and stand facing away from the machine.",
@@ -32317,7 +32067,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a rope to a high pulley and adjust the incline bench to a comfortable angle.\nStand facing away from the pulley with your feet shoulder-width apart.\nGrasp the rope with an overhand grip and extend your arms straight overhead.\n(reverse variation) Keep your elbows close to your head and your upper arms stationary throughout the exercise.\nLower the rope behind your head by bending your elbows until your forearms touch your biceps.\nPause for a moment, then extend your arms back to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a rope to a high pulley and adjust the incline bench to a comfortable angle.",
@@ -32338,7 +32088,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand facing a wall with your feet hip-width apart.\nPlace your hands against the wall at shoulder height.\nStep back with one foot, keeping your heel on the ground and your leg straight.\nBend your front knee slightly and lean forward, feeling a stretch in your calf.\nHold the stretch for 20-30 seconds.\nSwitch legs and repeat the stretch. Focus on elite movement.",
     "tips": [
       "Stand facing a wall with your feet hip-width apart.",
@@ -32360,7 +32110,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on an exercise ball with a dumbbell in each hand, palms facing each other.\nPlace one foot on the ground and extend the other leg straight out in front of you.\nLean forward slightly and bring your arms out to the sides, keeping a slight bend in your elbows.\nSlowly lower the dumbbells down and out to the sides, feeling a stretch in your chest.\n(gentle variation) Pause for a moment at the bottom, then squeeze your chest muscles to bring the dumbbells back up to the starting position.\nRepeat for the desired number of repetitions, then switch legs and repeat.",
     "tips": [
       "Sit on an exercise ball with a dumbbell in each hand, palms facing each other.",
@@ -32373,8 +32123,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Inclined Style Pelvic Tilt Into Bridge",
     "muscleGroup": "Glutes",
     "secondaryMuscles": [
-      "Hamstrings",
-      "Chest"
+      "Hamstrings"
     ],
     "equipment": "Bodyweight",
     "category": "Isolation",
@@ -32382,7 +32131,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie on your back with your knees bent and feet flat on the ground.\nPlace your arms by your sides with your palms facing down.\nEngage your glutes and core muscles.\nTilt your pelvis upward, lifting your hips off the ground. Emphasize inclined control.\nHold the bridge position for a few seconds.\nSlowly lower your hips back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Lie on your back with your knees bent and feet flat on the ground.",
@@ -32426,7 +32175,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start in a high plank position with your hands placed close together, directly under your shoulders.\nEngage your core and lower your body towards the ground, keeping your elbows close to your sides.\nPush through your palms to extend your arms and return to the starting position. Maintain macro form throughout.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Start in a high plank position with your hands placed close together, directly under your shoulders.",
@@ -32448,7 +32197,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on the stability ball with your feet flat on the ground and your back straight.\nHold the exercise ball with both hands and extend your arms straight out in front of you. Focus on partial movement.\nSlowly bring the exercise ball towards your chest, feeling a stretch in your chest muscles.\nHold the stretch for a few seconds, then slowly return to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Sit on the stability ball with your feet flat on the ground and your back straight.",
@@ -32491,7 +32240,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Attach a straight bar to a high pulley cable machine.\nStand facing the machine with your feet shoulder-width apart and a slight bend in your knees.\nGrasp the bar with an overhand grip, hands shoulder-width apart.\nKeep your elbows close to your sides and your upper arms stationary.\nExhale and push the bar down until your elbows are fully extended.\nPause for a moment, then inhale and slowly return the bar to the starting position. Maintain active form throughout.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Attach a straight bar to a high pulley cable machine.",
@@ -32524,16 +32273,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5380",
     "name": "Hanging Straight Twisting Leg Hip Raise With Compound",
     "muscleGroup": "Abs",
-    "secondaryMuscles": [
-      "Chest"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Bodyweight",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Hang from a pull-up bar with your arms fully extended and your legs straight.\nEngage your core and lift your legs up towards your chest, keeping them straight. Perform with compound intensity.\nOnce your legs are parallel to the ground, twist your hips to one side, bringing your legs towards that side.\nPause for a moment, then return to the starting position.\nRepeat the movement, but this time twist your hips to the opposite side.\nContinue alternating sides for the desired number of repetitions.",
     "tips": [
       "Hang from a pull-up bar with your arms fully extended and your legs straight.",
@@ -32577,7 +32324,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Place your hands on the edge of a box or elevated surface, slightly wider than shoulder-width apart.\nExtend your legs behind you, resting on the balls of your feet, creating a straight line from your head to your heels.\nLower your chest towards the box by bending your elbows, keeping your body in a straight line.\nPause for a moment at the bottom, then push yourself back up to the starting position by straightening your arms.\n(active variation) Repeat for the desired number of repetitions.",
     "tips": [
       "Place your hands on the edge of a box or elevated surface, slightly wider than shoulder-width apart.",
@@ -32590,7 +32337,6 @@ export const EXERCISE_LIBRARY = ([
     "name": "Slow Leg Pull In Flat Bench",
     "muscleGroup": "Abs",
     "secondaryMuscles": [
-      "Chest",
       "Back"
     ],
     "equipment": "Bodyweight",
@@ -32599,7 +32345,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a flat bench with your legs extended straight out in front of you.\nPlace your hands on the bench beside your hips for support.\nEngage your abs and lift your legs off the ground, bringing your knees towards your chest.\nPause for a moment at the top, then slowly lower your legs back down to the starting position.\nRepeat for the desired number of repetitions. Maintain slow form throughout.",
     "tips": [
       "Sit on a flat bench with your legs extended straight out in front of you.",
@@ -32621,7 +32367,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie flat on a bench with your head at one end and your feet firmly on the ground.\nHold a dumbbell with both hands and extend your arms straight above your chest. Perform with intensive intensity.\nKeeping your arms straight, slowly lower the dumbbell behind your head in an arc motion.\nPause for a moment at the bottom, then raise the dumbbell back to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Lie flat on a bench with your head at one end and your feet firmly on the ground.",
@@ -32633,18 +32379,14 @@ export const EXERCISE_LIBRARY = ([
     "id": "5385",
     "name": "Dumbbell Step Up Single Leg Balance With Bicep Curl - Chair Variation",
     "muscleGroup": "Biceps",
-    "secondaryMuscles": [
-      "Quads",
-      "Glutes",
-      "Hamstrings"
-    ],
+    "secondaryMuscles": [],
     "equipment": "Dumbbell",
     "category": "Isolation",
     "targetRepRange": [
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Stand in front of a step or platform with a dumbbell in each hand, palms facing your body.\nPlace your right foot on the step, ensuring your entire foot is in contact with the surface.\nEngage your core and push through your right heel to lift your body up onto the step, bringing your left knee up towards your chest.\nAt the top of the movement, perform a bicep curl by bending your elbows and bringing the dumbbells towards your shoulders.\nLower the dumbbells back down and simultaneously lower your left foot back to the ground.\n(chair variation) Repeat the movement on the opposite side, stepping up with your left foot and curling the dumbbells.\nContinue alternating sides for the desired number of repetitions.",
     "tips": [
       "Stand in front of a step or platform with a dumbbell in each hand, palms facing your body.",
@@ -32665,7 +32407,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on an exercise ball with your feet flat on the ground and your back straight.\nHold a dumbbell in each hand with your palms facing forward and your arms fully extended.\nKeeping your upper arms stationary, exhale and curl one dumbbell while rotating your forearm until your palm is facing your shoulder.\n(hold variation) Inhale and slowly lower the dumbbell back to the starting position.\nRepeat the curl with the other arm.\nContinue alternating curls for the desired number of repetitions.",
     "tips": [
       "Sit on an exercise ball with your feet flat on the ground and your back straight.",
@@ -32687,7 +32429,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start in a high plank position with your hands directly under your shoulders and your body in a straight line.\nLower your body towards the ground by bending your elbows, keeping them close to your sides.\nAs you lower, rotate your body to the left, extending your left arm straight out to the side. Focus on extreme movement.\nPush back up to the starting position, while rotating your body to the center.\nRepeat the push-up, this time rotating your body to the right and extending your right arm out to the side.\nContinue alternating sides with each repetition.",
     "tips": [
       "Start in a high plank position with your hands directly under your shoulders and your body in a straight line.",
@@ -32708,7 +32450,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Lie face down on a flat bench with a dumbbell in one hand, palm facing your body and arm fully extended.\nKeep your upper arm stationary and curl the dumbbell towards your shoulder, contracting your biceps.\nPause for a moment at the top, then slowly lower the dumbbell back to the starting position.\nRepeat for the desired number of repetitions, then switch arms. Focus on macro movement.",
     "tips": [
       "Lie face down on a flat bench with a dumbbell in one hand, palm facing your body and arm fully extended.",
@@ -32722,7 +32464,6 @@ export const EXERCISE_LIBRARY = ([
     "muscleGroup": "Back",
     "secondaryMuscles": [
       "Biceps",
-      "Chest",
       "Shoulders"
     ],
     "equipment": "Cable",
@@ -32744,8 +32485,7 @@ export const EXERCISE_LIBRARY = ([
     "name": "Barbell Reverse Wrist Curl - Prone Variation",
     "muscleGroup": "Forearms",
     "secondaryMuscles": [
-      "Biceps",
-      "Chest"
+      "Biceps"
     ],
     "equipment": "Barbell",
     "category": "Isolation",
@@ -32753,7 +32493,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Sit on a bench with your feet flat on the ground and hold a barbell with an overhand grip, palms facing down.\nRest your forearms on your thighs, allowing your wrists to hang off the edge.\nSlowly curl your wrists upward, bringing the barbell towards your body. Emphasize prone control.\nPause for a moment at the top, then slowly lower the barbell back down to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Sit on a bench with your feet flat on the ground and hold a barbell with an overhand grip, palms facing down.",
@@ -32777,7 +32517,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start by hanging from a pull-up bar with an overhand grip, hands slightly wider than shoulder-width apart.\nEngage your core and use a swinging motion to generate momentum.\nAs you swing forward, pull your chest towards the bar, using your lats and biceps to initiate the movement. Emphasize triple control.\nContinue the upward motion until your chest reaches the bar, then transition into a dip position by pushing down on the bar and extending your arms.\nLower yourself back down to the starting position by bending your arms and controlling the descent.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Start by hanging from a pull-up bar with an overhand grip, hands slightly wider than shoulder-width apart.",
@@ -32799,7 +32539,7 @@ export const EXERCISE_LIBRARY = ([
       8,
       12
     ],
-    "targetRpe": 8.0,
+    "targetRpe": 8,
     "instructions": "Start by standing with your feet shoulder-width apart.\nBend your knees and lower your body down into a squat position.\nAs you squat down, bring your knees up towards your chest and hug them with your arms.\nHold this position for a moment, then slowly return to the starting position.\nRepeat for the desired number of repetitions.",
     "tips": [
       "Start by standing with your feet shoulder-width apart.",
@@ -32818,5 +32558,7 @@ export const findExercise = (idOrName?: string): Exercise | undefined => {
   const direct = EXERCISE_MAP.get(idOrName);
   if (direct) return direct;
   const lower = idOrName.toLowerCase().trim();
-  return EXERCISE_LIBRARY.find((e) => e.id.toLowerCase() === lower || e.name.toLowerCase() === lower);
+  const exact = EXERCISE_LIBRARY.find((e) => e.id.toLowerCase() === lower || e.name.toLowerCase() === lower);
+  if (exact) return exact;
+  return EXERCISE_LIBRARY.find((e) => e.name.toLowerCase().includes(lower));
 };
