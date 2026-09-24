@@ -14,6 +14,8 @@ import { PRESET_ROUTINES } from '../data/presetRoutines';
 import { IndexedDBService, STORES } from './indexedDb';
 import { createDefaultMesocycle } from '../engine/mesocycleEngine';
 import { getExerciseMuscles } from '../engine/overloadEngine';
+import { findExercise } from '../data/exerciseLibrary';
+import { getExerciseTrackingType } from '../utils/trackingTypeUtils';
 import {
   parseWorkoutLogs,
   computePRsFromSessions,
@@ -223,7 +225,46 @@ export const StorageService = {
         this.saveRoutines(initial);
         return initial;
       }
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (!Array.isArray(parsed)) return PRESET_ROUTINES;
+
+      let needsResave = false;
+      const routines: Routine[] = parsed.map((r: Routine) => {
+        if (!r || !Array.isArray(r.exercises)) return r;
+        let routineChanged = false;
+        const sanitizedExercises = r.exercises.map((template) => {
+          const meta = findExercise(template.exerciseId);
+          const trueTrackingType = getExerciseTrackingType(meta, template.trackingType);
+          const isBodyweight = meta?.equipment === 'Bodyweight';
+
+          let updatedTemplate = { ...template };
+          if (meta && trueTrackingType !== template.trackingType) {
+            updatedTemplate.trackingType = trueTrackingType;
+            routineChanged = true;
+          }
+          if (trueTrackingType === 'reps_only' && updatedTemplate.defaultWeightKg !== 0) {
+            updatedTemplate.defaultWeightKg = 0;
+            routineChanged = true;
+          } else if (isBodyweight && updatedTemplate.defaultWeightKg === 20) {
+            updatedTemplate.defaultWeightKg = 0;
+            routineChanged = true;
+          }
+          return updatedTemplate;
+        });
+
+        if (routineChanged) {
+          needsResave = true;
+          return { ...r, exercises: sanitizedExercises };
+        }
+        return r;
+      });
+
+      if (needsResave) {
+        try {
+          localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(routines));
+        } catch {}
+      }
+      return routines;
     } catch (e) {
       console.error('Failed reading routines:', e);
       return PRESET_ROUTINES;

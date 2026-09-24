@@ -118,7 +118,22 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
 
   const handleStartEditing = (routine: Routine) => {
     // Deep clone so edits don't mutate state prematurely
-    setEditingRoutine(JSON.parse(JSON.stringify(routine)));
+    const cloned: Routine = JSON.parse(JSON.stringify(routine));
+    cloned.exercises = cloned.exercises.map((template) => {
+      const meta = getExerciseMeta(template.exerciseId);
+      const trackingType = getExerciseTrackingType(meta, template.trackingType);
+      const isBodyweight = meta?.equipment === 'Bodyweight';
+      const defaultWeightKg = trackingType === 'reps_only'
+        ? 0
+        : (isBodyweight && (template.defaultWeightKg === 20 || template.defaultWeightKg === undefined) ? 0 : (template.defaultWeightKg ?? 0));
+
+      return {
+        ...template,
+        trackingType,
+        defaultWeightKg
+      };
+    });
+    setEditingRoutine(cloned);
   };
 
   const handleCreateNewRoutine = () => {
@@ -219,11 +234,12 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
   const handleAddExerciseToEditor = (ex: Exercise) => {
     if (!editingRoutine) return;
     const trackingType = ex.trackingType || getExerciseTrackingType(ex);
+    const isBodyweight = ex.equipment === 'Bodyweight';
     const template: RoutineExerciseTemplate = {
       exerciseId: ex.id,
       defaultSets: 3,
       targetRepRange: ex.targetRepRange || [8, 12],
-      defaultWeightKg: trackingType === 'weight_reps' ? 20 : 0,
+      defaultWeightKg: trackingType === 'weight_reps' ? (isBodyweight ? 0 : 20) : 0,
       targetRpe: ex.targetRpe || 8.5,
       restSeconds: 60,
       trackingType,
@@ -436,7 +452,8 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
             currentRoutine.exercises.map((template, idx) => {
               const meta = getExerciseMeta(template.exerciseId);
               const trackingType = getExerciseTrackingType(meta, template.trackingType);
-              const targetWeight = template.defaultWeightKg || 20;
+              const isBodyweight = meta?.equipment === 'Bodyweight';
+              const targetWeight = template.defaultWeightKg !== undefined ? template.defaultWeightKg : (isBodyweight ? 0 : 20);
               const targetReps = template.targetRepRange[1] || 10;
               const restMins = Math.floor(template.restSeconds / 60);
               const restSecs = template.restSeconds % 60;
@@ -568,7 +585,11 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                           <strong style={{ color: '#fff' }}>{targetReps}</strong> Reps (RPE {template.targetRpe})
                         </div>
                         <div style={{ color: 'var(--accent-volt)', fontWeight: 800 }}>
-                          {formatWeight(targetWeight, userUnit, 2)}
+                          {isBodyweight && targetWeight === 0
+                            ? 'Bodyweight'
+                            : isBodyweight && targetWeight > 0
+                            ? `+${formatWeight(targetWeight, userUnit, 2)}`
+                            : formatWeight(targetWeight, userUnit, 2)}
                         </div>
                       </>
                     )}
@@ -1219,7 +1240,9 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                             </div>
 
                             <div>
-                              <span style={{ color: 'var(--text-muted)' }}>Weight ({userUnit})</span>
+                              <span style={{ color: 'var(--text-muted)' }}>
+                                {meta?.equipment === 'Bodyweight' ? `Added Wt (${userUnit})` : `Weight (${userUnit})`}
+                              </span>
                               <input
                                 type="number"
                                 step="0.01"
@@ -1233,7 +1256,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                                       : Math.round(template.defaultWeightKg * 100) / 100
                                     : ''
                                 }
-                                placeholder={userUnit === 'lbs' ? '45.00' : '20.00'}
+                                placeholder={meta?.equipment === 'Bodyweight' ? '0.00 (BW)' : userUnit === 'lbs' ? '45.00' : '20.00'}
                                 onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
                                   const raw = e.target.value;

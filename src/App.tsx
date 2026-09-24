@@ -132,10 +132,11 @@ export function App() {
         workouts
       );
 
-      const trackingType = template.trackingType || getExerciseTrackingType(exMeta);
+      const trackingType = getExerciseTrackingType(exMeta, template.trackingType);
       const isWeight = trackingType === 'weight_reps';
       const isCardioDist = trackingType === 'distance_time';
       const isTimed = trackingType === 'time_only';
+      const isBodyweight = exMeta?.equipment === 'Bodyweight';
 
       const resolvedName = exMeta?.name || template.exerciseId.replace(/^db-/, 'Dumbbell ').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
       const { primary } = getExerciseMuscles({
@@ -156,9 +157,9 @@ export function App() {
           id: `set-${Date.now()}-${idx}-${sIdx + 1}`,
           setNumber: sIdx + 1,
           type: 'working',
-          weightKg: isWeight ? (overload.currentWeight > 0 ? overload.targetWeight : (template.defaultWeightKg || overload.targetWeight || 20)) : 0,
+          weightKg: isWeight ? (overload.currentWeight > 0 ? overload.targetWeight : (isBodyweight ? (template.defaultWeightKg || 0) : (template.defaultWeightKg || overload.targetWeight || 20))) : 0,
           reps: isCardioDist || isTimed ? 0 : (overload.targetReps || template.targetRepRange[0] || 10),
-          targetWeightKg: isWeight ? (overload.currentWeight > 0 ? overload.targetWeight : (template.defaultWeightKg || overload.targetWeight)) : 0,
+          targetWeightKg: isWeight ? (overload.currentWeight > 0 ? overload.targetWeight : (isBodyweight ? (template.defaultWeightKg || 0) : (template.defaultWeightKg || overload.targetWeight || 20))) : 0,
           targetReps: isCardioDist || isTimed ? 0 : (overload.targetReps || template.targetRepRange[0] || 10),
           distanceKm: isCardioDist ? (template.defaultDistanceKm || 1.0) : undefined,
           durationSeconds: isCardioDist ? (template.defaultDurationSeconds || 900) : isTimed ? (template.defaultDurationSeconds || 45) : undefined,

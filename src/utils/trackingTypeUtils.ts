@@ -80,12 +80,70 @@ export function getExerciseTrackingType(
     return 'distance_time';
   }
 
-  // Bodyweight core holds (Planks, Wall sits)
+  // Bodyweight Equipment movements
+  if (equip === 'Bodyweight') {
+    // 1. Isometric / timed holds
+    if (
+      name.includes('plank') ||
+      name.includes('hollow hold') ||
+      name.includes('dead hang') ||
+      name.includes('hang') ||
+      name.includes('wall sit') ||
+      name.includes('l-sit') ||
+      name.includes('bridge hold') ||
+      name.includes('handstand hold') ||
+      name.includes('against wall') ||
+      name.includes('static hold')
+    ) {
+      return 'time_only';
+    }
+
+    // 2. Weighted-capable compound calisthenics (pull-up, chin-up, dip, muscle-up, or explicitly named weighted)
+    if (
+      name.includes('pull-up') ||
+      name.includes('pull up') ||
+      name.includes('chin-up') ||
+      name.includes('chin up') ||
+      name.includes('dip') ||
+      name.includes('muscle-up') ||
+      name.includes('muscle up') ||
+      name.includes('weighted')
+    ) {
+      return 'weight_reps';
+    }
+
+    // 3. All other bodyweight movements (Sit-ups, Crunches, Leg Raises, Push-ups, Bodyweight Squats, Calisthenics, etc.)
+    return 'reps_only';
+  }
+
+  // Calisthenics and floor core movements by name (if not using barbell/dumbbell/cable/machine)
   if (
-    (muscle === 'Abs' || muscle === 'Core') &&
-    (name.includes('plank') || name.includes('hollow hold') || name.includes('dead hang'))
+    equip !== 'Barbell' &&
+    equip !== 'Dumbbell' &&
+    equip !== 'Kettlebell' &&
+    equip !== 'Cable' &&
+    equip !== 'Machine' &&
+    equip !== 'Smith Machine'
   ) {
-    return 'time_only';
+    if (
+      name.includes('sit-up') ||
+      name.includes('sit up') ||
+      name.includes('crunch') ||
+      name.includes('flutter kick') ||
+      name.includes('leg raise') ||
+      name.includes('knee raise') ||
+      name.includes('russian twist') ||
+      name.includes('heel touch') ||
+      name.includes('v-up') ||
+      name.includes('air bike') ||
+      name.includes('push-up') ||
+      name.includes('push up') ||
+      name.includes('burpee') ||
+      name.includes('jumping jack') ||
+      name.includes('mountain climber')
+    ) {
+      return 'reps_only';
+    }
   }
 
   return 'weight_reps';
