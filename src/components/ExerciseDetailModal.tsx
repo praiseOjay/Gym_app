@@ -142,6 +142,7 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
     <SwipeableModalSheet
       onClose={onClose}
       maxHeight="92vh"
+      handleOnly
       overlayStyle={overlayZIndex ? { zIndex: overlayZIndex } : undefined}
     >
       {/* Modal Header */}

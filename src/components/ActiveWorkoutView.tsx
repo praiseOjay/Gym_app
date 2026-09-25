@@ -2031,7 +2031,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
 
       {/* Add Exercise Modal */}
       {showAddExerciseModal && (
-        <SwipeableModalSheet onClose={() => setShowAddExerciseModal(false)} maxHeight="90vh">
+        <SwipeableModalSheet onClose={() => setShowAddExerciseModal(false)} maxHeight="90vh" handleOnly>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Add Exercise</h3>
             <button
@@ -2083,7 +2083,17 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
             </div>
 
             <div
-              style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto' }}
+              data-no-swipe="true"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+                maxHeight: 'calc(90vh - 240px)',
+                overflowY: 'auto',
+                overscrollBehavior: 'contain',
+                touchAction: 'pan-y',
+                WebkitOverflowScrolling: 'touch'
+              }}
               onScroll={(e) => {
                 const t = e.currentTarget;
                 if (t.scrollHeight - t.scrollTop - t.clientHeight < 120) {

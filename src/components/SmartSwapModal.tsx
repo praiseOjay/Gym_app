@@ -114,7 +114,7 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
 
   return (
     <>
-      <SwipeableModalSheet onClose={onClose} maxHeight="90vh">
+      <SwipeableModalSheet onClose={onClose} maxHeight="90vh" handleOnly>
       {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -419,7 +419,17 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
 
           {/* Exercise List */}
           <div
-            style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 300, overflowY: 'auto' }}
+            data-no-swipe="true"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6,
+              maxHeight: 'calc(90vh - 350px)',
+              overflowY: 'auto',
+              overscrollBehavior: 'contain',
+              touchAction: 'pan-y',
+              WebkitOverflowScrolling: 'touch'
+            }}
             onScroll={(e) => {
               const t = e.currentTarget;
               if (t.scrollHeight - t.scrollTop - t.clientHeight < 120) {

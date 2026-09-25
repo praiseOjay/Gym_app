@@ -1098,7 +1098,17 @@ body {
   flex-shrink: 0;
   cursor: grab;
   touch-action: none;
+  position: relative;
   transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.modal-handle::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  bottom: -12px;
+  left: -24px;
+  right: -24px;
 }
 
 .modal-handle:hover,

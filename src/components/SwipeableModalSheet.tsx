@@ -12,6 +12,7 @@ export interface SwipeableModalSheetProps {
   maxHeight?: string;
   threshold?: number;
   enabled?: boolean;
+  handleOnly?: boolean;
 }
 
 export const SwipeableModalSheet: React.FC<SwipeableModalSheetProps> = ({
@@ -23,13 +24,15 @@ export const SwipeableModalSheet: React.FC<SwipeableModalSheetProps> = ({
   overlayStyle,
   showHandle = true,
   maxHeight,
-  threshold = 85,
-  enabled = true
+  threshold = 120,
+  enabled = true,
+  handleOnly = false
 }) => {
   const { sheetRef, handleRef, sheetStyle, backdropOpacity, isDragging } = useSwipeToDismiss({
     onClose,
     threshold,
-    enabled
+    enabled,
+    handleOnly
   });
 
   return (
@@ -55,9 +58,18 @@ export const SwipeableModalSheet: React.FC<SwipeableModalSheetProps> = ({
         {showHandle && (
           <div
             ref={handleRef}
-            className="modal-handle"
-            style={{ cursor: 'grab', touchAction: 'none' }}
-          />
+            className="modal-handle-container"
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              padding: '0 0 4px 0',
+              cursor: 'grab',
+              touchAction: 'none'
+            }}
+          >
+            <div className="modal-handle" />
+          </div>
         )}
         {children}
       </div>

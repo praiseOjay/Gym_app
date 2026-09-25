@@ -751,7 +751,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
 
       {/* VISUAL ROUTINE EDITOR MODAL */}
       {editingRoutine && (
-        <SwipeableModalSheet onClose={() => setEditingRoutine(null)} maxHeight="92vh">
+        <SwipeableModalSheet onClose={() => setEditingRoutine(null)} maxHeight="92vh" handleOnly>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>
@@ -1319,7 +1319,7 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
 
       {/* EXERCISE PICKER MODAL */}
       {showAddExercisePicker && (
-        <SwipeableModalSheet onClose={() => setShowAddExercisePicker(false)} maxHeight="85vh">
+        <SwipeableModalSheet onClose={() => setShowAddExercisePicker(false)} maxHeight="88vh" handleOnly>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 800 }}>Choose Exercise</h3>
               <button
@@ -1372,7 +1372,17 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
 
             {/* Exercises List */}
             <div
-              style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 380, overflowY: 'auto' }}
+              data-no-swipe="true"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 6,
+                maxHeight: 'calc(88vh - 240px)',
+                overflowY: 'auto',
+                overscrollBehavior: 'contain',
+                touchAction: 'pan-y',
+                WebkitOverflowScrolling: 'touch'
+              }}
               onScroll={(e) => {
                 const t = e.currentTarget;
                 if (t.scrollHeight - t.scrollTop - t.clientHeight < 120) {
