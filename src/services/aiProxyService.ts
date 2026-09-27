@@ -15,14 +15,13 @@ export interface AIProxyStatus {
 
 // Development fallback key for local verification before production proxy deployment
 const DEV_FALLBACK_KEY =
-  (typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_GEMINI_API_KEY) ||
-  'AIzaSyAfyy7j_3Vc9eJ4ds7RxOOmvHzUnjskosQ';
+  (typeof import.meta !== 'undefined' && (import.meta as any)?.env?.VITE_GEMINI_API_KEY) || '';
 
 const ACTIVE_GEMINI_MODELS = [
+  'gemini-3.8-flash',
+  'gemini-3.8-flash-lite',
   'gemini-3.6-flash',
-  'gemini-2.5-flash',
-  'gemini-2.0-flash',
-  'gemini-1.5-flash'
+  'gemini-2.5-flash'
 ];
 
 const STORAGE_CUSTOM_PROXY_KEY = 'overload_custom_ai_proxy_url_v1';
@@ -51,7 +50,12 @@ class AIProxyService {
 
   private loadCustomKey(): string {
     if (typeof window === 'undefined') return '';
-    return localStorage.getItem(STORAGE_CUSTOM_KEY_KEY) || '';
+    const stored = localStorage.getItem(STORAGE_CUSTOM_KEY_KEY) || '';
+    if (stored && stored.includes('Afyy7j')) {
+      localStorage.removeItem(STORAGE_CUSTOM_KEY_KEY);
+      return '';
+    }
+    return stored;
   }
 
   public getProxyUrl(): string {

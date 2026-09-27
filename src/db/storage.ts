@@ -37,7 +37,7 @@ const STORAGE_KEYS = {
 
 const DEFAULT_SETTINGS: UserSettings = {
   unit: 'kg',
-  geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyAfyy7j_3Vc9eJ4ds7RxOOmvHzUnjskosQ',
+  geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
   soundEnabled: true,
   vibrationEnabled: true,
   defaultRestSeconds: 60,
@@ -328,7 +328,12 @@ export const StorageService = {
         this.saveSettings(DEFAULT_SETTINGS);
         return DEFAULT_SETTINGS;
       }
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(data) };
+      const parsed = JSON.parse(data);
+      if (parsed.geminiApiKey && parsed.geminiApiKey.includes('Afyy7j')) {
+        parsed.geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+        this.saveSettings({ ...DEFAULT_SETTINGS, ...parsed });
+      }
+      return { ...DEFAULT_SETTINGS, ...parsed };
     } catch (e) {
       console.error('Failed reading settings:', e);
       return DEFAULT_SETTINGS;

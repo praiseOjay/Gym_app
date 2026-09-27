@@ -18,7 +18,7 @@ npx supabase link --project-ref your-supabase-project-id
 ### Step 2: Store your Gemini Secret Key
 
 ```bash
-npx supabase secrets set GEMINI_API_KEY="AIzaSyYourSecretGeminiApiKeyHere"
+npx supabase secrets set GEMINI_API_KEY="your_gemini_api_key_here"
 ```
 
 ### Step 3: Deploy the Edge Function
