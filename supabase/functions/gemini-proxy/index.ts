@@ -49,7 +49,12 @@ serve(async (req: Request) => {
     }
 
     // Models to try in order of speed and capability
-    const models = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+    const models = [
+      "gemini-3.8-flash",
+      "gemini-3.8-flash-lite",
+      "gemini-3.6-flash",
+      "gemini-2.5-flash"
+    ];
     let lastError = "Unknown proxy error";
 
     for (const model of models) {
