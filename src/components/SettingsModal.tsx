@@ -29,7 +29,9 @@ import {
   Bot,
   ShieldCheck,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Vibrate,
+  Bell
 } from 'lucide-react';
 import { WorkoutImportModal } from './WorkoutImportModal';
 import { SwipeableModalSheet } from './SwipeableModalSheet';
@@ -37,6 +39,8 @@ import { subscriptionService } from '../services/subscriptionService';
 import { currencyService, SUPPORTED_CURRENCIES } from '../services/currencyService';
 import { aiProxyService } from '../services/aiProxyService';
 import { PaywallModal } from './PaywallModal';
+import { setGlobalHapticsEnabled } from '../utils/haptics';
+import { notificationService } from '../services/notificationService';
 
 interface SettingsModalProps {
   settings: UserSettings;
@@ -51,13 +55,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   onResetData
 }) => {
-  const [localSettings, setLocalSettings] = useState<UserSettings>({ ...settings });
+  const [localSettings, setLocalSettings] = useState<UserSettings>(() => ({
+    notificationsEnabled: true,
+    notificationTime: '08:00',
+    ...settings,
+    vibrationEnabled: settings.vibrationEnabled ?? true
+  }));
   const [showKey, setShowKey] = useState(false);
   const [savedAlert, setSavedAlert] = useState(false);
   const [exportStatus, setExportStatus] = useState<string | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showPasteModal, setShowPasteModal] = useState(false);
   const [showWorkoutImportModal, setShowWorkoutImportModal] = useState(false);
+  const [notificationTestStatus, setNotificationTestStatus] = useState<{ success: boolean; message: string } | null>(null);
   const [pastedJsonText, setPastedJsonText] = useState('');
   const [pasteError, setPasteError] = useState<string | null>(null);
   const [subState, setSubState] = useState(() => subscriptionService.getState());
@@ -376,6 +386,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const handleSave = () => {
     aiProxyService.setCustomKey(localSettings.geminiApiKey || '');
     aiProxyService.setProxyUrl(customProxyUrl);
+    setGlobalHapticsEnabled(localSettings.vibrationEnabled ?? true);
     onSave(localSettings);
     setSavedAlert(true);
     setTimeout(() => {
@@ -1007,6 +1018,177 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               }
             />
           </div>
+        </div>
+
+        {/* Haptic Vibrations Toggle */}
+        <div className="gym-card" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(0, 245, 155, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <Vibrate size={18} color="var(--accent-volt)" />
+              </div>
+              <div>
+                <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Haptic Feedback</span>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+                  Physical vibration pulses on rep logging, timer zero, & PR fanfare
+                </div>
+              </div>
+            </div>
+            <input
+              type="checkbox"
+              style={{ width: 22, height: 22, accentColor: 'var(--accent-volt)', cursor: 'pointer' }}
+              checked={localSettings.vibrationEnabled ?? true}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setLocalSettings({ ...localSettings, vibrationEnabled: checked });
+                setGlobalHapticsEnabled(checked);
+                if (checked) {
+                  triggerHaptic('medium', true);
+                }
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Workout & Rest Notification Reminders */}
+        <div className="gym-card" style={{ padding: '16px' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: (localSettings.notificationsEnabled ?? true) ? 14 : 0
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(0, 163, 255, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <Bell size={18} color="var(--accent-cyan)" />
+              </div>
+              <div>
+                <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Notification Reminders</span>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+                  Rest period completion alerts & daily workout reminders
+                </div>
+              </div>
+            </div>
+            <input
+              type="checkbox"
+              style={{ width: 22, height: 22, accentColor: 'var(--accent-cyan)', cursor: 'pointer' }}
+              checked={localSettings.notificationsEnabled ?? true}
+              onChange={async (e) => {
+                const checked = e.target.checked;
+                if (checked) {
+                  const granted = await notificationService.requestPermission();
+                  if (!granted && notificationService.isSupported()) {
+                    setNotificationTestStatus({
+                      success: false,
+                      message: 'Please enable notifications in your browser or device permissions to receive alerts.'
+                    });
+                  }
+                }
+                setLocalSettings({ ...localSettings, notificationsEnabled: checked });
+              }}
+            />
+          </div>
+
+          {(localSettings.notificationsEnabled ?? true) && (
+            <div style={{ paddingTop: 12, borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff' }}>Daily Workout Reminder Time</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                    Alerts you to train if no workout has been logged today
+                  </div>
+                </div>
+                <input
+                  type="time"
+                  className="settings-input"
+                  style={{ width: 'auto', padding: '6px 12px', fontSize: '0.88rem', fontWeight: 700 }}
+                  value={localSettings.notificationTime || '08:00'}
+                  onChange={(e) => setLocalSettings({ ...localSettings, notificationTime: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                  Permission:{' '}
+                  <strong
+                    style={{
+                      color:
+                        notificationService.getPermissionStatus() === 'granted'
+                          ? 'var(--accent-volt)'
+                          : '#FFB020'
+                    }}
+                  >
+                    {notificationService.getPermissionStatus()}
+                  </strong>
+                </span>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const res = await notificationService.sendTestNotification();
+                    setNotificationTestStatus(res);
+                    setTimeout(() => setNotificationTestStatus(null), 4000);
+                  }}
+                  style={{
+                    background: 'rgba(0, 163, 255, 0.12)',
+                    border: '1px solid rgba(0, 163, 255, 0.3)',
+                    color: 'var(--accent-cyan)',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    padding: '6px 14px',
+                    borderRadius: 'var(--radius-sm)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                >
+                  <Bell size={13} />
+                  Send Test Notification
+                </button>
+              </div>
+
+              {notificationTestStatus && (
+                <div
+                  style={{
+                    marginTop: 10,
+                    padding: '8px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    background: notificationTestStatus.success ? 'rgba(0, 245, 155, 0.1)' : 'rgba(255, 75, 75, 0.1)',
+                    color: notificationTestStatus.success ? 'var(--accent-volt)' : '#FF4B4B',
+                    border: `1px solid ${
+                      notificationTestStatus.success ? 'rgba(0, 245, 155, 0.25)' : 'rgba(255, 75, 75, 0.25)'
+                    }`
+                  }}
+                >
+                  {notificationTestStatus.message}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Athlete Name */}

@@ -216,6 +216,23 @@ export function formatDuration(seconds: number | undefined): string {
 }
 
 /**
+ * Formats duration in seconds strictly as "hh:mm:ss" for workout tracking timers.
+ * Examples: 5 -> "00:00:05", 75 -> "00:01:15", 3665 -> "01:01:05"
+ */
+export function formatWorkoutTime(seconds: number | undefined): string {
+  if (!seconds || seconds <= 0 || isNaN(seconds)) return '00:00:00';
+  const total = Math.round(seconds);
+  const hrs = Math.floor(total / 3600);
+  const mins = Math.floor((total % 3600) / 60);
+  const secs = total % 60;
+
+  const hh = String(hrs).padStart(2, '0');
+  const mm = String(mins).padStart(2, '0');
+  const ss = String(secs).padStart(2, '0');
+  return `${hh}:${mm}:${ss}`;
+}
+
+/**
  * Parses user input string (e.g., "20", "20:00", "1:30", "45s") into total seconds
  */
 export function parseDurationString(input: string | number): number {

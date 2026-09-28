@@ -10,7 +10,9 @@ import type {
 import { StorageService } from './db/storage';
 import { calculateMuscleRecovery, calculateProgressiveOverload, getExerciseMuscles } from './engine/overloadEngine';
 import { calculateSessionTotalCalories } from './engine/calorieEngine';
-import { getExerciseTrackingType } from './utils/trackingTypeUtils';
+import { getExerciseTrackingType, formatWorkoutTime } from './utils/trackingTypeUtils';
+import { setGlobalHapticsEnabled } from './utils/haptics';
+import { notificationService } from './services/notificationService';
 import { findExercise } from './data/exerciseLibrary';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
@@ -51,12 +53,6 @@ const ActiveWorkoutBanner: React.FC<{
     0
   );
 
-  const formatTimer = (sec: number) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
-  };
-
   return (
     <div className="active-session-banner" onClick={onResume}>
       <div className="banner-left">
@@ -64,7 +60,7 @@ const ActiveWorkoutBanner: React.FC<{
         <div>
           <div className="banner-title">{session.routineName}</div>
           <div className="banner-meta">
-            {setsLogged} sets logged · ⏱️ {formatTimer(elapsed)} · Tap to resume
+            {setsLogged} sets logged · ⏱️ {formatWorkoutTime(elapsed)} · Tap to resume
           </div>
         </div>
       </div>
@@ -106,6 +102,26 @@ export function App() {
     () => getTodayWorkoutState(routines, workouts),
     [routines, workouts]
   );
+
+  // Synchronize global haptics configuration with user settings
+  useEffect(() => {
+    setGlobalHapticsEnabled(settings.vibrationEnabled ?? true);
+  }, [settings.vibrationEnabled]);
+
+  // Periodic daily workout reminder check
+  useEffect(() => {
+    const checkReminder = () => {
+      notificationService.checkAndSendDailyReminder({
+        notificationsEnabled: settings.notificationsEnabled ?? true,
+        notificationTime: settings.notificationTime || '08:00',
+        userName: settings.userName
+      });
+    };
+
+    checkReminder();
+    const interval = setInterval(checkReminder, 60000);
+    return () => clearInterval(interval);
+  }, [settings.notificationsEnabled, settings.notificationTime, settings.userName]);
 
   // Save active workout whenever it updates
   const handleUpdateActiveSession = (updated: WorkoutSession) => {

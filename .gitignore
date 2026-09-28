@@ -38,4 +38,8 @@ keystore.properties
 *.pepk
 *keystore-base64.txt
 
+# Temporary scratch scripts
+scratch/
+
+
 

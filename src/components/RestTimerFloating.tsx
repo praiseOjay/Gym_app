@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Timer, X, Plus, Minus } from 'lucide-react';
 import { sounds } from '../utils/audio';
 import { VoiceCoach } from '../services/voiceCoach';
+import { triggerHaptic } from '../utils/haptics';
+import { notificationService } from '../services/notificationService';
 
 interface RestTimerFloatingProps {
   initialSeconds?: number;
@@ -58,7 +60,9 @@ export const RestTimerFloating: React.FC<RestTimerFloatingProps> = ({
           if (soundEnabled) {
             sounds.playTimerComplete();
           }
+          triggerHaptic('success');
           VoiceCoach.announceRestComplete();
+          notificationService.sendRestCompleteNotification();
           onFinish();
         }
         return;

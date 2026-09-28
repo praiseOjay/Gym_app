@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import type { WorkoutSession, UserSettings, MesocycleBlock, MuscleRecoveryFeedback, MuscleGroup } from '../types/gym';
 import { analyzeWorkoutSessionWithAI } from '../services/geminiService';
 import { kgToLbs } from '../engine/overloadEngine';
+import { formatWorkoutTime } from '../utils/trackingTypeUtils';
 import { StorageService } from '../db/storage';
 import { EXERCISE_LIBRARY } from '../data/exerciseLibrary';
 import {
@@ -155,8 +156,8 @@ export const WorkoutSummaryModal: React.FC<WorkoutSummaryModalProps> = ({
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Duration
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1rem', color: '#fff' }}>
-              {minutes}m
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '0.92rem', color: '#fff' }}>
+              {formatWorkoutTime(session.durationSeconds)}
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>

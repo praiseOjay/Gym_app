@@ -5,8 +5,33 @@
  */
 export type HapticType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'pr';
 
-export function triggerHaptic(type: HapticType = 'medium', enabled: boolean = true): void {
-  if (!enabled || typeof window === 'undefined' || !('vibrate' in navigator)) {
+let globalHapticsEnabled = true;
+
+// Initialize from local storage if available
+if (typeof window !== 'undefined') {
+  try {
+    const raw = localStorage.getItem('overload_settings_v3');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (typeof parsed.vibrationEnabled === 'boolean') {
+        globalHapticsEnabled = parsed.vibrationEnabled;
+      }
+    }
+  } catch {
+    // Ignore storage parse errors
+  }
+}
+
+export function setGlobalHapticsEnabled(enabled: boolean): void {
+  globalHapticsEnabled = enabled;
+}
+
+export function isHapticsEnabled(): boolean {
+  return globalHapticsEnabled;
+}
+
+export function triggerHaptic(type: HapticType = 'medium', enabled: boolean = globalHapticsEnabled): void {
+  if (!enabled || !globalHapticsEnabled || typeof window === 'undefined' || !('vibrate' in navigator)) {
     return;
   }
 

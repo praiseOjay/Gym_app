@@ -6,6 +6,7 @@ import {
   displayDistance,
   distanceUnitLabel,
   formatDuration,
+  formatWorkoutTime,
   displayWeight
 } from '../utils/trackingTypeUtils';
 import {
@@ -516,9 +517,9 @@ export const WorkoutCalendar: React.FC<WorkoutCalendarProps> = ({
                       }, 0);
                       return (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 2 }}>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontFamily: 'var(--font-mono)' }}>
                             <Clock size={12} />
-                            {Math.round(session.durationSeconds / 60)} min
+                            {formatWorkoutTime(session.durationSeconds)}
                           </span>
                           {session.totalVolumeKg > 0 && (
                             <>

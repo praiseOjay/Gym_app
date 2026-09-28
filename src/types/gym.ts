@@ -175,6 +175,8 @@ export interface UserSettings {
   geminiApiKey: string;
   soundEnabled: boolean;
   vibrationEnabled: boolean;
+  notificationsEnabled?: boolean;
+  notificationTime?: string;
   defaultRestSeconds: number;
   userName: string;
   experienceLevel: 'Beginner' | 'Intermediate' | 'Advanced';

@@ -40,6 +40,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
   soundEnabled: true,
   vibrationEnabled: true,
+  notificationsEnabled: true,
+  notificationTime: '08:00',
   defaultRestSeconds: 60,
   userName: 'Athlete',
   experienceLevel: 'Intermediate',

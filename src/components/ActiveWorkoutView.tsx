@@ -66,6 +66,7 @@ import {
   toStorageDistance,
   distanceUnitLabel,
   formatDuration,
+  formatWorkoutTime,
   formatSetPerformance
 } from '../utils/trackingTypeUtils';
 
@@ -270,9 +271,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   }, [session.startTime, session.date, getTrueElapsedSeconds]);
 
   const formatElapsed = (sec: number) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
+    return formatWorkoutTime(sec);
   };
 
   // Convert display values based on unit (rounded to 2 decimal places)
